@@ -109,9 +109,11 @@ body {
   font-family: "Open Sans", sans-serif;
 }
 /**glovales **/
-.contenedor {
-  width: 98%;
-  margin: 0 auto;
+.barra .contenedor {
+  display: flex;
+  flex-wrap: wrap; /* permite que bajen elementos */
+  align-items: center;
+  justify-content: space-between;
 }
 
 @media only screen and (min-width: 480px) {
@@ -132,10 +134,37 @@ body {
   }
 }
 
+.seccion {
+  padding: 30px 0;
+}
+
+.seccion p {
+  font-size: 1.2em;
+  text-align: center;
+}
 
 h2 {
   font-family: "Oswald", sans-serif;
+  font-size: 1.4em;
+  text-transform: uppercase;
+  text-align: center;
 }
+
+h2::after {
+  content: '';
+  margin: 0 auto;
+  background-image: url(../img/separadores.png);
+  height: 50px;
+  width: 100px;
+  display: block;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+
+}
+
+
+
 /**header**/
 div.hero {
   background-image: url(../img/cielonoche.png);
@@ -144,25 +173,81 @@ div.hero {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center 20%;
+  position: relative;
+}
+.logos-laterales {
+  position: absolute;
+  top: 20px;
+  width: 100%;
+  pointer-events: none;
 }
 
+.logo-izq {
+  position: absolute;
+  left: 20px;
+  width: 180px;
+}
+
+.logo-der {
+  position: absolute;
+  right: 20px;
+  width: 180px;
+}
+@media (max-width:768px) {
+  .logo-izq {
+    width: 120px;
+    left: 20px;   /* más pegado */
+  }
+
+  .logo-der {
+    width: 120px;
+    right: 20px;  /* más pegado */
+  }
+}
+
+
+@media (max-width:768px) {
+  nav.redes-sociales {
+    margin-top: 120px; /*  baja debajo de logos */
+  }
+}
 div.contenido-header {
   padding-top: 40px;
 }
 
 @media only screen and (min-width:768px) {
   div.contenido-header {
-    padding-top: 10px;
+    padding-top: 120px;
   }
 }
 
 nav.redes-sociales {
   text-align: center;
 }
+
 nav.redes-sociales a {
-  color: #ffff;
-  font-size: 2em;
-  margin-right: 20px;
+  display: inline-flex;          /* mejor que inline-block */
+  justify-content: center;
+  align-items: center;
+
+  width: 60px;
+  height: 60px;
+
+  border-radius: 60%;
+  background-color: transparent;
+  color: #fff;
+
+  transition: all 0.3s ease;
+  
+}
+
+nav.redes-sociales a i {
+  font-size: 2rem;
+}
+nav.redes-sociales a:hover {
+  background-color: #da002b; /* rojo */
+  transform: scale(1.1);
+  color: #fff;
 }
 nav.redes-sociales a:last-child {
   margin-right: 0;
@@ -183,18 +268,19 @@ div.informacion-evento {
 div.informacion-evento p {
   margin: 0;
   display: inline;
-  font-size: 20px;
+  font-size: 15px;
   text-transform: uppercase;
 }
 div.informacion-evento p i {
-  color: #e93300;
-  font-size: 2.4rem;
+  color: #da002b;
+  font-size: 2rem;
 }
 .clearfix {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* 🔥 separa izquierda y derecha */
   align-items: center;
 }
+
 p.slogan {
   text-transform: none!important;
 }
@@ -207,6 +293,51 @@ h1.nombre-sitio {
   font-family: "Boldonse", system-ui;
 
 }
+h1.nombre-sitio {
+  background: linear-gradient(
+    90deg,
+    #0089e4,
+    #2597f4,
+    #4fafff,
+    #f00e1c,
+    #ec323d,
+    #0089e4
+  );
+
+ background-size: 300%;
+
+  background-clip: text;              /* 👈 estándar */
+  -webkit-background-clip: text;      /* 👈 compatibilidad */
+
+  color: transparent;                 /* 👈 estándar */
+  -webkit-text-fill-color: transparent;
+
+  animation: ola 5s linear infinite;
+}
+
+@keyframes ola {
+  0% {
+    background-position: 0%;
+  }
+  100% {
+    background-position: 300%;
+  }
+}
+
+p.slogan span {
+  background: linear-gradient(90deg, #f00e1c, #ec323d, #f00e1c);
+  background-size: 300%;
+
+  background-clip: text;              /* 👈 estándar */
+  -webkit-background-clip: text;      /* 👈 compatibilidad */
+
+  color: transparent;                 /* 👈 estándar */
+  -webkit-text-fill-color: transparent;
+
+  animation: ola 10s linear infinite;
+}
+
+
 @media only screen and (min-width:768px) {
   h1.nombre-sitio {
 
@@ -219,68 +350,128 @@ h1.nombre-sitio {
 
 /**barra **/
 div.barra {
-  background-color: #da002b;
+  background-color: #353535;
   padding: 20px 0;
 }
 
-
-div.logo{
-  width: 90%;
-  
+.logo {
+  flex: 0 0 auto;
 }
-div.logo img {
-  width: 100%;
+
+
+
+/** para el tamaño del logo para celular**/
+.logo img {
+  width: 400px;
+}
+/** para el tamaño del logo para pc**/
+@media (min-width:768px) {
+  .logo img {
+    width: 700px;
+  }
 }
 
 @media only screen and (min-width: 768px) {
   div.logo {
-    max-width: 33%;
+    max-width: 60%;
   }
 }
 
 /**navegacion principal**/
+
 nav.navegacion-principal {
   display: none;
 }
-
 nav.navegacion-principal a {
   font-family: "Oswald", sans-serif;;
   color: #ffff;
-  font-size: 1.3em;
+  font-size: 1em;
   text-transform: uppercase;
   text-decoration: none;
   transition: all .6s ease;
+  width: 100%;
+  display: block;
+  text-align: center;
+  padding: 10px;
+  margin-bottom: 20px;
+  
+}
+
+.navegacion-principal {
+  width: 100%;
+}
+
+
+
+@media only screen and (min-width:768px) {
+
+  .barra .contenedor {
+    flex-wrap: nowrap;
+  }
+
+  .menu-movil {
+    display: none;
+  }
+
+  nav.navegacion-principal {
+    width: auto;
+    display: block;
+    flex: 1;
+    text-align: right;
+  }
+
+  nav.navegacion-principal a {
+    padding: 10px 10px;
+    width: auto;
+    display: inline-block;
+    text-align: center;
+    margin: 0 10px 0 0;
+    
+  }
 }
 
 nav.navegacion-principal a:hover {
-  background-color: #022E5B;
+  background-color: #03045e;
+  border: 2px solid #03045e;
 }
 
 nav.navegacion-principal a:last-child {
-  border: 2px solid #022E5B;
-  color: #022E5B;
+  border: 2px solid #da002b;
+  color: #da002b;
 }
 
 nav.navegacion-principal a:last-child:hover
 {
-  color: #ffff;
+  color: #fff;
 } 
 
+
+/** Menu Movil**/
+div.menu-movil {
+  flex: unset;
+
+  width: 40px;
+}
+
+
+
+div.menu-movil:hover {
+  cursor: pointer;
+}
+
 @media only screen and (min-width:768px) {
-  nav.navegacion-principal {
-    width: 67%;
-    float: right;
-    text-align: right;
-    display: block;
+  div.menu-movil {
+    display: none;
   }
 }
 
-nav.navegacion-principal a {
-  margin-right: 20px;
-  padding: 10px 10px;
-  display:  inline-block;
-}
+div.menu-movil span {
+  height: 8px;
+  margin-bottom: 6px;
+  background-color: white;
+  display: block;
 
+}
 /* ==========================================================================
    Helper classes
    ========================================================================== */
