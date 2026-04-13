@@ -71,7 +71,7 @@
         <a href="#">conferencia</a>
         <a href="#">calendario</a>
         <a href="#">invitados</a>
-        <a href="#">reservaciones</a>
+        <a href="registro.html">Incripciones</a>
       </nav>
 
     </div> <!--contenedor-->
@@ -98,9 +98,9 @@
         <div class="programa-evento">
           <h2>programa del encuentro</h2>
           <nav class="menu-programa">
-            <a href="#alabanzas"><i class="fa-solid fa-music"></i>Alabanzas</a>
-            <a href="#conferencias"><i class="fa-solid fa-cross"></i>Conferencias</a>
-            <a href="#seminarios"><i class="fa-solid fa-book-bible"></i>Seminarios</a>
+            <a href="#viernes"><i class="fa-solid fa-music"></i>Viernes</a>
+            <a href="#sabado"><i class="fa-solid fa-cross"></i>Sabado</a>
+            <a href="#domingo"><i class="fa-solid fa-book-bible"></i>Domingo</a>
 
           </nav>
 
@@ -231,41 +231,30 @@
     </div>
   </section>
 
-  <div id="mapa" class="mapa"></div>
 
-  <section class="seccion">
-    <h2>Testimoniales</h2>
-    <div class="testimoniales contenedor">
-      <div class="testimonial">
-         <blockquote>
-            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Consequuntur aut aliquam temporibus quo eaque, illum perferendis nulla tenetur animi! Cumque minus corporis nihil ipsam harum saepe voluptatum est nisi voluptates?</p>
-            <footer class="info-testimonial">
-               <img src="img/testimonial.jpg" alt="imagen testimonial">
-               <cite>Ptr Reynaldo Esequiel <span>Lider de jovenes en @CBBA</span></cite>
-            </footer>
-         </blockquote>
-      </div><!--fin del testimonial-->
-      <div class="testimonial">
-        <blockquote>
-           <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Consequuntur aut aliquam temporibus quo eaque, illum perferendis nulla tenetur animi! Cumque minus corporis nihil ipsam harum saepe voluptatum est nisi voluptates?</p>
-           <footer class="info-testimonial">
-             <img src="img/testimonial.jpg" alt="imagen testimonial">
-             <cite>Ptr Reynaldo Esequiel <span>Lider de jovenes en @CBBA</span></cite>
-           </footer>
-        </blockquote>
-      </div><!--fin del testimonial-->
-      <div class="testimonial">
-        <blockquote>
-           <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Consequuntur aut aliquam temporibus quo eaque, illum perferendis nulla tenetur animi! Cumque minus corporis nihil ipsam harum saepe voluptatum est nisi voluptates?</p>
-           <footer class="info-testimonial">
-             <img src="img/testimonial.jpg" alt="imagen testimonial">
-             <cite>Ptr Reynaldo Esequiel <span>Lider de jovenes en @CBBA</span></cite>
-           </footer>
-        </blockquote>
-      </div><!--fin del testimonial-->
+  <section class="seccion-mapa">
+    <h2>Ubicacion del evento</h2>
+    <p class="texto-mapa">
+      <i class="fa-solid fa-location-dot"></i> 
+      Haz click en el mapa para abrir en Google Maps y obtener direcciones
+    </p>
+    <div class="contenedor-mapa">
+      <a href="https://maps.google.com/?q=-21.541682,-64.726782" target="_blank" class="link-mapa">
+        <iframe 
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3203.750919665405!2d-64.72678242144536!3d-21.541682100000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9406475233b071dd%3A0xdbb1f8dbcd3f54bc!2sPunto%20de%20Venta%20Loter%C3%ADa%20%22Kiosko%20Ex.%20Terminal%22!5e1!3m2!1ses-419!2sbo!4v1776045310858!5m2!1ses-419!2sbo" 
+          width="100%" 
+          height="100%" 
+          style="border:0;pointer-events:none;" 
+          allowfullscreen="" 
+          loading="lazy">
+        </iframe>
+        <div class="overlay-mapa">
+          <i class="fa-solid fa-location-dot"></i>
+          <p>Click para abrir en Google Maps</p>
+        </div>
+      </a>
     </div>
   </section>
-
 
   <div class="newsletter parallax">
     <div class="contenido contenedor">
@@ -277,18 +266,45 @@
 
   <section class="seccion">
     <h2>Faltan</h2>
-    <div class="cuenta-regresiva">
-      <ul class="clearfix">
-        <li><p class="numero">80</p> dias</li>
-        <li><p class="numero">15</p> horas</li>
-        <li><p class="numero">5</p> minutos</li>
-        <li><p class="numero">30</p> segundos</li>
-
+    <div class="cuenta-regresiva contenedor">
+      <ul class="">
+        <li><p class="numero" id="dias">0</p> dias</li>
+        <li><p class="numero" id="horas">0</p> horas</li>
+        <li><p class="numero" id="minutos">0</p> minutos</li>
+        <li><p class="numero" id="segundos">0</p> segundos</li>
       </ul>
-
     </div>
-
   </section>
+  
+  <footer class="site-footer">
+    <div class="contenedor">
+      <div class="footer-informacion">
+        <h3>Sobre <span>Mins De Jovenes Oruro</span></h3>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut, qui fugit nostrum nesciunt perspiciatis distinctio necessitatibus, nobis dolore obcaecati incidunt magnam natus mollitia nihil laudantium, asperiores eveniet tempore! Natus, repellat.</p>
+      </div>
+
+      <div class="Ultimas-tweets">
+        <h3>Ultimas<span>Noticias</span></h3>
+        <ul>
+          <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum mollitia ullam nobis provident illum natus vitae, eveniet tempora, beatae animi soluta sequi quis? Totam dolore dolor reiciendis minima labore sequi.</li>
+          <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum mollitia ullam nobis provident illum natus vitae, eveniet tempora, beatae animi soluta sequi quis? Totam dolore dolor reiciendis minima labore sequi.</li>
+          <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum mollitia ullam nobis provident illum natus vitae, eveniet tempora, beatae animi soluta sequi quis? Totam dolore dolor reiciendis minima labore sequi.</li>        
+        </ul>
+      </div>
+      <div class="menu">
+        <h3>Redes <span>Sociales</span></h3>
+        <nav class="redes-sociales">
+          <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+          <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+        </nav>
+      </div>
+    </div>
+    <p class="copyright">
+      Todos los derechos Reservados Lima technology cel 68319277
+    </p>
+  </footer>
 
 
   

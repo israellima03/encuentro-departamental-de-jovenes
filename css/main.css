@@ -342,9 +342,9 @@ div.informacion-evento p i {
   color: #da002b;
   font-size: 2rem;
 }
-.clearfix {
+div.informacion-evento .clearfix {
   display: flex;
-  justify-content: space-between; /* 🔥 separa izquierda y derecha */
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -539,6 +539,37 @@ div.menu-movil span {
 
 }
 
+/* hamburguesa activa - se convierte en X */
+div.menu-movil.activo span:nth-child(1) {
+  transform: rotate(45deg) translate(10px, 10px);
+  transition: all .3s ease;
+}
+
+div.menu-movil.activo span:nth-child(2) {
+  opacity: 0;
+  transition: all .3s ease;
+}
+
+div.menu-movil.activo span:nth-child(3) {
+  transform: rotate(-45deg) translate(10px, -10px);
+  transition: all .3s ease;
+}
+
+div.menu-movil span {
+  transition: all .3s ease;
+}
+
+/* menu visible en celular cuando tiene clase activo */
+@media only screen and (max-width: 768px) {
+  nav.navegacion-principal.activo {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background-color: #353535;
+    padding: 10px 0;
+  }
+}
+
 /**Alabanzas**/
 section.programa {
   position: relative;
@@ -561,6 +592,7 @@ div.contenedor-video {
 div.contenido-programa {
    position: relative; /* 🔥 ESTE ES EL CAMBIO CLAVE */
   width: 100%;
+  padding-top: 60px;
 }
 div.programa-evento {
   background-color: rgba(255, 255, 255, .8);
@@ -879,11 +911,78 @@ div.tabla-precio p.numero {
 }
 
 /*mapa*/
-div.mapa {
-  height: 450px;
-  background-color: green;
+section.seccion-mapa {
+  padding: 30px 0;
+  background-color: #fff;
 }
 
+p.texto-mapa {
+  text-align: center !important;
+  font-size: 1em !important;
+  color: #03045e;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+p.texto-mapa i {
+  color: #da002b;
+  margin-right: 8px;
+}
+
+div.contenedor-mapa {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  cursor: pointer;
+}
+
+@media only screen and (min-width: 768px) {
+  div.contenedor-mapa {
+    height: 500px;
+    width: 90%;
+    margin: 0 auto;
+  }
+}
+
+a.link-mapa {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  text-decoration: none;
+}
+
+/* capa encima del mapa con mensaje */
+div.overlay-mapa {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(3, 4, 94, 0.85);
+  color: #fff;
+  text-align: center;
+  padding: 12px;
+  transition: all .3s ease;
+}
+
+div.overlay-mapa i {
+  color: #da002b;
+  font-size: 1.4em;
+  margin-right: 8px;
+}
+
+div.overlay-mapa p {
+  display: inline;
+  font-size: 1em !important;
+  text-align: center !important;
+  color: #fff;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+a.link-mapa:hover div.overlay-mapa {
+  background-color: rgba(218, 0, 43, 0.9);
+}
 /*testimoniales*/
 div.testimoniales {
   padding-bottom: 20px;
@@ -1009,51 +1108,467 @@ div.newsletter .contenido h3 {
   }
 }
 
-
 /*cuenta regresiva*/
+div.cuenta-regresiva ul {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  padding: 20px;
+}
+
+@media only screen and (max-width: 768px) {
+  div.cuenta-regresiva ul {
+    grid-template-columns: 1fr;
+  }
+}
+
 div.cuenta-regresiva ul li {
   text-transform: uppercase;
   font-family: 'Oswald', sans-serif;
-  font-size: 1.6rem;
-  text-align: center; 
-}
-
-/* CONTENEDOR */
-.cuenta-regresiva ul {
-  display: flex;
-  justify-content: space-between;
-  padding: 0;
-  list-style: none;
-}
-
-/* ITEMS */
-.cuenta-regresiva ul li {
-  text-transform: uppercase;
-  font-family: 'Oswald', sans-serif;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   text-align: center;
-  color: black;
-  width: 23%;
+  padding: 10px;
+  color: #03045e;
+  letter-spacing: 3px;
+  text-shadow: 
+    1px 1px 3px rgba(3, 4, 94, 0.3);
 }
 
-/* NÚMEROS 🔵 */
-.numero {
-  font-size: 3rem;
-  font-weight: bold;
-  color: #0077b6; /* 🔥 azul */
+div.cuenta-regresiva ul li p.numero {
+  color: #03045e;                  /* azul suave */
+  font-size: 3.5em;
+  margin: 0 0 5px 0;
+  line-height: 1;
+  text-shadow: 
+    0 0 8px rgba(79, 175, 255, 0.9),
+    0 0 20px rgba(79, 175, 255, 0.6),
+    0 0 40px rgba(0, 137, 228, 0.4),
+    2px 2px 6px rgba(0, 0, 0, 0.4);
 }
 
-/* 📱 CELULAR (columna) */
-@media (max-width: 768px) {
-  .cuenta-regresiva ul {
+
+
+/*footer*/
+footer.site-footer {
+  background-color: #353535;
+  padding: 40px 0 0 0;
+  margin-top: 40px;
+}
+
+footer.site-footer .contenedor {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  padding-bottom: 40px;
+}
+
+
+footer.site-footer h3 {
+  color: #fff;
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.2em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  letter-spacing: 2px;
+}
+@media only screen and (max-width: 768px) {
+  footer.site-footer .contenedor {
+    grid-template-columns: 1fr;
+    gap: 1px;
+    padding: 0 20px 30px 20px;
+  }
+
+  div.menu h3 {
+    margin-bottom: 0px;
+  }
+
+  div.menu {
+    display: flex;
     flex-direction: column;
+    gap: 5px;
+  }
+
+  footer .redes-sociales {
+    margin-top: 0 !important;
+  }
+
+  footer.site-footer h3 {
+    margin-bottom: 10px;
+  }
+
+  footer .redes-sociales {
     gap: 10px;
   }
 
-  .cuenta-regresiva ul li {
-    width: 100%;
+  div.menu {
+    margin-top: 0;
   }
 }
+footer.site-footer h3 span {
+  color: #da002b;
+}
+
+footer.site-footer p {
+  color: #fff;
+  font-family: 'PT Sans', sans-serif;
+  font-size: 0.9em;
+  line-height: 1.8;
+}
+
+/* noticias */
+div.Ultimas-tweets ul li {
+  color: #fff;
+  font-family: 'PT Sans', sans-serif;
+  font-size: 0.9em;
+  line-height: 1.6;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #2a2a3e;
+}
+
+div.Ultimas-tweets ul li:last-child {
+  border-bottom: none;
+}
+
+/* redes sociales del footer */
+footer .redes-sociales {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+footer .redes-sociales a {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background-color: #353535;
+  color: #fff;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.1rem;
+  transition: all .3s ease;
+  border: 1px solid #fff;
+}
+
+footer .redes-sociales a:hover {
+  background-color: #da002b;
+  border-color: #da002b;
+  transform: scale(1.1);
+}
+
+/* copyright */
+p.copyright {
+  background-color: #0d0d1a;
+  color: #666;
+  text-align: center;
+  padding: 20px;
+  font-size: 0.85em;
+  font-family: 'PT Sans', sans-serif;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+/*INTERNAS*/
+/*REGISTRO*/
+
+form.registro h3 {          
+  text-align: center;
+  text-transform: uppercase;
+  margin: 20px 0 0 0;
+}
+
+form.registro label {
+  margin-bottom: 5px;
+  font-weight: bold;
+  display: block;
+}
+
+h4 {
+  text-align: center;
+  text-transform: uppercase;
+  border-bottom: 2px solid #da002b;
+  padding-bottom: 10px;
+  font-size: 1.2em;
+  margin: 0 0 15px 0;
+}
+
+div.caja {
+  background-color: white;
+  border: 2px solid #e1e1e1;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+/* campos del formulario */
+div#datos-usuario {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 5px;
+}
+
+@media only screen and (min-width: 768px) {
+  div#datos-usuario {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+div.campo {
+  padding: 15px 20px;
+}
+
+div.campo label {
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #333;
+}
+
+div.campo input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #e1e1e1;
+  font-size: 1em;
+  font-family: 'PT Sans', sans-serif;
+}
+
+div.campo input:focus {
+  outline: none;
+  border-color: #03045e;
+}
+
+/* paquetes */
+div#paquetes h3 {
+  text-align: center;
+  margin: 20px 0 15px 0;
+}
+
+div#paquetes .lista-precios {
+  max-width: 100%;
+}
+
+div.paquetes .tabla-precio:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+div.paquetes .tabla-precio input {
+  width: 100px;
+  margin: 10px auto 0 auto;
+  display: block;
+  padding: 5px;
+  border: 1px solid #e1e1e1;
+  text-align: center;
+  font-size: 1em;
+}
+
+/* eventos / talleres */
+div#eventos h3 {
+  text-align: center;
+  margin: 20px 0 10px 0;
+}
+
+.contenido-dia {
+  padding: 20px;
+  display: none;
+}
+
+/* el h4 va centrado arriba, fuera del grid */
+.contenido-dia h4 {
+  text-align: center;
+  border-bottom: 2px solid #da002b;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  font-size: 1.2em;
+}
+
+/* el grid se aplica al contenedor de los divs, NO al contenido-dia */
+@media only screen and (min-width: 768px) {
+  .contenido-dia {
+    display: block;        /* el contenido-dia NO es grid */
+  }
+
+  /* solo los divs hijos directos van en columnas */
+  .contenido-dia > div {
+    display: inline-block;
+    width: 32%;
+    vertical-align: top;
+    padding: 0 10px;
+  }
+}
+
+.contenido-dia > div p {
+  text-align: left;
+  font-weight: bold;
+  color: #da002b;
+  text-transform: uppercase;
+  font-size: 0.9em;
+  margin-bottom: 10px;
+}
+
+.contenido-dia > div label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: normal;
+  cursor: pointer;
+}
+
+.contenido-dia > div input {
+  margin-right: 10px;
+  accent-color: #da002b;
+}
+
+.contenido-dia > div label time {
+  color: #da002b;
+  font-weight: bold;
+  margin: 0 8px;
+} 
+
+/* resumen y pago */
+div#resumen h3 {
+  text-align: center;
+  margin: 20px 0 10px 0;
+}
+
+div.resumen p {
+  font-size: 1.2em;
+  text-transform: uppercase;
+  font-weight: bold;
+  color: #03045e;
+}
+
+div.resumen div.caja {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media only screen and (min-width: 768px) {
+  div.resumen div.caja {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+div.extras div.orden {
+  margin: 15px 0;
+}
+
+div.extras div.orden label {
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+div.extras div.orden input {
+  width: 80px;
+  padding: 5px;
+  border: 1px solid #e1e1e1;
+  margin-top: 8px;
+  text-align: center;
+  font-size: 1em;
+}
+
+div.extras div.order {
+  margin: 15px 0;
+}
+
+div.extras div.order label {
+  font-weight: bold;
+  margin-bottom: 8px;
+  display: block;
+  color: #333;
+}
+
+div.extras div.order select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #e1e1e1;
+  font-size: 1em;
+  font-family: 'PT Sans', sans-serif;
+  margin-top: 8px;
+}
+
+div.resumen div.total {
+  padding: 20px;
+  border-left: 2px solid #e1e1e1;
+}
+
+div#lista-productos {
+  margin: 10px 0;
+  font-size: 0.9em;
+  color: #666;
+}
+
+div#suma-total {
+  font-size: 2em;
+  font-weight: bold;
+  color: #03045e;
+  margin: 10px 0 20px 0;
+  text-align: center;
+}
+
+div.resumen input[type="button"],
+div.resumen input[type="submit"] {
+  display: block;
+  margin: 15px auto;
+  cursor: pointer;
+}
+
+#lista-productos {
+  background-color: #e1e1e1;
+  padding: 20px;
+  display: none;
+}
+
+/* error general del formulario */
+#error {
+  clear: both;
+  padding: 15px 20px;
+  text-align: center;
+  display: none;
+  background-color: #fff5f5;
+  border: 1px solid #da002b;
+  color: #da002b;
+  font-weight: bold;
+  margin: 10px 20px;
+  border-radius: 4px;
+}
+
+/* texto informativo paquetes */
+p.texto-paquete {
+  text-align: center;
+  color: #666;
+  margin-bottom: 15px;
+  font-style: italic;
+}
+
+/* paquete seleccionable con radio */
+.paquete-label {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-weight: normal !important;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.paquete-label input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #da002b;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* resalta la tabla cuando el radio esta seleccionado */
+.tabla-precio:has(input[type="radio"]:checked) {
+  border: 2px solid #da002b;
+  box-shadow: 0 0 20px rgba(218, 0, 43, 0.3);
+  transform: scale(1.03);
+}
+
+
 /* ==========================================================================
    Helper classes
    ========================================================================== */
