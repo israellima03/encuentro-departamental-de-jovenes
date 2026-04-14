@@ -1568,6 +1568,514 @@ p.texto-paquete {
   transform: scale(1.03);
 }
 
+/*conferencia.html*/
+
+/* ==========================================
+   PAGINA DE CONFERENCIAS
+   ========================================== */
+
+section.seccion-conferencias {
+  padding: 20px 0 40px 0;
+}
+
+/* bloque de cada dia */
+div.dia-conferencia {
+  margin-bottom: 40px;
+}
+
+/* titulo del dia - viernes, sabado, domingo */
+h3.titulo-dia {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.4em;
+  text-transform: uppercase;
+  color: #fff;
+  background-color: #03045e;
+  padding: 12px 20px;
+  margin-bottom: 20px;
+  border-left: 5px solid #da002b;
+}
+
+h3.titulo-dia i {
+  color: #da002b;
+  margin-right: 10px;
+}
+
+/* contenedor de tarjetas del dia */
+div.lista-conferencias {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media only screen and (min-width: 768px) {
+  div.lista-conferencias {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* tarjeta individual de cada conferencia */
+div.tarjeta-conferencia {
+  background-color: #fff;
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all .3s ease;
+}
+
+div.tarjeta-conferencia:hover {
+  box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+  transform: translateY(-3px);
+}
+
+/* tarjeta con material no disponible */
+div.tarjeta-conferencia.proximamente {
+  opacity: 0.75;
+}
+
+/* parte superior con foto y datos */
+div.info-conferencia {
+  display: flex;
+  gap: 15px;
+  padding: 20px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+/* foto circular del expositor */
+div.foto-expositor {
+  flex-shrink: 0;
+}
+
+div.foto-expositor img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #da002b;
+}
+
+/* datos: hora, tema, expositor, descripcion */
+div.datos-conferencia {
+  flex: 1;
+}
+
+span.hora-conf {
+  display: inline-block;
+  background-color: #03045e;
+  color: #fff;
+  font-size: 0.8em;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+  font-family: 'Oswald', sans-serif;
+}
+
+span.hora-conf i {
+  margin-right: 5px;
+  color: #4fafff;
+}
+
+h4.tema-conf {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.2em;
+  color: #03045e;
+  text-transform: uppercase;
+  margin: 5px 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+p.expositor-conf {
+  color: #da002b;
+  font-weight: bold;
+  font-size: 0.9em;
+  margin: 5px 0;
+  text-transform: uppercase;
+}
+
+p.expositor-conf i {
+  margin-right: 6px;
+}
+
+p.descripcion-conf {
+  color: #666;
+  font-size: 0.85em;
+  line-height: 1.5;
+  margin: 8px 0 0 0;
+  text-align: left !important;
+  font-size: 0.85em !important;
+}
+
+/* seccion de materiales */
+div.materiales {
+  padding: 15px 20px 20px 20px;
+}
+
+p.titulo-materiales {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.9em !important;
+  text-transform: uppercase;
+  color: #333;
+  margin-bottom: 10px;
+  font-weight: bold !important;
+  text-align: left !important;
+}
+
+p.titulo-materiales i {
+  color: #da002b;
+  margin-right: 8px;
+}
+
+div.lista-materiales {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* cada fila de material descargable */
+a.material-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid #e1e1e1;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #333;
+  transition: all .2s ease;
+  background-color: #fafafa;
+}
+
+a.material-item:hover {
+  background-color: #f0f4ff;
+  border-color: #03045e;
+  transform: translateX(3px);
+}
+
+/* icono del tipo de archivo con colores */
+div.icono-material {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4em;
+  flex-shrink: 0;
+}
+
+div.icono-material.pdf {
+  background-color: #fff0f0;
+  color: #e53935;
+}
+
+div.icono-material.ppt {
+  background-color: #fff3e0;
+  color: #e65100;
+}
+
+div.icono-material.img {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+div.icono-material.zip {
+  background-color: #f3e5f5;
+  color: #6a1b9a;
+}
+
+div.icono-material.video {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+/* texto con nombre y tipo */
+div.info-material {
+  flex: 1;
+}
+
+span.nombre-material {
+  display: block;
+  font-weight: bold;
+  font-size: 0.9em;
+  color: #333;
+}
+
+span.tipo-material {
+  display: block;
+  font-size: 0.78em;
+  color: #888;
+  margin-top: 2px;
+}
+
+/* icono de descarga o ver al final */
+i.icono-accion {
+  color: #03045e;
+  font-size: 1em;
+  flex-shrink: 0;
+}
+
+a.material-item:hover i.icono-accion {
+  color: #da002b;
+}
+
+/* mensaje cuando no hay material aun */
+div.sin-material {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  border: 2px dashed #e1e1e1;
+  border-radius: 6px;
+}
+
+div.sin-material i {
+  font-size: 2em;
+  color: #ccc;
+  display: block;
+  margin-bottom: 8px;
+}
+
+div.sin-material p {
+  font-size: 0.9em !important;
+  color: #999 !important;
+  margin: 0;
+  text-align: center !important;
+}
+/*hasta aqui va el diseño de la conferencia*/
+
+/* ==========================================
+   CALENDARIO DE EVENTOS
+   ========================================== */
+/* ==========================================
+   CALENDARIO DE EVENTOS
+   ========================================== */
+
+div.calendario {
+  padding: 20px 0;
+}
+
+/* bloque de cada dia */
+div.dia-calendario {
+  margin-bottom: 50px;
+}
+
+/* cabecera del dia */
+h3.titulo-fecha {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.3em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(135deg, #03045e, #0077b6);
+  padding: 14px 24px;
+  margin-bottom: 20px;
+  border-left: 6px solid #da002b;
+  letter-spacing: 2px;
+  box-shadow: 0 4px 15px rgba(3, 4, 94, 0.3);
+}
+
+h3.titulo-fecha i {
+  color: #da002b;
+  margin-right: 10px;
+}
+
+/* grid de tarjetas - 3 en pc, 2 en tablet, 1 en celular */
+div.lista-eventos-dia {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media only screen and (min-width: 600px) {
+  div.lista-eventos-dia {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media only screen and (min-width: 992px) {
+  div.lista-eventos-dia {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ==========================================
+   TARJETA BASE - fondo transparente con
+   borde de color segun tipo de evento
+   ========================================== */
+div.tarjeta-evento {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #03045e;
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+  transition: all .3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+div.tarjeta-evento:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+}
+
+/* colores del borde superior segun tipo */
+div.tarjeta-evento.tipo-conferencia { border-top-color: #03045e; }
+div.tarjeta-evento.tipo-taller      { border-top-color: #da002b; }
+div.tarjeta-evento.tipo-vigilia     { border-top-color: #6a1b9a; }
+div.tarjeta-evento.tipo-paseo       { border-top-color: #2e7d32; }
+div.tarjeta-evento.tipo-carrera     { border-top-color: #e65100; }
+div.tarjeta-evento.tipo-clausura    { border-top-color: #b8860b; }
+
+/* ==========================================
+   CABECERA DE LA TARJETA
+   fondo de color segun tipo
+   ========================================== */
+div.tarjeta-cabecera {
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+div.tarjeta-evento.tipo-conferencia div.tarjeta-cabecera { background: linear-gradient(135deg, #03045e, #0077b6); }
+div.tarjeta-evento.tipo-taller      div.tarjeta-cabecera { background: linear-gradient(135deg, #da002b, #ff4d6d); }
+div.tarjeta-evento.tipo-vigilia     div.tarjeta-cabecera { background: linear-gradient(135deg, #6a1b9a, #9c27b0); }
+div.tarjeta-evento.tipo-paseo       div.tarjeta-cabecera { background: linear-gradient(135deg, #2e7d32, #43a047); }
+div.tarjeta-evento.tipo-carrera     div.tarjeta-cabecera { background: linear-gradient(135deg, #e65100, #ff7043); }
+div.tarjeta-evento.tipo-clausura    div.tarjeta-cabecera { background: linear-gradient(135deg, #b8860b, #f0a500); }
+
+/* hora en la cabecera */
+span.hora-bloque {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.95em;
+  color: #fff;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+span.hora-bloque i {
+  color: rgba(255,255,255,0.7);
+  margin-right: 5px;
+}
+
+/* badge del tipo */
+span.tipo-badge {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.72em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.9);
+  background-color: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.4);
+}
+
+/* ==========================================
+   ICONO GRANDE DEL TIPO DE EVENTO
+   ========================================== */
+div.tarjeta-icono {
+  text-align: center;
+  padding: 20px 16px 10px 16px;
+  font-size: 2.5em;
+}
+
+div.tarjeta-evento.tipo-conferencia div.tarjeta-icono { color: #03045e; }
+div.tarjeta-evento.tipo-taller      div.tarjeta-icono { color: #da002b; }
+div.tarjeta-evento.tipo-vigilia     div.tarjeta-icono { color: #6a1b9a; }
+div.tarjeta-evento.tipo-paseo       div.tarjeta-icono { color: #2e7d32; }
+div.tarjeta-evento.tipo-carrera     div.tarjeta-icono { color: #e65100; }
+div.tarjeta-evento.tipo-clausura    div.tarjeta-icono { color: #b8860b; }
+
+/* ==========================================
+   CUERPO DE LA TARJETA
+   ========================================== */
+div.tarjeta-cuerpo {
+  padding: 10px 16px 16px 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* tema */
+h4.evento-tema {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1em;
+  color: #1a1a2e;
+  text-transform: uppercase;
+  margin: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+  line-height: 1.3;
+  text-align: center;
+}
+
+/* separador */
+div.separador-evento {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #da002b, transparent);
+  margin: 2px 0;
+}
+
+/* detalles: moderador, alabanza, expositor */
+div.evento-detalles {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+}
+
+div.evento-detalle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  background-color: rgba(3, 4, 94, 0.05);
+  border-radius: 6px;
+  border-left: 3px solid #da002b;
+}
+
+div.evento-detalle > i {
+  color: #da002b;
+  font-size: 0.9em;
+  flex-shrink: 0;
+  width: 16px;
+  text-align: center;
+}
+
+span.detalle-etiqueta {
+  display: block;
+  font-size: 0.68em;
+  text-transform: uppercase;
+  color: #999;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+span.detalle-valor {
+  display: block;
+  font-size: 0.85em;
+  font-weight: bold;
+  color: #333;
+  line-height: 1.3;
+}
+
+/* error de base de datos */
+p.error-bd {
+  background-color: #fff5f5;
+  border: 1px solid #da002b;
+  color: #da002b;
+  padding: 15px 20px;
+  border-radius: 4px;
+  font-weight: bold;
+  text-align: center !important;
+}
+/*hasta aqui es calendario.php*/
 
 /* ==========================================================================
    Helper classes
