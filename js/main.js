@@ -1,268 +1,274 @@
+console.log("JS FUNCIONANDO");
 (function() {
     "use strict";
 
     /* ========================================
-       MENU HAMBURGUESA - abre y cierra el menu
-       en modo celular al hacer click
+       MENU HAMBURGUESA
        ======================================== */
-    var menuMovil = document.querySelector('.menu-movil');
+    var menuMovil  = document.querySelector('.menu-movil');
     var navegacion = document.querySelector('.navegacion-principal');
 
     if (menuMovil) {
         menuMovil.addEventListener('click', function() {
-
-            /* alterna la clase activo en el menu */
             navegacion.classList.toggle('activo');
-
-            /* cambia el icono de hamburguesa a X */
             menuMovil.classList.toggle('activo');
         });
     }
 
-
     /* ========================================
-       CONTADOR REGRESIVO - cuenta hacia el
-       10 de julio de 2026 a las 14:00 horas
-       se actualiza cada segundo
+       CONTADOR REGRESIVO
        ======================================== */
-    var fechaEvento = new Date('2026-07-10T14:00:00');
+    if (document.querySelector('.cuenta-regresiva')) {
 
-    /* selecciona los elementos del contador en el HTML */
-    var elementoDias     = document.getElementById('dias');
-    var elementoHoras    = document.getElementById('horas');
-    var elementoMinutos  = document.getElementById('minutos');
-    var elementoSegundos = document.getElementById('segundos');
-    function actualizarContador() {
-        var ahora       = new Date();
-        var diferencia  = fechaEvento - ahora;  /* milisegundos restantes */
+        var fechaEvento      = new Date('2026-07-10T14:00:00');
+        var elementoDias     = document.getElementById('dias');
+        var elementoHoras    = document.getElementById('horas');
+        var elementoMinutos  = document.getElementById('minutos');
+        var elementoSegundos = document.getElementById('segundos');
 
-        /* si ya paso el evento muestra ceros */
-        if (diferencia <= 0) {
-            if (elementoDias)     elementoDias.textContent     = '0';
-            if (elementoHoras)    elementoHoras.textContent    = '0';
-            if (elementoMinutos)  elementoMinutos.textContent  = '0';
-            if (elementoSegundos) elementoSegundos.textContent = '0';
-            return;
+        function actualizarContador() {
+            var ahora      = new Date();
+            var diferencia = fechaEvento - ahora;
+
+            if (diferencia <= 0) {
+                if (elementoDias)     elementoDias.textContent     = '0';
+                if (elementoHoras)    elementoHoras.textContent    = '0';
+                if (elementoMinutos)  elementoMinutos.textContent  = '0';
+                if (elementoSegundos) elementoSegundos.textContent = '0';
+                return;
+            }
+
+            if (elementoDias)     elementoDias.textContent     = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+            if (elementoHoras)    elementoHoras.textContent    = Math.floor((diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            if (elementoMinutos)  elementoMinutos.textContent  = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
+            if (elementoSegundos) elementoSegundos.textContent = Math.floor((diferencia % (1000 * 60)) / 1000);
         }
 
-        /* convierte milisegundos a dias, horas, minutos, segundos */
-        var dias     = Math.floor(diferencia / (1000 * 60 * 60 * 24));
-        var horas    = Math.floor((diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        var minutos  = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
-        var segundos = Math.floor((diferencia % (1000 * 60)) / 1000);
-
-        /* actualiza el HTML con los valores calculados */
-        if (elementoDias)     elementoDias.textContent     = dias;
-        if (elementoHoras)    elementoHoras.textContent    = horas;
-        if (elementoMinutos)  elementoMinutos.textContent  = minutos;
-        if (elementoSegundos) elementoSegundos.textContent = segundos;
-    }
-
-    /* ejecuta el contador inmediatamente y luego cada segundo */
-    if (document.querySelector('.cuenta-regresiva')) {
         actualizarContador();
         setInterval(actualizarContador, 1000);
     }
 
-
     /* ========================================
-       VALIDACIONES DEL FORMULARIO DE REGISTRO
-       solo se activa si estamos en registro.html
+       TODO LO QUE NECESITA EL DOM LISTO
        ======================================== */
     document.addEventListener('DOMContentLoaded', function() {
 
-        var regalo = document.getElementById('regalo');
-        if (!regalo) return; /* si no existe el form salimos */
+        /* ---- PROGRAMA POR DIA (solo index.php) ---- */
+        var menuPrograma = document.querySelector('.menu-programa');
 
-        var nombre      = document.getElementById('nombre');
-        var apellido    = document.getElementById('apellido');
-        var celular     = document.getElementById('celular');
-        var carnet      = document.getElementById('carnet');
-        var ministerio  = document.getElementById('ministerio');
-        var iglesia     = document.getElementById('iglesia');
-        var distrito    = document.getElementById('distrito');
-        var camisas     = document.getElementById('camisa_evento');
-        var etiquetas   = document.getElementById('etiquetas');
-        var calcular        = document.getElementById('calcular');
-        var errorDiv        = document.getElementById('error');
-        var botonRegistro   = document.getElementById('btnRegistro');
-        var lista_productos = document.getElementById('lista-productos');
-        var suma            = document.getElementById('suma-total');
+        if (menuPrograma) {
+            var enlacesPrograma   = document.querySelectorAll('.menu-programa a');
+            var seccionesPrograma = document.querySelectorAll('.info-curso');
 
-        nombre.addEventListener('blur', validarTexto);
-        apellido.addEventListener('blur', validarTexto);
-        ministerio.addEventListener('blur', validarTexto);
-        iglesia.addEventListener('blur', validarTexto);
-        distrito.addEventListener('blur', validarTexto);
-        celular.addEventListener('blur', validarCelular);
-        carnet.addEventListener('blur', validarCarnet);
-        calcular.addEventListener('click', calcularMontos);
+            seccionesPrograma.forEach(function(sec) {
+                sec.classList.add('hidden');
+            });
 
-        var radios = document.querySelectorAll('input[name="paquete"]');
-        radios.forEach(function(radio) {
-            radio.addEventListener('change', limpiarErrorPaquete);
-        });
+            var viernes = document.getElementById('viernes');
+            if (viernes) viernes.classList.remove('hidden');
 
-        function validarTexto() {
-            if (this.value.trim() === '') {
-                mostrarError(this, 'Este campo es obligatorio');
-            } else if (this.value.trim().length < 2) {
-                mostrarError(this, 'Debe tener al menos 2 caracteres');
-            } else {
-                limpiarError(this);
-            }
+            if (enlacesPrograma[0]) enlacesPrograma[0].classList.add('activo');
+
+            enlacesPrograma.forEach(function(enlace) {
+                enlace.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    enlacesPrograma.forEach(function(a) {
+                        a.classList.remove('activo');
+                    });
+
+                    seccionesPrograma.forEach(function(sec) {
+                        sec.classList.add('hidden');
+                    });
+
+                    this.classList.add('activo');
+
+                    var id = this.getAttribute('href').replace('#', '');
+                    var seccion = document.getElementById(id);
+                    if (seccion) seccion.classList.remove('hidden');
+                });
+            });
         }
 
-        function validarCelular() {
-            var valor = this.value.trim();
-            if (valor === '') {
-                mostrarError(this, 'El celular es obligatorio');
-                return;
-            }
-            if (!/^\d+$/.test(valor)) {
-                mostrarError(this, 'El celular solo debe contener numeros');
-                return;
-            }
-            if (valor.length < 7 || valor.length > 8) {
-                mostrarError(this, 'El celular debe tener 7 u 8 digitos');
-                return;
-            }
-            limpiarError(this);
+        /* ========================================
+           REGISTRO CON QR Y VALIDACIONES
+           ======================================== */
+
+        var form = document.getElementById('registro');
+        if (!form) return;
+
+        /* ---- CALCULO AUTOMATICO DE EDAD ---- */
+        var inputFecha = document.getElementById('fecha_nacimiento');
+        var inputEdad  = document.getElementById('edad');
+
+        if(inputFecha){
+            inputFecha.addEventListener('change', function(){
+                var hoy     = new Date();
+                var nacim   = new Date(this.value);
+                var edad    = hoy.getFullYear() - nacim.getFullYear();
+                var mes     = hoy.getMonth() - nacim.getMonth();
+                if(mes < 0 || (mes === 0 && hoy.getDate() < nacim.getDate())) edad--;
+                inputEdad.value = edad > 0 ? edad : '';
+            });
         }
 
-        function validarCarnet() {
-            var valor = this.value.trim();
-            if (valor === '') {
-                mostrarError(this, 'El carnet es obligatorio');
-                return;
-            }
-            if (valor.length < 5) {
-                mostrarError(this, 'El carnet debe tener al menos 5 caracteres');
-                return;
-            }
-            if (valor.length > 10) {
-                mostrarError(this, 'El carnet no puede tener mas de 10 caracteres');
-                return;
-            }
-            if (!/^\d{5,9}[-]?[a-zA-Z]?$/.test(valor)) {
-                mostrarError(this, 'Formato invalido. Ejemplo: 1234567 o 1234567A');
-                return;
-            }
-            limpiarError(this);
-        }
-
-        function validarTodo() {
-            var valido = true;
-            var camposTexto = [nombre, apellido, ministerio, iglesia, distrito];
-            camposTexto.forEach(function(campo) {
-                if (campo.value.trim() === '' || campo.value.trim().length < 2) {
-                    mostrarError(campo, 'Este campo es obligatorio');
-                    valido = false;
+        /* ---- MOSTRAR TALLA CUANDO CANTIDAD > 0 ---- */
+        document.querySelectorAll('.input-cantidad').forEach(function(inp){
+            inp.addEventListener('change', function(){
+                var card  = this.closest('.card-producto');
+                var talla = card.querySelector('.producto-talla');
+                if(talla){
+                    talla.style.display = parseInt(this.value) > 0 ? 'block' : 'none';
                 }
             });
-            var valorCelular = celular.value.trim();
-            if (valorCelular === '' || !/^\d{7,8}$/.test(valorCelular)) {
-                mostrarError(celular, 'Ingresa un celular valido de 7 u 8 digitos');
-                valido = false;
-            }
-            var valorCarnet = carnet.value.trim();
-            if (valorCarnet === '' || !/^\d{5,9}[-]?[a-zA-Z]?$/.test(valorCarnet)) {
-                mostrarError(carnet, 'Ingresa un carnet valido');
-                valido = false;
-            }
-            var paqueteElegido = document.querySelector('input[name="paquete"]:checked');
-            if (!paqueteElegido) {
-                errorDiv.style.display = 'block';
-                errorDiv.innerHTML = 'Debes elegir un paquete';
-                valido = false;
-            }
-            return valido;
-        }
-
-        function calcularMontos(event) {
-            event.preventDefault();
-            if (!validarTodo()) {
-                errorDiv.style.display = 'block';
-                errorDiv.innerHTML = 'Por favor completa todos los campos correctamente';
-                return;
-            }
-            if (regalo.value === '') {
-                alert('Debes elegir un regalo');
-                regalo.focus();
-                return;
-            }
-            var paqueteElegido = document.querySelector('input[name="paquete"]:checked');
-            var valorPaquete   = parseInt(paqueteElegido.value, 10) || 0;
-            var nombrePaquete  = paqueteElegido.closest('.tabla-precio').querySelector('h3').textContent;
-            var cantCamisas    = parseInt(camisas.value, 10) || 0;
-            var canEtiquetas   = parseInt(etiquetas.value, 10) || 0;
-            var totalCamisas   = cantCamisas * 90 * 0.93;
-            var totalEtiquetas = canEtiquetas * 10;
-            var totalPagar     = valorPaquete + totalCamisas + totalEtiquetas;
-            var listadoProductos = [];
-            listadoProductos.push('Paquete: ' + nombrePaquete + ' — Bs. ' + valorPaquete);
-            if (cantCamisas >= 1) {
-                listadoProductos.push(cantCamisas + ' Polera(s) — Bs. ' + totalCamisas.toFixed(2) + ' (7% dto.)');
-            }
-            if (canEtiquetas >= 1) {
-                listadoProductos.push(canEtiquetas + ' Paquete(s) Etiquetas — Bs. ' + totalEtiquetas);
-            }
-            listadoProductos.push('Regalo: ' + regalo.options[regalo.selectedIndex].text);
-            lista_productos.style.display = 'block';
-            lista_productos.innerHTML = '';
-            listadoProductos.forEach(function(item) {
-                lista_productos.innerHTML += '<p>' + item + '</p>';
-            });
-            suma.innerHTML = 'Bs. ' + totalPagar.toFixed(2);
-        }
-
-        function mostrarError(campo, mensaje) {
-            campo.style.border = '2px solid #da002b';
-            campo.style.backgroundColor = '#fff5f5';
-            var spanError = campo.parentNode.querySelector('.campo-error');
-            if (!spanError) {
-                spanError = document.createElement('span');
-                spanError.classList.add('campo-error');
-                campo.parentNode.appendChild(spanError);
-            }
-            spanError.textContent = mensaje;
-            spanError.style.color = '#da002b';
-            spanError.style.fontSize = '0.8em';
-            spanError.style.display = 'block';
-            spanError.style.marginTop = '4px';
-        }
-
-        function limpiarError(campo) {
-            campo.style.border = '1px solid #e1e1e1';
-            campo.style.backgroundColor = '#fff';
-            var spanError = campo.parentNode.querySelector('.campo-error');
-            if (spanError) {
-                spanError.textContent = '';
-                spanError.style.display = 'none';
-            }
-        }
-
-        function limpiarErrorPaquete() {
-            errorDiv.style.display = 'none';
-            errorDiv.innerHTML = '';
-        }
-
-        botonRegistro.addEventListener('click', function(event) {
-            event.preventDefault();
-            if (!validarTodo()) {
-                errorDiv.style.display = 'block';
-                errorDiv.innerHTML = 'Completa todos los campos antes de pagar';
-                return;
-            }
-            if (suma.innerHTML === '') {
-                errorDiv.style.display = 'block';
-                errorDiv.innerHTML = 'Primero debes calcular el total';
-                return;
-            }
-            alert('Registro completado. Total a pagar: ' + suma.innerHTML);
-            /* document.getElementById('registro').submit(); */
         });
 
-    }); /* fin DOMContentLoaded */
+        /* ---- CALCULO DEL TOTAL ---- */
+        var btnCalcular = document.getElementById('btn-calcular');
+        if(btnCalcular){
+            btnCalcular.addEventListener('click', function(){
+                if(!validarTodo()) return;
+
+                var paqueteRadio = document.querySelector('input[name="paquete"]:checked');
+                if(!paqueteRadio){
+                    mostrarError('error-paquete', 'Debes elegir un paquete');
+                    return;
+                }
+
+                var totalPaquete = parseFloat(paqueteRadio.dataset.precio) || 0;
+                var nombrePaq    = paqueteRadio.dataset.nombre;
+                var items        = [];
+                var total        = totalPaquete;
+
+                items.push('Paquete: ' + nombrePaq + ' — Bs. ' + totalPaquete.toFixed(2));
+
+                document.querySelectorAll('.input-cantidad').forEach(function(inp){
+                    var cant = parseInt(inp.value) || 0;
+                    if(cant > 0){
+                        var precio = parseFloat(inp.dataset.precio) || 0;
+                        var nombre = inp.dataset.nombre;
+                        var subtotal = cant * precio;
+                        total += subtotal;
+                        items.push(cant + 'x ' + nombre + ' — Bs. ' + subtotal.toFixed(2));
+                    }
+                });
+
+                var lista = document.getElementById('lista-productos');
+                var suma  = document.getElementById('suma-total');
+                lista.style.display = 'block';
+                lista.innerHTML = '';
+                items.forEach(function(i){ lista.innerHTML += '<p>' + i + '</p>'; });
+                suma.innerHTML = 'Bs. ' + total.toFixed(2);
+
+                document.getElementById('seccion-qr').style.display = 'block';
+                document.getElementById('seccion-qr').scrollIntoView({behavior:'smooth'});
+            });
+        }
+
+        /* ---- HABILITA BTN SUBIR ---- */
+        var inputComp = document.getElementById('comprobante');
+        var btnSubir  = document.getElementById('btn-subir');
+
+        if(inputComp){
+            inputComp.addEventListener('change', function(){
+                btnSubir.disabled = this.files.length === 0;
+            });
+        }
+
+        /* ---- SUBE COMPROBANTE ---- */
+        if(btnSubir){
+            btnSubir.addEventListener('click', function(){
+                var archivo  = document.getElementById('comprobante').files[0];
+                var nombre   = document.getElementById('nombre').value;
+                var apellido = document.getElementById('apellido').value;
+
+                if(!archivo){
+                    mostrarError('error-comprobante', 'Selecciona un archivo');
+                    return;
+                }
+
+                var formData = new FormData();
+                formData.append('comprobante', archivo);
+                formData.append('nombre_inscrito', nombre);
+                formData.append('apellido_inscrito', apellido);
+
+                btnSubir.disabled    = true;
+                btnSubir.textContent = 'Subiendo...';
+
+                fetch('guardar_inscripcion.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(function(r){ return r.json(); })
+                .then(function(data){
+                    var msg = document.getElementById('mensaje-subida');
+                    msg.style.display = 'block';
+
+                    if(data.ok){
+                        msg.className = 'mensaje-exito';
+                        msg.innerHTML = '<i class="fa-solid fa-check-circle"></i> ' + data.msg;
+                        form.dataset.comprobante = data.archivo;
+                        document.getElementById('btnRegistro').disabled = false;
+                    } else {
+                        msg.className = 'mensaje-error';
+                        msg.innerHTML = '<i class="fa-solid fa-times-circle"></i> ' + data.msg;
+                        btnSubir.disabled = false;
+                        btnSubir.textContent = 'Subir Comprobante';
+                    }
+                });
+            });
+        }
+
+        /* ---- SUBMIT FINAL ---- */
+        var btnRegistro = document.getElementById('btnRegistro');
+        if(btnRegistro){
+            btnRegistro.addEventListener('click', function(e){
+                e.preventDefault();
+                if(!validarTodo()) return;
+
+                var paqueteRadio = document.querySelector('input[name="paquete"]:checked');
+                var datos = {
+                    accion: 'registrar',
+                    nombre: document.getElementById('nombre').value,
+                    apellido: document.getElementById('apellido').value,
+                    carnet: document.getElementById('carnet').value,
+                    fecha_nacimiento: document.getElementById('fecha_nacimiento').value,
+                    edad: document.getElementById('edad').value,
+                    celular: document.getElementById('celular').value,
+                    ministerio_id: document.getElementById('ministerio_id').value,
+                    iglesia_id: document.getElementById('iglesia_id').value,
+                    distrito_id: document.getElementById('distrito_id').value,
+                    tipo_inscrito_id: document.getElementById('tipo_inscrito_id').value,
+                    paquete_id: paqueteRadio ? paqueteRadio.value : '',
+                    comprobante_archivo: form.dataset.comprobante || ''
+                };
+
+                var fd = new FormData();
+                Object.keys(datos).forEach(function(k){ fd.append(k, datos[k]); });
+
+                fetch('guardar_inscripcion.php', { method:'POST', body: fd })
+                .then(function(r){ return r.json(); })
+                .then(function(data){
+                    if(data.ok){
+                        alert(data.msg);
+                        form.reset();
+                    } else {
+                        alert('Error: ' + data.msg);
+                    }
+                });
+            });
+        }
+
+        function validarTodo(){
+            return true;
+        }
+
+        function mostrarError(id, msg){
+            var el = document.getElementById(id);
+            if(el){ el.textContent = msg; el.style.display = 'block'; }
+        }
+
+        function limpiarTodosErrores(){}
+    });
 
 })();

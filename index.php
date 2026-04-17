@@ -13,38 +13,165 @@
         <source src="videos/tarija-video.mp4" type="video/mp4">
         <source src="videos/tarija-video.webm" type="video/webm">
       </video>
+    </div>
 
-    </div><!--contenedor video-->
     <div class="contenido-programa">
       <div class="contenedor">
         <div class="programa-evento">
+
           <h2>programa del encuentro</h2>
+
+          <!-- MENU -->
           <nav class="menu-programa">
             <a href="#viernes"><i class="fa-solid fa-music"></i>Viernes</a>
             <a href="#sabado"><i class="fa-solid fa-cross"></i>Sabado</a>
             <a href="#domingo"><i class="fa-solid fa-book-bible"></i>Domingo</a>
-
           </nav>
 
-          <div id="alabanzas" class="info-curso ocultar clearfix">
-            <div class="detalle-evento">
-              <h3>Adoracion, Jubilo, y Gozo</h3>
-              <p><i class="fa-solid fa-clock"></i>16:00 hrs</p>
-              <p><i class="fa-solid fa-calendar"></i>14 de Jubilo</p>
-              <p><i class="fa-solid fa-user"></i>Minis 70 veces 7</p>
-            </div>
-            <div class="detalle-evento">
-              <h3>Adoracion, Jubilo, y Gozo</h3>
-              <p><i class="fa-solid fa-clock"></i>20:00 hrs</p>
-              <p><i class="fa-solid fa-calendar"></i>14 de Jubilo</p>
-              <p><i class="fa-solid fa-user"></i>Minis Beracka</p>
-            </div>
-            <a href="#" class="button">Ver todos</a>
+          <?php 
+          require_once('includes/funciones/bd_conexion.php');
+
+          $sql = "SELECT e.*, 
+                         g.nombre_grupo,
+                         t.titulo        AS tema,
+                         ex.nombre       AS expositor_nombre,
+                         ex.apellido     AS expositor_apellido,
+                         ex.rango        AS expositor_rango
+                  FROM eventos e
+                  LEFT JOIN grupos_alabanza g  ON e.id_grupo    = g.id_grupo
+                  LEFT JOIN temas           t  ON e.id_tema      = t.id_tema
+                  LEFT JOIN expositores     ex ON e.id_expositor = ex.id_expositor
+                  ORDER BY e.id_dia, e.hora_inicio";
+
+          $resultado = $conn->query($sql);
+
+          $eventos = [
+            1 => [], // viernes
+            2 => [], // sabado
+            3 => []  // domingo
+          ];
+
+          while($row = $resultado->fetch_assoc()){
+            $eventos[$row['id_dia']][] = $row;
+          }
+          ?>
+
+          <!-- VIERNES -->
+          <div id="viernes" class="info-curso">
+            <?php foreach($eventos[1] as $evento): ?>
+              <div class="detalle-evento">
+                <h3><?php echo htmlspecialchars($evento['tipo_evento']); ?></h3>
+
+                <p><i class="fa-solid fa-clock"></i>
+                  <?php echo substr($evento['hora_inicio'],0,5); ?> hrs
+                </p>
+
+                <p><i class="fa-solid fa-calendar"></i>
+                  <?php echo $evento['fecha']; ?>
+                </p>
+
+                <?php if (!empty($evento['tema'])): ?>
+                  <p><i class="fa-solid fa-book-open"></i>
+                    <?php echo htmlspecialchars($evento['tema']); ?>
+                  </p>
+                <?php endif; ?>
+
+                <?php if (!empty($evento['expositor_nombre'])): ?>
+                  <p><i class="fa-solid fa-user-tie"></i>
+                    <?php echo htmlspecialchars($evento['expositor_rango'] . ' ' . $evento['expositor_nombre'] . ' ' . $evento['expositor_apellido']); ?>
+                  </p>
+                <?php endif; ?>
+
+                <?php if (!empty($evento['nombre_grupo'])): ?>
+                  <p><i class="fa-solid fa-music"></i>
+                    <?php echo htmlspecialchars($evento['nombre_grupo']); ?>
+                  </p>
+                <?php endif; ?>
+
+              </div>
+            <?php endforeach; ?>
+            <a href="calendario.php" class="button">Ver todos</a>
           </div>
+
+          <!-- SABADO -->
+          <div id="sabado" class="info-curso">
+            <?php foreach($eventos[2] as $evento): ?>
+              <div class="detalle-evento">
+                <h3><?php echo htmlspecialchars($evento['tipo_evento']); ?></h3>
+
+                <p><i class="fa-solid fa-clock"></i>
+                  <?php echo substr($evento['hora_inicio'],0,5); ?> hrs
+                </p>
+
+                <p><i class="fa-solid fa-calendar"></i>
+                  <?php echo $evento['fecha']; ?>
+                </p>
+
+                <?php if (!empty($evento['tema'])): ?>
+                  <p><i class="fa-solid fa-book-open"></i>
+                    <?php echo htmlspecialchars($evento['tema']); ?>
+                  </p>
+                <?php endif; ?>
+
+                <?php if (!empty($evento['expositor_nombre'])): ?>
+                  <p><i class="fa-solid fa-user-tie"></i>
+                    <?php echo htmlspecialchars($evento['expositor_rango'] . ' ' . $evento['expositor_nombre'] . ' ' . $evento['expositor_apellido']); ?>
+                  </p>
+                <?php endif; ?>
+
+                <?php if (!empty($evento['nombre_grupo'])): ?>
+                  <p><i class="fa-solid fa-music"></i>
+                    <?php echo htmlspecialchars($evento['nombre_grupo']); ?>
+                  </p>
+                <?php endif; ?>
+
+              </div>
+            <?php endforeach; ?>
+            <a href="calendario.php" class="button">Ver todos</a>
+          </div>
+
+          <!-- DOMINGO -->
+          <div id="domingo" class="info-curso">
+            <?php foreach($eventos[3] as $evento): ?>
+              <div class="detalle-evento">
+                <h3><?php echo htmlspecialchars($evento['tipo_evento']); ?></h3>
+
+                <p><i class="fa-solid fa-clock"></i>
+                  <?php echo substr($evento['hora_inicio'],0,5); ?> hrs
+                </p>
+
+                <p><i class="fa-solid fa-calendar"></i>
+                  <?php echo $evento['fecha']; ?>
+                </p>
+
+                <?php if (!empty($evento['tema'])): ?>
+                  <p><i class="fa-solid fa-book-open"></i>
+                    <?php echo htmlspecialchars($evento['tema']); ?>
+                  </p>
+                <?php endif; ?>
+
+                <?php if (!empty($evento['expositor_nombre'])): ?>
+                  <p><i class="fa-solid fa-user-tie"></i>
+                    <?php echo htmlspecialchars($evento['expositor_rango'] . ' ' . $evento['expositor_nombre'] . ' ' . $evento['expositor_apellido']); ?>
+                  </p>
+                <?php endif; ?>
+
+                <?php if (!empty($evento['nombre_grupo'])): ?>
+                  <p><i class="fa-solid fa-music"></i>
+                    <?php echo htmlspecialchars($evento['nombre_grupo']); ?>
+                  </p>
+                <?php endif; ?>
+
+              </div>
+            <?php endforeach; ?>
+            <a href="calendario.php" class="button">Ver todos</a>
+          </div>
+
         </div>
       </div>
     </div>
   </section>
+
 
   <section class="invitados contenedor seccion">
     <h2>Nuestros invitados</h2>

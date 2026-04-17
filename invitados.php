@@ -1,7 +1,7 @@
 
 <?php include_once 'includes/templates/header.php'; ?>
 
-<section class="seccion contenedor">
+ <section class="seccion contenedor">
   <h2>Nuestros Invitados</h2>
 
   <?php
@@ -9,7 +9,7 @@
     try {
       require_once('includes/funciones/bd_conexion.php');
 
-      $sql = "SELECT id_expositor, nombre, apellido, rango, descripcion, imagen
+      $sql = "SELECT  id_expositor, nombre, apellido, rango, descripcion, imagen
               FROM expositores
               ORDER BY apellido, nombre";
 
@@ -79,6 +79,6 @@
     <?php endif; ?>
   </div>
 
-</section>
+ </section>
 
 <?php include_once 'includes/templates/footer.php'; ?>
