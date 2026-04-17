@@ -1874,8 +1874,227 @@ div.seccion-productos h3 {
   text-align: center;
   margin-bottom: 5px;
 }
+/* ============================================================
+   ESTILOS ADICIONALES PARA VALIDACIONES Y ESTADOS DE INSCRIPCION
+   Agregar al final de tu archivo CSS existente (registro.css o main.css)
+   ============================================================ */
 
+/* ---- Botón calcular deshabilitado ---- */
+#btn-calcular:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: auto; /* para que el title (tooltip) funcione */
+}
+
+/* ---- Aviso inscrito ya existente ---- */
+div.aviso-inscrito-existente {
+  background-color: #fff8e1;
+  border: 2px solid #f59e0b;
+  border-left: 6px solid #f59e0b;
+  border-radius: 8px;
+  padding: 20px 25px;
+  margin: 20px 0;
+  display: none;
+}
+
+div.aviso-inscrito-existente > i {
+  font-size: 1.5em;
+  color: #f59e0b;
+  margin-right: 10px;
+}
+
+div.aviso-inscrito-existente strong {
+  font-size: 1.1em;
+  color: #92400e;
+  display: block;
+  margin-bottom: 8px;
+}
+
+div.aviso-inscrito-existente p {
+  color: #78350f;
+  margin: 6px 0;
+  font-size: 0.95em;
+}
+
+.aviso-no-continuar {
+  font-weight: bold;
+  color: #da002b !important;
+  margin-top: 12px !important;
+  padding-top: 10px;
+  border-top: 1px solid #f59e0b;
+}
+
+/* Estado confirmado */
+span.estado-confirmado {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #16a34a;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+/* Estado pendiente */
+span.estado-pendiente {
+  background-color: #fef9c3;
+  color: #713f12;
+  border: 1px solid #ca8a04;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.aviso-pendiente-msg {
+  font-style: italic;
+  color: #92400e !important;
+}
+
+.aviso-confirmado-msg {
+  font-style: italic;
+  color: #166534 !important;
+}
+
+/* ---- Mensaje de registro exitoso final ---- */
+div.mensaje-registro-exitoso {
+  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+  border: 2px solid #2e7d32;
+  border-radius: 16px;
+  padding: 50px 40px;
+  text-align: center;
+  margin: 30px auto;
+  max-width: 600px;
+  animation: fadeInUp 0.5s ease;
+}
+
+div.mre-icono {
+  font-size: 4em;
+  color: #2e7d32;
+  margin-bottom: 20px;
+}
+
+div.mensaje-registro-exitoso h3 {
+  color: #1b5e20;
+  font-size: 1.6em;
+  margin-bottom: 15px;
+  text-transform: none;
+  border-bottom: none;
+}
+
+div.mensaje-registro-exitoso p {
+  color: #33691e;
+  font-size: 1em;
+  margin: 8px 0;
+  line-height: 1.6;
+}
+
+div.mre-nota {
+  background-color: #fff;
+  border: 1px solid #a5d6a7;
+  border-radius: 8px;
+  padding: 12px 20px;
+  margin-top: 20px;
+  color: #2e7d32;
+  font-size: 0.9em;
+}
+
+div.mre-nota i {
+  margin-right: 8px;
+  color: #388e3c;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- Errores de talla en productos ---- */
+.card-producto .campo-error.error-talla {
+  margin-top: 5px;
+  font-size: 0.8em;
+}
+
+/* ---- Campos con error (borde rojo) ---- */
+div.campo input.campo-invalido,
+div.campo select.campo-invalido {
+  border-color: #da002b;
+  background-color: #fff5f5;
+}
+
+/* ---- campo-error visible ---- */
+span.campo-error {
+  color: #da002b;
+  font-size: 0.82em;
+  display: none;
+  margin-top: 4px;
+  padding-left: 4px;
+}
 /*hasta aqui es registro bb*/
+/* buscador de estado */
+div.buscador-estado {
+  background-color: #f8faff;
+  border: 2px solid #03045e;
+}
+
+div.buscador-estado h4 {
+  color: #03045e;
+}
+
+div.card-resultado-estado {
+  background: #fff;
+  border: 1px solid #e1e1e1;
+  border-left: 4px solid #03045e;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+div.card-resultado-estado p {
+  margin: 8px 0;
+  font-size: 0.95em;
+  text-align: left !important;
+  color: #333;
+}
+
+div.card-resultado-estado p i {
+  color: #da002b;
+  margin-right: 8px;
+  width: 16px;
+}
+
+/* hint calcular */
+#hint-calcular {
+  font-size: 0.82em;
+  color: #999;
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* grid campos datos personales */
+div.grid-campos {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 5px;
+}
+
+@media only screen and (min-width: 768px) {
+  div.grid-campos {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* seccion-form espaciado */
+div.seccion-form {
+  margin-bottom: 30px;
+}
 
 /*conferencia.html*/
 

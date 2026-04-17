@@ -1,7 +1,7 @@
 <?php include_once 'includes/templates/header.php'; ?>
 
   <section class="seccion contenedor">
-    <h2>El mejor encuentro de de jovenes cristianos</h2>
+    <h2>La Iglesia Dios De La Profecia te invita a ser parte de este encuentro </h2>
     <p>
       Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsam minus iste ut magni tenetur doloribus voluptatum, totam fuga? Ipsa non laborum corporis deserunt magni nesciunt perferendis aperiam accusamus quae voluptatum!
     </p>
@@ -249,7 +249,7 @@
               <li>Todas las conferencias</li>
               <li>Todos los Talleres</li>
             </ul>
-            <a href="#" class="button hollow">Comprar</a>
+            <a href="tipo_inscripciones.php" class="button hollow">Comprar</a>
           </div>
         </li>
         <li>
@@ -261,7 +261,7 @@
               <li>Todas las conferencias</li>
               <li>Todos los Talleres</li>
             </ul>
-            <a href="#" class="button">Comprar</a>
+            <a href="tipo_inscripciones.php" class="button">Comprar</a>
           </div>
         </li>
         <li>
@@ -273,7 +273,7 @@
               <li>Recuerdo del encuentro</li>
               <li>Todos los Talleres</li>
             </ul>
-            <a href="#" class="button hollow">Comprar</a>
+            <a href="tipo_inscripciones.php" class="button hollow">Comprar</a>
           </div>
         </li>
       </ul>
@@ -309,7 +309,7 @@
     <div class="contenido contenedor">
       <p>Registrate para el</p>
       <h3>Encuentro departamental</h3>
-      <a href="#" class="button trasparente">Registro</a>
+      <a href="tipo_inscripciones.php" class="button trasparente">Registro</a>
     </div>
   </div>
 
