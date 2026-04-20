@@ -50,29 +50,29 @@
         <ul class="lista-lideres">
           <li class="lider-item">
             <div class="lider-info">
-              <span class="lider-nombre">Hno. Carlos Mamani</span>
-              <span class="lider-zona">Iglesia Central Oruro</span>
+              <span class="lider-nombre">Hno. Joel Paredez</span>
+              <span class="lider-zona">Iglesia Vinto</span>
             </div>
-            <a href="https://wa.me/59171234567" target="_blank" class="boton-whatsapp">
-              <i class="fa-brands fa-whatsapp"></i> 71234567
+            <a href="https://wa.me/59168319277?text=Hola%20soy%20un%20joven%20interesado%20en%20el%20encuentro%20y%20quiero%20más%20información" target="_blank" class="boton-whatsapp">
+              <i class="fa-brands fa-whatsapp"></i> 68319277
             </a>
           </li>
           <li class="lider-item">
             <div class="lider-info">
-              <span class="lider-nombre">Hna. Maria Quispe</span>
-              <span class="lider-zona">Iglesia Norte Oruro</span>
+              <span class="lider-nombre">Gabriel Mariscal</span>
+              <span class="lider-zona">Iglesia San Isidro</span>
             </div>
-            <a href="https://wa.me/59172345678" target="_blank" class="boton-whatsapp">
-              <i class="fa-brands fa-whatsapp"></i> 72345678
+            <a href="https://wa.me/59168319277?text=Hola%20soy%20un%20joven%20interesado%20en%20el%20encuentro%20y%20quiero%20más%20información" target="_blank" class="boton-whatsapp">
+              <i class="fa-brands fa-whatsapp"></i> 68319277
             </a>
           </li>
           <li class="lider-item">
             <div class="lider-info">
-              <span class="lider-nombre">Ptr. Roberto Flores</span>
+              <span class="lider-nombre">Nombre los demas lideres</span>
               <span class="lider-zona">Iglesia Sur Oruro</span>
             </div>
-            <a href="https://wa.me/59173456789" target="_blank" class="boton-whatsapp">
-              <i class="fa-brands fa-whatsapp"></i> 73456789
+            <a href="https://wa.me/59168319277?text=Hola%20soy%20un%20joven%20interesado%20en%20el%20encuentro%20y%20quiero%20más%20información" target="_blank" class="boton-whatsapp">
+              <i class="fa-brands fa-whatsapp"></i> 68319277
             </a>
           </li>
         </ul>
@@ -86,20 +86,29 @@
         <ul class="lista-lideres">
           <li class="lider-item">
             <div class="lider-info">
-              <span class="lider-nombre">Obispo Juan Condori</span>
-              <span class="lider-zona">Distrito Oruro Norte</span>
+              <span class="lider-nombre">Hrn Iddy Acno</span>
+              <span class="lider-zona">Distrito 1</span>
             </div>
-            <a href="https://wa.me/59174567890" target="_blank" class="boton-whatsapp">
-              <i class="fa-brands fa-whatsapp"></i> 74567890
+            <a href="https://wa.me/59168319277?text=Hola%20soy%20un%20joven%20interesado%20en%20el%20encuentro%20y%20quiero%20más%20información" target="_blank" class="boton-whatsapp">
+              <i class="fa-brands fa-whatsapp"></i> 68319277
             </a>
           </li>
           <li class="lider-item">
             <div class="lider-info">
-              <span class="lider-nombre">Ptr. Ana Gutierrez</span>
-              <span class="lider-zona">Distrito Oruro Sur</span>
+              <span class="lider-nombre">Hrn Josue Beltran</span>
+              <span class="lider-zona">Distrito 2</span>
             </div>
-            <a href="https://wa.me/59175678901" target="_blank" class="boton-whatsapp">
-              <i class="fa-brands fa-whatsapp"></i> 75678901
+            <a href="https://wa.me/59168319277?text=Hola%20soy%20un%20joven%20interesado%20en%20el%20encuentro%20y%20quiero%20más%20información" target="_blank" class="boton-whatsapp">
+              <i class="fa-brands fa-whatsapp"></i> 68319277
+            </a>
+          </li>
+          <li class="lider-item">
+            <div class="lider-info">
+              <span class="lider-nombre">Hrn Jhuliza Espinoza</span>
+              <span class="lider-zona">Distrito 2 (lider de adolencentes)</span>
+            </div>
+            <a href="https://wa.me/59168319277?text=Hola%20soy%20un%20joven%20interesado%20en%20el%20encuentro%20y%20quiero%20más%20información" target="_blank" class="boton-whatsapp">
+              <i class="fa-brands fa-whatsapp"></i> 68319277
             </a>
           </li>
         </ul>
@@ -108,6 +117,21 @@
       <div class="aviso-efectivo">
         <i class="fa-solid fa-triangle-exclamation"></i>
         Solo tu líder puede completar el registro en efectivo.
+      </div>
+      <!-- BOTON LOGIN LIDERES -->
+      <div class="bloque-login-lider">
+        <div class="separador-login"></div>
+        <p class="texto-login-lider">
+          <i class="fa-solid fa-lock"></i>
+          ¿Eres lider? Ingresa con tu cuenta para registrar jovenes en efectivo
+        </p>
+        <a href="login.php" class="button button-login-lider">
+          <i class="fa-solid fa-right-to-bracket"></i> Acceso Lideres
+        </a>
+        <p class="aviso-solo-lider">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          Solo el lider autorizado puede ingresar al sistema de registro
+        </p>
       </div>
 
     </div>

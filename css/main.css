@@ -569,6 +569,56 @@ div.menu-movil span {
     padding: 10px 0;
   }
 }
+/* ---- flecha deslizar ---- */
+div.scroll-down {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  color: rgba(255,255,255,0.6);
+  pointer-events: none;
+}
+
+p.scroll-texto {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.75em !important;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin: 0 0 6px 0;
+  display: block !important;
+  color: rgba(255,255,255,0.6);
+}
+
+div.scroll-flechas {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+div.scroll-flechas i {
+  font-size: 0.9em;
+  animation: bajar 1.5s ease infinite;
+  color: rgba(255,255,255,0.6);
+}
+
+div.scroll-flechas i:nth-child(1) { animation-delay: 0s;    opacity: 0.3; }
+div.scroll-flechas i:nth-child(2) { animation-delay: 0.2s;  opacity: 0.6; }
+div.scroll-flechas i:nth-child(3) { animation-delay: 0.4s;  opacity: 1;   }
+
+@keyframes bajar {
+  0%   { transform: translateY(-4px); opacity: 0; }
+  50%  { opacity: 1; }
+  100% { transform: translateY(4px);  opacity: 0; }
+}
+
+/* ---- enlace activo en la barra ---- */
+nav.navegacion-principal a.nav-activo {
+  background-color: #da002b !important;
+  border-color: #da002b !important;
+  color: #fff !important;
+}
 
 /**Alabanzas**/
 section.programa {
@@ -916,6 +966,92 @@ div.tabla-precio h3 {
 div.tabla-precio p.numero {
   color: #03045e;
   margin: 20px 0;
+}
+/* aviso inscripcion */
+div.aviso-inscripcion {
+  background-color: #e8f0fe;
+  border-left: 4px solid #03045e;
+  padding: 14px 20px;
+  margin-bottom: 25px;
+  border-radius: 4px;
+  color: #03045e;
+  font-size: 0.95em;
+  text-align: center;
+}
+
+div.aviso-inscripcion i {
+  color: #da002b;
+  margin-right: 8px;
+}
+
+a.link-inscripcion {
+  color: #da002b;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+/* precio original tachado en index */
+p.precio-original {
+  text-decoration: line-through;
+  color: #999;
+  font-size: 0.9em;
+  text-align: center;
+  margin: 5px 0 0 0;
+}
+
+/* badge descuento en index */
+div.badge-descuento {
+  background-color: #da002b;
+  color: #fff;
+  text-align: center;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8em;
+  font-weight: bold;
+  margin: 8px auto;
+  display: inline-block;
+}
+
+p.fecha-descuento {
+  font-size: 0.78em;
+  color: #666;
+  text-align: center;
+  margin: 4px 0 10px 0;
+}
+
+/* barra de cupos */
+div.barra-cupos {
+  width: 100%;
+  height: 8px;
+  background-color: #e1e1e1;
+  border-radius: 10px;
+  margin: 12px 0 6px 0;
+  overflow: hidden;
+}
+
+div.barra-cupos-relleno {
+  height: 100%;
+  border-radius: 10px;
+  transition: width .5s ease;
+}
+
+div.barra-cupos.cupo-alto  div.barra-cupos-relleno { background-color: #2e7d32; }
+div.barra-cupos.cupo-medio div.barra-cupos-relleno { background-color: #f9a825; }
+div.barra-cupos.cupo-bajo  div.barra-cupos-relleno { background-color: #da002b; }
+
+/* texto cupos */
+p.texto-cupos {
+  font-size: 0.85em;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+p.texto-cupos.cupo-alto  { color: #2e7d32; }
+p.texto-cupos.cupo-medio { color: #f9a825; }
+p.texto-cupos.cupo-bajo  { color: #da002b; }
+
+p.texto-cupos strong {
+  font-size: 1.2em;
 }
 
 /*mapa*/
@@ -2081,13 +2217,27 @@ div.card-resultado-estado p i {
 /* grid campos datos personales */
 div.grid-campos {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr;  /* celular: 1 columna */
   gap: 5px;
 }
 
-@media only screen and (min-width: 768px) {
+@media only screen and (min-width: 600px) {
   div.grid-campos {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);  /* tablet: 2 columnas */
+  }
+}
+
+@media only screen and (min-width: 992px) {
+  div.grid-campos {
+    grid-template-columns: repeat(3, 1fr);  /* pc: 3 columnas */
+  }
+}
+
+/* en celular quita el span 2 del ministerio */
+@media only screen and (max-width: 599px) {
+  div.grid-campos .campo[style*="span 2"],
+  div.grid-campos .campo[style*="grid-column"] {
+    grid-column: span 1 !important;
   }
 }
 
@@ -2095,7 +2245,299 @@ div.grid-campos {
 div.seccion-form {
   margin-bottom: 30px;
 }
+/* ============================================================
+   ESTILOS ADICIONALES PARA VALIDACIONES Y ESTADOS DE INSCRIPCION
+   Agregar al final de tu archivo CSS existente (registro.css o main.css)
+   ============================================================ */
 
+/* ---- Botón calcular deshabilitado ---- */
+#btn-calcular:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: auto; /* para que el title (tooltip) funcione */
+}
+
+/* ---- Aviso inscrito ya existente ---- */
+div.aviso-inscrito-existente {
+  background-color: #fff8e1;
+  border: 2px solid #f59e0b;
+  border-left: 6px solid #f59e0b;
+  border-radius: 8px;
+  padding: 20px 25px;
+  margin: 20px 0;
+  display: none;
+}
+
+div.aviso-inscrito-existente > i {
+  font-size: 1.5em;
+  color: #f59e0b;
+  margin-right: 10px;
+}
+
+div.aviso-inscrito-existente strong {
+  font-size: 1.1em;
+  color: #92400e;
+  display: block;
+  margin-bottom: 8px;
+}
+
+div.aviso-inscrito-existente p {
+  color: #78350f;
+  margin: 6px 0;
+  font-size: 0.95em;
+}
+
+.aviso-no-continuar {
+  font-weight: bold;
+  color: #da002b !important;
+  margin-top: 12px !important;
+  padding-top: 10px;
+  border-top: 1px solid #f59e0b;
+}
+
+/* Estado confirmado */
+span.estado-confirmado {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #16a34a;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+/* Estado pendiente */
+span.estado-pendiente {
+  background-color: #fef9c3;
+  color: #713f12;
+  border: 1px solid #ca8a04;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.aviso-pendiente-msg {
+  font-style: italic;
+  color: #92400e !important;
+}
+
+.aviso-confirmado-msg {
+  font-style: italic;
+  color: #166534 !important;
+}
+
+/* ---- Mensaje de registro exitoso final ---- */
+div.mensaje-registro-exitoso {
+  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+  border: 2px solid #2e7d32;
+  border-radius: 16px;
+  padding: 50px 40px;
+  text-align: center;
+  margin: 30px auto;
+  max-width: 600px;
+  animation: fadeInUp 0.5s ease;
+}
+
+div.mre-icono {
+  font-size: 4em;
+  color: #2e7d32;
+  margin-bottom: 20px;
+}
+
+div.mensaje-registro-exitoso h3 {
+  color: #1b5e20;
+  font-size: 1.6em;
+  margin-bottom: 15px;
+  text-transform: none;
+  border-bottom: none;
+}
+
+div.mensaje-registro-exitoso p {
+  color: #33691e;
+  font-size: 1em;
+  margin: 8px 0;
+  line-height: 1.6;
+}
+
+div.mre-nota {
+  background-color: #fff;
+  border: 1px solid #a5d6a7;
+  border-radius: 8px;
+  padding: 12px 20px;
+  margin-top: 20px;
+  color: #2e7d32;
+  font-size: 0.9em;
+}
+
+div.mre-nota i {
+  margin-right: 8px;
+  color: #388e3c;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- Errores de talla en productos ---- */
+.card-producto .campo-error.error-talla {
+  margin-top: 5px;
+  font-size: 0.8em;
+}
+
+/* ---- Campos con error (borde rojo) ---- */
+div.campo input.campo-invalido,
+div.campo select.campo-invalido {
+  border-color: #da002b;
+  background-color: #fff5f5;
+}
+
+/* ---- campo-error visible ---- */
+span.campo-error {
+  color: #da002b;
+  font-size: 0.82em;
+  display: none;
+  margin-top: 4px;
+  padding-left: 4px;
+}
+
+/* ============================================================
+   BLOQUE RESUMEN COMPLETO
+   ============================================================ */
+
+div.resumen-completo {
+  padding: 25px;
+  margin-bottom: 30px;
+}
+
+div.resumen-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+@media only screen and (min-width: 768px) {
+  div.resumen-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+
+
+h5.resumen-subtitulo {
+  font-size: 0.95em;
+  text-transform: uppercase;
+  color: #da002b;
+  border-bottom: 1px solid #e1e1e1;
+  padding-bottom: 6px;
+  margin: 0 0 12px 0;
+  font-family: 'PT Sans', sans-serif;
+}
+
+h5.resumen-subtitulo i {
+  margin-right: 6px;
+}
+
+table.tabla-resumen {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92em;
+}
+
+table.tabla-resumen tr {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+table.tabla-resumen td {
+  padding: 7px 5px;
+  vertical-align: top;
+  color: #333;
+}
+
+table.tabla-resumen td.lbl {
+  font-weight: bold;
+  color: #666;
+  width: 45%;
+  padding-right: 10px;
+  white-space: nowrap;
+}
+
+/* total destacado */
+div.resumen-total-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #03045e;
+  color: #fff;
+  border-radius: 8px;
+  padding: 15px 20px;
+  margin-top: 20px;
+}
+
+span.resumen-total-lbl {
+  font-weight: bold;
+  font-size: 0.9em;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+span.resumen-total-num {
+  font-size: 1.8em;
+  font-weight: bold;
+  color: #fff;
+}
+
+/* botones de accion del resumen */
+div.resumen-acciones {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 2px solid #e1e1e1;
+}
+
+div.resumen-acciones .button {
+  min-width: 200px;
+}
+
+div.resumen-acciones .button.hollow {
+  background: transparent;
+  border: 2px solid #03045e;
+  color: #03045e;
+}
+
+div.resumen-acciones .button.hollow:hover {
+  background: #03045e;
+  color: #fff;
+}
+
+/* campo derivado (solo lectura) */
+input.campo-derivado {
+  background-color: #f5f7ff !important;
+  color: #03045e !important;
+  font-weight: bold;
+  cursor: default;
+}
+
+/* span req */
+span.req { color: #da002b; }
+
+/* campo ancho - ocupa 2 columnas solo en tablet/pc */
+@media only screen and (min-width: 600px) {
+  div.campo.campo-ancho {
+    grid-column: span 2;
+  }
+}
 /*conferencia.html*/
 
 /* ==========================================
@@ -2603,6 +3045,25 @@ p.error-bd {
   font-weight: bold;
   text-align: center !important;
 }
+  /* colores nuevos tipos */
+div.tarjeta-evento.tipo-predica        { border-top-color: #c62828; }
+div.tarjeta-evento.tipo-concurso       { border-top-color: #f9a825; }
+div.tarjeta-evento.tipo-deportivo      { border-top-color: #1565c0; }
+div.tarjeta-evento.tipo-premiacion     { border-top-color: #6d4c41; }
+div.tarjeta-evento.tipo-paseo-tours   { border-top-color: #00695c; }
+
+div.tarjeta-evento.tipo-predica       div.tarjeta-cabecera { background: linear-gradient(135deg, #c62828, #ef5350); }
+div.tarjeta-evento.tipo-concurso      div.tarjeta-cabecera { background: linear-gradient(135deg, #f9a825, #ffca28); }
+div.tarjeta-evento.tipo-deportivo     div.tarjeta-cabecera { background: linear-gradient(135deg, #1565c0, #1e88e5); }
+div.tarjeta-evento.tipo-premiacion    div.tarjeta-cabecera { background: linear-gradient(135deg, #6d4c41, #a1887f); }
+div.tarjeta-evento.tipo-paseo-tours  div.tarjeta-cabecera { background: linear-gradient(135deg, #00695c, #26a69a); }
+
+div.tarjeta-evento.tipo-predica       div.tarjeta-icono { color: #c62828; }
+div.tarjeta-evento.tipo-concurso      div.tarjeta-icono { color: #f9a825; }
+div.tarjeta-evento.tipo-deportivo     div.tarjeta-icono { color: #1565c0; }
+div.tarjeta-evento.tipo-premiacion    div.tarjeta-icono { color: #6d4c41; }
+div.tarjeta-evento.tipo-paseo-tours div.tarjeta-icono { color: #00695c; }
+
 /*hasta aqui es calendario.php*/
 
 /* ==========================================
@@ -2960,7 +3421,66 @@ div.aviso-efectivo i {
   color: #f9a825;
   margin-right: 8px;
 }
-/*hasta aqui es la parte de los invitados.php*/
+/* boton login lider */
+div.bloque-login-lider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+div.separador-login {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #2e7d32, transparent);
+  margin-bottom: 5px;
+}
+
+p.texto-login-lider {
+  font-size: 0.88em !important;
+  color: #555;
+  text-align: center !important;
+  margin: 0;
+}
+
+p.texto-login-lider i {
+  color: #2e7d32;
+  margin-right: 6px;
+}
+
+a.button-login-lider {
+  background-color: #03045e;
+  border-color: #03045e;
+  padding: 10px 30px;
+  font-size: 1em;
+  width: 100%;
+  text-align: center;
+  display: block;
+}
+
+a.button-login-lider:hover {
+  background-color: #0077b6;
+  border-color: #0077b6;
+}
+
+a.button-login-lider i {
+  margin-right: 8px;
+}
+
+p.aviso-solo-lider {
+  font-size: 0.78em !important;
+  color: #999;
+  text-align: center !important;
+  margin: 0;
+  font-style: italic;
+}
+
+p.aviso-solo-lider i {
+  color: #f9a825;
+  margin-right: 5px;
+}
+/*hasta aqui es la parte de los tipo_inscripcion.php*/
 /* ==========================================================================
    Helper classes
    ========================================================================== */

@@ -5,17 +5,18 @@ require_once('includes/funciones/bd_conexion.php');
 /* ============================================
    CARGA DE COMBOS Y DATOS
    ============================================ */
+
 $ministerios = [];
-$res = $conn->query("SELECT id, nombre FROM ministerios ORDER BY nombre");
+$res = $conn->query("
+    SELECT m.id, m.nombre AS ministerio,
+           i.id AS iglesia_id, i.nombre AS iglesia,
+           d.id AS distrito_id, d.nombre AS distrito
+    FROM ministerios m
+    LEFT JOIN iglesias i ON m.iglesia_id = i.id
+    LEFT JOIN distritos d ON i.distrito_id = d.id
+    ORDER BY m.nombre
+");
 while($r = $res->fetch_assoc()) $ministerios[] = $r;
-
-$iglesias = [];
-$res = $conn->query("SELECT id, nombre FROM iglesias ORDER BY nombre");
-while($r = $res->fetch_assoc()) $iglesias[] = $r;
-
-$distritos = [];
-$res = $conn->query("SELECT id, nombre FROM distritos ORDER BY nombre");
-while($r = $res->fetch_assoc()) $distritos[] = $r;
 
 $tipos = [];
 $res = $conn->query("SELECT id, nombre FROM tipos_inscrito ORDER BY id");
@@ -50,241 +51,300 @@ while($r = $res->fetch_assoc()) $regalos[] = $r;
   <div class="aviso-qr">
     <i class="fa-solid fa-qrcode"></i>
     El pago es <strong>unicamente por QR / Banca Movil</strong>. 
-    Completa todos los datos, escanea el QR, sube tu comprobante y tu inscripcion quedara como <strong>PENDIENTE</strong> hasta que la tesorera la confirme.
+    Completa todos los datos, revisa el resumen, escanea el QR, sube tu comprobante y tu inscripcion quedara como <strong>PENDIENTE</strong> hasta que la tesorera la confirme.
   </div>
 
-  <form id="form-registro" novalidate>
+  <!-- ====================== FORMULARIO ====================== -->
+  <div id="bloque-formulario">
+    <form id="form-registro" novalidate>
 
-    <!-- ====================== DATOS PERSONALES ====================== -->
-    <div class="seccion-form caja">
-      <h4><i class="fa-solid fa-user"></i> Datos Personales</h4>
-      <div class="grid-campos">
+      <!-- DATOS PERSONALES -->
+      <div class="seccion-form caja">
+        <h4><i class="fa-solid fa-user"></i> Datos Personales</h4>
+        <div class="grid-campos">
 
-        <div class="campo">
-          <label>Nombre <span class="req">*</span></label>
-          <input type="text" id="nombre" placeholder="Tu nombre">
-          <span class="campo-error" id="err-nombre"></span>
-        </div>
-
-        <div class="campo">
-          <label>Apellido <span class="req">*</span></label>
-          <input type="text" id="apellido" placeholder="Tu apellido">
-          <span class="campo-error" id="err-apellido"></span>
-        </div>
-
-        <div class="campo">
-          <label>Carnet de Identidad <span class="req">*</span></label>
-          <input type="text" id="carnet" placeholder="Ej: 1234567 o 1234567A">
-          <span class="campo-error" id="err-carnet"></span>
-        </div>
-
-        <div class="campo">
-          <label>Fecha de Nacimiento <span class="req">*</span></label>
-          <input type="date" id="fecha_nacimiento">
-          <span class="campo-error" id="err-fecha"></span>
-        </div>
-
-        <div class="campo">
-          <label>Edad</label>
-          <input type="text" id="edad" placeholder="Se calcula automaticamente" readonly>
-        </div>
-
-        <div class="campo">
-          <label>Celular <span class="req">*</span></label>
-          <input type="text" id="celular" placeholder="Ej: 70000000">
-          <span class="campo-error" id="err-celular"></span>
-        </div>
-
-        <div class="campo">
-          <label>Ministerio <span class="req">*</span></label>
-          <select id="ministerio_id">
-            <option value="">-- Selecciona tu ministerio --</option>
-            <?php foreach($ministerios as $m): ?>
-              <option value="<?php echo $m['id']; ?>"><?php echo htmlspecialchars($m['nombre']); ?></option>
-            <?php endforeach; ?>
-          </select>
-          <span class="campo-error" id="err-ministerio"></span>
-        </div>
-
-        <div class="campo">
-          <label>Iglesia <span class="req">*</span></label>
-          <select id="iglesia_id">
-            <option value="">-- Selecciona tu iglesia --</option>
-            <?php foreach($iglesias as $i): ?>
-              <option value="<?php echo $i['id']; ?>"><?php echo htmlspecialchars($i['nombre']); ?></option>
-            <?php endforeach; ?>
-          </select>
-          <span class="campo-error" id="err-iglesia"></span>
-        </div>
-
-        <div class="campo">
-          <label>Distrito <span class="req">*</span></label>
-          <select id="distrito_id">
-            <option value="">-- Selecciona tu distrito --</option>
-            <?php foreach($distritos as $d): ?>
-              <option value="<?php echo $d['id']; ?>"><?php echo htmlspecialchars($d['nombre']); ?></option>
-            <?php endforeach; ?>
-          </select>
-          <span class="campo-error" id="err-distrito"></span>
-        </div>
-
-        <div class="campo">
-          <label>Tipo de Inscrito <span class="req">*</span></label>
-          <select id="tipo_inscrito_id">
-            <option value="">-- Selecciona tu tipo --</option>
-            <?php foreach($tipos as $t): ?>
-              <option value="<?php echo $t['id']; ?>"><?php echo htmlspecialchars($t['nombre']); ?></option>
-            <?php endforeach; ?>
-          </select>
-          <span class="campo-error" id="err-tipo"></span>
-        </div>
-
-      </div><!-- grid-campos -->
-    </div>
-
-    <!-- ====================== PAQUETES ====================== -->
-    <div class="seccion-form">
-      <h3 style="text-align:center;margin-bottom:8px;">Elige tu Paquete</h3>
-      <p class="texto-paquete">Solo puedes elegir un paquete</p>
-      <span class="campo-error" id="err-paquete" style="text-align:center;display:block;"></span>
-
-      <ul class="lista-precios">
-        <?php foreach($paquetes as $paq):
-          $con_desc    = !empty($paq['descuento_porcentaje']);
-          $pf          = $con_desc ? $paq['precio_final'] : $paq['precio'];
-          $agotado     = $paq['cupos_disponibles'] <= 0;
-        ?>
-          <li>
-            <div class="tabla-precio <?php echo $agotado ? 'agotado' : ''; ?>">
-
-              <label class="paquete-label">
-                <input type="radio" name="paquete"
-                       value="<?php echo $paq['id']; ?>"
-                       data-precio="<?php echo $pf; ?>"
-                       data-nombre="<?php echo htmlspecialchars($paq['nombre']); ?>"
-                       <?php echo $agotado ? 'disabled' : ''; ?>>
-                <h3><?php echo htmlspecialchars($paq['nombre']); ?></h3>
-              </label>
-
-              <?php if($con_desc): ?>
-                <p class="precio-original">Bs. <?php echo number_format($paq['precio'],2); ?></p>
-                <p class="numero">Bs. <?php echo number_format($pf,2); ?></p>
-                <div class="badge-descuento">
-                  <i class="fa-solid fa-tag"></i>
-                  <?php echo htmlspecialchars($paq['descuento_nombre']); ?> —
-                  <?php echo $paq['descuento_porcentaje']; ?>% OFF
-                </div>
-                <p class="fecha-descuento">
-                  <i class="fa-solid fa-calendar"></i>
-                  Hasta: <?php echo date('d/m/Y', strtotime($paq['fecha_fin'])); ?>
-                </p>
-              <?php else: ?>
-                <p class="numero">Bs. <?php echo number_format($pf,2); ?></p>
-              <?php endif; ?>
-
-              <p class="cupos-disponibles">
-                <i class="fa-solid fa-users"></i>
-                <?php echo $paq['cupos_disponibles']; ?> / <?php echo $paq['cupo_total']; ?> cupos
-              </p>
-
-              <ul class="lista-beneficios">
-                <li>Recuerdo del encuentro</li>
-                <li>Todas las conferencias</li>
-                <li>Todos los talleres</li>
-              </ul>
-
-              <?php if($agotado): ?>
-                <p class="texto-agotado">AGOTADO</p>
-              <?php endif; ?>
-            </div>
-          </li>
-        <?php endforeach; ?>
-      </ul>
-    </div>
-
-    <!-- ====================== PRODUCTOS ====================== -->
-    <?php if(!empty($productos)): ?>
-    <div class="seccion-form seccion-productos">
-      <h3>Productos Adicionales</h3>
-      <p class="texto-paquete">Opcional — poleras, gorras y mas</p>
-      <div class="grid-productos">
-        <?php foreach($productos as $prod): ?>
-          <div class="card-producto">
-            <div class="producto-imagen">
-              <?php if(!empty($prod['imagen'])): ?>
-                <img src="img/<?php echo htmlspecialchars($prod['imagen']); ?>" alt="<?php echo htmlspecialchars($prod['nombre']); ?>">
-              <?php else: ?>
-                <div class="producto-sin-imagen"><i class="fa-solid fa-shirt"></i></div>
-              <?php endif; ?>
-            </div>
-            <div class="producto-info">
-              <h4><?php echo htmlspecialchars($prod['nombre']); ?></h4>
-              <p class="producto-precio">Bs. <?php echo number_format($prod['precio'],2); ?></p>
-              <p class="producto-cupos"><i class="fa-solid fa-box"></i> <?php echo $prod['cupos_disponibles']; ?> disponibles</p>
-              <div class="producto-cantidad">
-                <label>Cantidad:</label>
-                <input type="number" min="0" max="<?php echo $prod['cupos_disponibles']; ?>"
-                       class="input-cantidad" value="0"
-                       data-id="<?php echo $prod['id']; ?>"
-                       data-nombre="<?php echo htmlspecialchars($prod['nombre']); ?>"
-                       data-precio="<?php echo $prod['precio']; ?>">
-              </div>
-              <div class="producto-talla" style="display:none;">
-                <label>Talla:</label>
-                <select class="select-talla" data-id="<?php echo $prod['id']; ?>">
-                  <option value="">-- Talla --</option>
-                  <option value="XS">XS</option>
-                  <option value="S">S</option>
-                  <option value="M">M</option>
-                  <option value="L">L</option>
-                  <option value="XL">XL</option>
-                  <option value="XXL">XXL</option>
-                </select>
-                <span class="campo-error error-talla"></span>
-              </div>
-            </div>
+          <div class="campo">
+            <label>Nombre <span class="req">*</span></label>
+            <input type="text" id="nombre" placeholder="Tu nombre">
+            <span class="campo-error" id="err-nombre"></span>
           </div>
-        <?php endforeach; ?>
-      </div>
-    </div>
-    <?php endif; ?>
 
-    <!-- ====================== REGALO ====================== -->
-    <div class="seccion-form caja">
-      <h4><i class="fa-solid fa-gift"></i> Selecciona tu Regalo</h4>
-      <div class="campo" style="max-width:400px;">
-        <label>Regalo <span class="req">*</span></label>
-        <select id="regalo_id">
-          <option value="">-- Selecciona un regalo --</option>
-          <?php foreach($regalos as $r): ?>
-            <option value="<?php echo $r['id']; ?>"><?php echo htmlspecialchars($r['nombre']); ?></option>
+          <div class="campo">
+            <label>Apellido <span class="req">*</span></label>
+            <input type="text" id="apellido" placeholder="Tu apellido">
+            <span class="campo-error" id="err-apellido"></span>
+          </div>
+
+          <div class="campo">
+            <label>Carnet de Identidad <span class="req">*</span></label>
+            <input type="text" id="carnet" placeholder="Ej: 1234567 o 1234567-1A">
+            <span class="campo-error" id="err-carnet"></span>
+          </div>
+
+          <div class="campo">
+            <label>Fecha de Nacimiento <span class="req">*</span></label>
+            <input type="date" id="fecha_nacimiento">
+            <span class="campo-error" id="err-fecha"></span>
+          </div>
+
+          <div class="campo">
+            <label>Edad</label>
+            <input type="text" id="edad" placeholder="Se calcula automaticamente" readonly>
+          </div>
+
+          <div class="campo">
+            <label>Celular <span class="req">*</span></label>
+            <input type="text" id="celular" placeholder="Ej: 68319277">
+            <span class="campo-error" id="err-celular"></span>
+          </div>
+
+          <div class="campo">
+            <label>Tipo de Inscrito <span class="req">*</span></label>
+            <select id="tipo_inscrito_id">
+              <option value="">-- Selecciona tu tipo --</option>
+              <?php foreach($tipos as $t): ?>
+                <option value="<?php echo $t['id']; ?>"><?php echo htmlspecialchars($t['nombre']); ?></option>
+              <?php endforeach; ?>
+            </select>
+            <span class="campo-error" id="err-tipo"></span>
+          </div>
+
+          <!-- MINISTERIO: al elegir se derivan iglesia y distrito automáticamente -->
+          <div class="campo campo-ancho">
+            <label>Ministerio <span class="req">*</span></label>
+            <select id="ministerio_id">
+              <option value="">-- Selecciona tu ministerio --</option>
+              <?php foreach($ministerios as $m): ?>
+                <option value="<?php echo $m['id']; ?>"
+                        data-iglesia-id="<?php echo $m['iglesia_id']; ?>"
+                        data-iglesia="<?php echo htmlspecialchars($m['iglesia']); ?>"
+                        data-distrito-id="<?php echo $m['distrito_id']; ?>"
+                        data-distrito="<?php echo htmlspecialchars($m['distrito']); ?>">
+                  <?php echo htmlspecialchars($m['ministerio']); ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+            <span class="campo-error" id="err-ministerio"></span>
+          </div>
+
+          <!-- Iglesia y Distrito: se muestran automáticamente (solo lectura) -->
+          <div class="campo">
+            <label>Iglesia</label>
+            <input type="text" id="iglesia_nombre" placeholder="Se completa al elegir ministerio" readonly class="campo-derivado">
+          </div>
+
+          <div class="campo" style="display:none;"><!-- campo oculto -->
+            <input type="hidden" id="iglesia_id" value="">
+            <input type="hidden" id="distrito_id" value="">
+          </div>
+
+          <div class="campo">
+            <label>Distrito</label>
+            <input type="text" id="distrito_nombre" placeholder="Se completa al elegir ministerio" readonly class="campo-derivado">
+          </div>
+
+        </div><!-- grid-campos -->
+      </div>
+
+      <!-- PAQUETES -->
+      <div class="seccion-form">
+        <h3 style="text-align:center;margin-bottom:8px;">Elige tu Paquete</h3>
+        <p class="texto-paquete">Solo puedes elegir un paquete</p>
+        <span class="campo-error" id="err-paquete" style="text-align:center;display:block;"></span>
+
+        <ul class="lista-precios">
+          <?php foreach($paquetes as $paq):
+            $con_desc = !empty($paq['descuento_porcentaje']);
+            $pf       = $con_desc ? $paq['precio_final'] : $paq['precio'];
+            $agotado  = $paq['cupos_disponibles'] <= 0;
+          ?>
+            <li>
+              <div class="tabla-precio <?php echo $agotado ? 'agotado' : ''; ?>">
+                <label class="paquete-label">
+                  <input type="radio" name="paquete"
+                         value="<?php echo $paq['id']; ?>"
+                         data-precio="<?php echo $pf; ?>"
+                         data-nombre="<?php echo htmlspecialchars($paq['nombre']); ?>"
+                         <?php echo $agotado ? 'disabled' : ''; ?>>
+                  <h3><?php echo htmlspecialchars($paq['nombre']); ?></h3>
+                </label>
+
+                <?php if($con_desc): ?>
+                  <p class="precio-original">Bs. <?php echo number_format($paq['precio'],2); ?></p>
+                  <p class="numero">Bs. <?php echo number_format($pf,2); ?></p>
+                  <div class="badge-descuento">
+                    <i class="fa-solid fa-tag"></i>
+                    <?php echo htmlspecialchars($paq['descuento_nombre']); ?> —
+                    <?php echo $paq['descuento_porcentaje']; ?>% OFF
+                  </div>
+                  <p class="fecha-descuento">
+                    <i class="fa-solid fa-calendar"></i>
+                    Hasta: <?php echo date('d/m/Y', strtotime($paq['fecha_fin'])); ?>
+                  </p>
+                <?php else: ?>
+                  <p class="numero">Bs. <?php echo number_format($pf,2); ?></p>
+                <?php endif; ?>
+
+                <p class="cupos-disponibles">
+                  <i class="fa-solid fa-users"></i>
+                  <?php echo $paq['cupos_disponibles']; ?> / <?php echo $paq['cupo_total']; ?> cupos
+                </p>
+
+                <ul class="lista-beneficios">
+                  <li>Recuerdo del encuentro</li>
+                  <li>Todas las conferencias</li>
+                  <li>Todos los talleres</li>
+                </ul>
+
+                <?php if($agotado): ?>
+                  <p class="texto-agotado">AGOTADO</p>
+                <?php endif; ?>
+              </div>
+            </li>
           <?php endforeach; ?>
-        </select>
-        <span class="campo-error" id="err-regalo"></span>
+        </ul>
       </div>
-    </div>
 
-    <!-- ====================== RESUMEN ====================== -->
-    <div class="seccion-form resumen">
-      <h3>Resumen de tu Inscripcion</h3>
-      <div class="caja">
-        <div class="extras">
+      <!-- PRODUCTOS -->
+      <?php if(!empty($productos)): ?>
+      <div class="seccion-form seccion-productos">
+        <h3>Productos Adicionales</h3>
+        <p class="texto-paquete">Opcional — poleras, gorras y mas</p>
+        <div class="grid-productos">
+          <?php foreach($productos as $prod): ?>
+            <div class="card-producto">
+              <div class="producto-imagen">
+                <?php if(!empty($prod['imagen'])): ?>
+                  <img src="img/<?php echo htmlspecialchars($prod['imagen']); ?>" alt="<?php echo htmlspecialchars($prod['nombre']); ?>">
+                <?php else: ?>
+                  <div class="producto-sin-imagen"><i class="fa-solid fa-shirt"></i></div>
+                <?php endif; ?>
+              </div>
+              <div class="producto-info">
+                <h4><?php echo htmlspecialchars($prod['nombre']); ?></h4>
+                <p class="producto-precio">Bs. <?php echo number_format($prod['precio'],2); ?></p>
+                <p class="producto-cupos"><i class="fa-solid fa-box"></i> <?php echo $prod['cupos_disponibles']; ?> disponibles</p>
+                <div class="producto-cantidad">
+                  <label>Cantidad:</label>
+                  <input type="number" min="0" max="<?php echo $prod['cupos_disponibles']; ?>"
+                         class="input-cantidad" value="0"
+                         data-id="<?php echo $prod['id']; ?>"
+                         data-nombre="<?php echo htmlspecialchars($prod['nombre']); ?>"
+                         data-precio="<?php echo $prod['precio']; ?>">
+                </div>
+                <div class="producto-talla" style="display:none;">
+                  <label>Talla:</label>
+                  <select class="select-talla" data-id="<?php echo $prod['id']; ?>">
+                    <option value="">-- Talla --</option>
+                    <option value="XS">XS</option>
+                    <option value="S">S</option>
+                    <option value="M">M</option>
+                    <option value="L">L</option>
+                    <option value="XL">XL</option>
+                    <option value="XXL">XXL</option>
+                  </select>
+                  <span class="campo-error error-talla"></span>
+                </div>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+      <?php endif; ?>
+
+      <!-- REGALO -->
+      <div class="seccion-form caja">
+        <h4><i class="fa-solid fa-gift"></i> Selecciona tu Regalo</h4>
+        <div class="campo" style="max-width:400px;">
+          <label>Regalo <span class="req">*</span></label>
+          <select id="regalo_id">
+            <option value="">-- Selecciona un regalo --</option>
+            <?php foreach($regalos as $r): ?>
+              <option value="<?php echo $r['id']; ?>"><?php echo htmlspecialchars($r['nombre']); ?></option>
+            <?php endforeach; ?>
+          </select>
+          <span class="campo-error" id="err-regalo"></span>
+        </div>
+      </div>
+
+      <!-- BOTON CALCULAR -->
+      <div class="seccion-form resumen">
+        <h3>Resumen de tu Inscripcion</h3>
+        <div class="caja" style="text-align:center;padding:25px;">
           <button type="button" id="btn-calcular" class="button" disabled>
-            <i class="fa-solid fa-calculator"></i> Calcular Total y Ver QR
+            <i class="fa-solid fa-eye"></i> Ver Resumen y Continuar al Pago
           </button>
           <p class="texto-paquete" id="hint-calcular">Completa todos los campos para activar este boton</p>
         </div>
-        <div class="total">
-          <p>Detalle:</p>
-          <div id="lista-productos"></div>
-          <p>Total a pagar:</p>
-          <div id="suma-total"></div>
+      </div>
+
+    </form>
+  </div><!-- fin bloque-formulario -->
+
+  <!-- ====================== BLOQUE RESUMEN (oculto hasta calcular) ====================== -->
+  <div id="bloque-resumen" style="display:none;">
+
+    <div class="resumen-completo caja">
+      <h4><i class="fa-solid fa-clipboard-list"></i> Verifica tus Datos Antes de Pagar</h4>
+
+      <div class="resumen-grid">
+        <!-- columna izquierda: datos personales -->
+        <div class="resumen-col">
+          <h5 class="resumen-subtitulo"><i class="fa-solid fa-user"></i> Datos Personales</h5>
+          <table class="tabla-resumen">
+            <tr><td class="lbl">Nombre completo</td><td id="res-nombre-completo">—</td></tr>
+            <tr><td class="lbl">Carnet</td><td id="res-carnet">—</td></tr>
+            <tr><td class="lbl">Fecha de nacimiento</td><td id="res-fecha">—</td></tr>
+            <tr><td class="lbl">Edad</td><td id="res-edad">—</td></tr>
+            <tr><td class="lbl">Celular</td><td id="res-celular">—</td></tr>
+            <tr><td class="lbl">Tipo de inscrito</td><td id="res-tipo">—</td></tr>
+          </table>
+
+          <h5 class="resumen-subtitulo" style="margin-top:20px;"><i class="fa-solid fa-church"></i> Datos de Iglesia</h5>
+          <table class="tabla-resumen">
+            <tr><td class="lbl">Ministerio</td><td id="res-ministerio">—</td></tr>
+            <tr><td class="lbl">Iglesia</td><td id="res-iglesia">—</td></tr>
+            <tr><td class="lbl">Distrito</td><td id="res-distrito">—</td></tr>
+          </table>
         </div>
+
+        <!-- columna derecha: paquete, productos, regalo, total -->
+        <div class="resumen-col">
+          <h5 class="resumen-subtitulo"><i class="fa-solid fa-box-open"></i> Inscripcion</h5>
+          <table class="tabla-resumen">
+            <tr><td class="lbl">Paquete</td><td id="res-paquete">—</td></tr>
+            <tr><td class="lbl">Precio paquete</td><td id="res-precio-paquete">—</td></tr>
+            <tr><td class="lbl">Regalo elegido</td><td id="res-regalo">—</td></tr>
+          </table>
+
+          <div id="res-productos-wrap" style="display:none;">
+            <h5 class="resumen-subtitulo" style="margin-top:20px;"><i class="fa-solid fa-shirt"></i> Productos Adicionales</h5>
+            <table class="tabla-resumen" id="res-productos-tabla"></table>
+          </div>
+
+          <div class="resumen-total-wrap">
+            <span class="resumen-total-lbl">TOTAL A PAGAR</span>
+            <span class="resumen-total-num" id="res-total">Bs. 0.00</span>
+          </div>
+        </div>
+      </div><!-- resumen-grid -->
+
+      <!-- botones de acción -->
+      <div class="resumen-acciones">
+        <button type="button" id="btn-editar" class="button hollow">
+          <i class="fa-solid fa-pen-to-square"></i> Editar mis datos
+        </button>
+        <button type="button" id="btn-ir-pago" class="button">
+          <i class="fa-solid fa-qrcode"></i> Todo esta correcto, ir al pago
+        </button>
       </div>
     </div>
 
-    <!-- ====================== QR ====================== -->
-    <div id="seccion-qr" class="seccion-qr" style="display:none;">
+  </div><!-- fin bloque-resumen -->
+
+  <!-- ====================== QR ====================== -->
+  <div id="seccion-qr" style="display:none;">
+    <div class="seccion-qr">
       <h3><i class="fa-solid fa-qrcode"></i> Realiza tu Pago por QR</h3>
       <div class="qr-contenido">
 
@@ -318,8 +378,7 @@ while($r = $res->fetch_assoc()) $regalos[] = $r;
 
       </div>
     </div>
-
-  </form><!-- fin form-registro -->
+  </div>
 
   <!-- ====================== BUSCADOR DE ESTADO ====================== -->
   <div class="seccion-form caja buscador-estado" style="margin-top:50px;">

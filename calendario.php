@@ -1,7 +1,7 @@
 <?php include_once 'includes/templates/header.php'; ?>
 
 <section class="seccion contenedor">
-  <h2>Calendario de Eventos</h2>
+  <h2>Pre Calendario de Eventos</h2>
 
   <?php 
     try {
@@ -74,18 +74,21 @@
 
             /* icono segun tipo de evento */
             $iconos = [
-              'Conferencia' => 'fa-solid fa-cross',
-              'Taller'      => 'fa-solid fa-book-open',
-              'Vigilia'     => 'fa-solid fa-moon',
-              'Paseo'       => 'fa-solid fa-person-hiking',
-              'Carrera'     => 'fa-solid fa-person-running',
-              'Clausura'    => 'fa-solid fa-flag-checkered',
+                'Conferencia'   => 'fa-solid fa-cross',
+                'Taller'        => 'fa-solid fa-book-open',
+                'Vigilia'       => 'fa-solid fa-moon',
+                'Paseo'         => 'fa-solid fa-person-hiking',
+                'Paseo(Tours)'  => 'fa-solid fa-bus',
+                'Carrera'       => 'fa-solid fa-person-running',
+                'Clausura'      => 'fa-solid fa-flag-checkered',
+                'Predica'       => 'fa-solid fa-bible',
+                'Concurso'      => 'fa-solid fa-trophy',
+                'Deportivo'     => 'fa-solid fa-futbol',
+                'Premiacion'    => 'fa-solid fa-medal',
             ];
-            $icono = isset($iconos[$evento['tipo_evento']]) 
-                     ? $iconos[$evento['tipo_evento']] 
-                     : 'fa-solid fa-calendar-check';
-
-            $clase_tipo = strtolower(str_replace(' ', '-', $evento['tipo_evento']));
+            $icono      = $iconos[$evento['tipo_evento']] ?? 'fa-solid fa-calendar-check';
+            $clase_tipo = strtolower(
+                str_replace(['(', ')', ' '], ['-', '', '-'], $evento['tipo_evento']));
           ?>
 
             <div class="tarjeta-evento tipo-<?php echo $clase_tipo; ?>">
