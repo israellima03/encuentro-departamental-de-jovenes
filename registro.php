@@ -190,10 +190,35 @@ while($r = $res->fetch_assoc()) $regalos[] = $r;
                   <?php echo $paq['cupos_disponibles']; ?> / <?php echo $paq['cupo_total']; ?> cupos
                 </p>
 
+                <!-- lista de beneficios segun id del paquete -->
                 <ul class="lista-beneficios">
-                  <li>Recuerdo del encuentro</li>
-                  <li>Todas las conferencias</li>
-                  <li>Todos los talleres</li>
+                  <?php
+                    $bens = [
+                      1 => [
+                        'Todas las conferencias',
+                        'Recuerdo del encuentro',
+                        'Tours Tarija',
+                        'Encuentro deportivo',
+                      ],
+                      2 => [
+                        'Todas las conferencias',
+                        'Recuerdo del encuentro',
+                        'Tours Tarija',
+                        'Encuentro deportivo',
+                        'Alojamiento en iglesia',
+                      ],
+                      3 => [
+                        'Todas las conferencias',
+                        'Recuerdo del encuentro',
+                        'Tours Tarija',
+                        'Encuentro deportivo',
+                        'Habitacion en alojamiento',
+                      ],
+                    ];
+                    $lista = $bens[$paq['id']] ?? ['Entrada al encuentro'];
+                    foreach($lista as $b): ?>
+                      <li><?php echo $b; ?></li>
+                  <?php endforeach; ?>
                 </ul>
 
                 <?php if($agotado): ?>
@@ -234,14 +259,22 @@ while($r = $res->fetch_assoc()) $regalos[] = $r;
                 </div>
                 <div class="producto-talla" style="display:none;">
                   <label>Talla:</label>
-                  <select class="select-talla" data-id="<?php echo $prod['id']; ?>">
+                  <select class="select-talla" data-id="<?php echo $prod['id']; ?>"
+                          data-tipo="<?php echo htmlspecialchars($prod['tipo']); ?>">
                     <option value="">-- Talla --</option>
-                    <option value="XS">XS</option>
-                    <option value="S">S</option>
-                    <option value="M">M</option>
-                    <option value="L">L</option>
-                    <option value="XL">XL</option>
-                    <option value="XXL">XXL</option>
+                    <?php if(trim(strtolower($prod['tipo'])) === 'Gorra'): ?>
+                      <option value="Chica">Chica</option>
+                      <option value="Medio">Medio</option>
+                      <option value="Grande">Grande</option>
+                      <option value="Extra Grande">Extra Grande</option>
+                    <?php else: ?>
+                      <option value="XS">XS</option>
+                      <option value="S">S</option>
+                      <option value="M">M</option>
+                      <option value="L">L</option>
+                      <option value="XL">XL</option>
+                      <option value="XXL">XXL</option>
+                    <?php endif; ?>
                   </select>
                   <span class="campo-error error-talla"></span>
                 </div>
@@ -349,7 +382,7 @@ while($r = $res->fetch_assoc()) $regalos[] = $r;
       <div class="qr-contenido">
 
         <div class="qr-imagen-wrap">
-          <p class="qr-instruccion"><i class="fa-solid fa-circle-info"></i> Escanea este QR con tu app de banca movil</p>
+          <p class="qr-instruccion"><i class="fa-solid fa-circle-info"></i>Descarga y Escanea este QR con tu app de banca movil no olvides poner tu nombre en el comprobante</p>
           <img src="img/comprobante1.jpeg" alt="QR de pago" class="qr-imagen">
           <a href="img/comprobante1.jpeg" download="QR-Encuentro.jpeg" class="button hollow">
             <i class="fa-solid fa-download"></i> Descargar QR
