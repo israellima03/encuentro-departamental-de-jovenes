@@ -258,11 +258,14 @@ while($r = $res->fetch_assoc()) $regalos[] = $r;
                          data-precio="<?php echo $prod['precio']; ?>">
                 </div>
                 <div class="producto-talla" style="display:none;">
-                  <label>Talla:</label>
+                 <label>Talla:</label>
                   <select class="select-talla" data-id="<?php echo $prod['id']; ?>"
-                          data-tipo="<?php echo htmlspecialchars($prod['tipo']); ?>">
+                          data-tipo="<?php echo htmlspecialchars(strtolower(trim($prod['tipo']))); ?>">
                     <option value="">-- Talla --</option>
-                    <?php if(trim(strtolower($prod['tipo'])) === 'Gorra'): ?>
+                    <?php
+                      $tipo_prod = strtolower(trim($prod['tipo']));
+                      if($tipo_prod === 'gorra'):
+                    ?>
                       <option value="Chica">Chica</option>
                       <option value="Medio">Medio</option>
                       <option value="Grande">Grande</option>

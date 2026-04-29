@@ -125,7 +125,7 @@
           <i class="fa-solid fa-lock"></i>
           ¿Eres lider? Ingresa con tu cuenta para registrar jovenes en efectivo
         </p>
-        <a href="login.php" class="button button-login-lider">
+        <a href="admin/login.php" class="button button-login-lider">
           <i class="fa-solid fa-right-to-bracket"></i> Acceso Lideres
         </a>
         <p class="aviso-solo-lider">

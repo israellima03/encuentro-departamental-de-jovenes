@@ -72,6 +72,80 @@ console.log("JS FUNCIONANDO");
         }
 
         /* ========================================
+           BUSCADOR DE ESTADO — siempre activo
+           ======================================== */
+        var btnBuscarEstado = document.getElementById('btn-buscar');
+        if (btnBuscarEstado) {
+            btnBuscarEstado.addEventListener('click', function () {
+                ejecutarBusqueda();
+            });
+        }
+
+        /* tambien buscar al presionar Enter en el input */
+        var inputBuscar = document.getElementById('buscar-inscrito');
+        if (inputBuscar) {
+            inputBuscar.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    ejecutarBusqueda();
+                }
+            });
+        }
+
+        function ejecutarBusqueda() {
+            var busqueda  = document.getElementById('buscar-inscrito').value.trim();
+            var resultado = document.getElementById('resultado-busqueda');
+            var btn       = document.getElementById('btn-buscar');
+
+            if (!busqueda) {
+                resultado.innerHTML = '<p style="color:#da002b;text-align:center;">Ingresa tu carnet o celular</p>';
+                return;
+            }
+
+            btn.disabled  = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Buscando...';
+
+            var fd = new FormData();
+            fd.append('accion',   'buscar_estado');
+            fd.append('busqueda', busqueda);
+
+            fetch('guardar_inscripcion.php', { method: 'POST', body: fd })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                btn.disabled  = false;
+                btn.innerHTML = '<i class="fa-solid fa-search"></i> Consultar Estado';
+
+                if (data.ok) {
+                    var d   = data.datos;
+                    var est = d.estado_pago === 'confirmado'
+                        ? '<span class="estado-confirmado"><i class="fa-solid fa-circle-check"></i> CONFIRMADO</span>'
+                        : '<span class="estado-pendiente"><i class="fa-solid fa-clock"></i> PENDIENTE — en espera de verificacion</span>';
+                    resultado.innerHTML =
+                        '<div class="card-resultado-estado">' +
+                        '<p><strong><i class="fa-solid fa-user"></i> ' + d.nombre + ' ' + d.apellido + '</strong></p>' +
+                        '<p><i class="fa-solid fa-id-card"></i> Carnet: ' + d.carnet + '</p>' +
+                        '<p><i class="fa-solid fa-box"></i> Paquete: ' + d.paquete + '</p>' +
+                        '<p><i class="fa-solid fa-calendar"></i> Registrado: ' + d.fecha + '</p>' +
+                        '<p>Estado: ' + est + '</p>' +
+                        (d.estado_pago === 'pendiente'
+                            ? '<p class="aviso-pendiente-msg">Tu comprobante esta siendo revisado por la tesorera. Para saber si fue confirmada pregunta a tu lider local o distrital.</p>'
+                            : '<p class="aviso-confirmado-msg">Tu inscripcion esta confirmada. Nos vemos en el encuentro!</p>') +
+                        '</div>';
+                } else {
+                    resultado.innerHTML =
+                        '<div class="aviso-inscrito-existente" style="display:block;">' +
+                        '<i class="fa-solid fa-circle-info"></i> ' + data.msg +
+                        '</div>';
+                }
+            })
+            .catch(function () {
+                btn.disabled  = false;
+                btn.innerHTML = '<i class="fa-solid fa-search"></i> Consultar Estado';
+                resultado.innerHTML = '<p style="color:#da002b;text-align:center;">Error de conexion. Intenta de nuevo.</p>';
+            });
+        }
+
+        /* ========================================
            REGISTRO
            ======================================== */
         var formReg = document.getElementById('form-registro');
@@ -217,7 +291,6 @@ console.log("JS FUNCIONANDO");
             var nombrePaq    = radio.dataset.nombre;
             var total        = precioPaq;
 
-            // Datos personales
             setText('res-nombre-completo', nombre + ' ' + apellido);
             setText('res-carnet',   carnet);
             setText('res-fecha',    formatearFecha(fecha));
@@ -225,17 +298,14 @@ console.log("JS FUNCIONANDO");
             setText('res-celular',  celular);
             setText('res-tipo',     tipoTexto);
 
-            // Datos iglesia
             setText('res-ministerio', ministerioTx);
             setText('res-iglesia',    iglesiaTx  || '—');
             setText('res-distrito',   distritoTx || '—');
 
-            // Paquete y regalo
             setText('res-paquete',        nombrePaq);
             setText('res-precio-paquete', 'Bs. ' + precioPaq.toFixed(2));
             setText('res-regalo',         regaloTx);
 
-            // Productos
             var tablaProds = document.getElementById('res-productos-tabla');
             var wrapProds  = document.getElementById('res-productos-wrap');
             tablaProds.innerHTML = '';
@@ -264,7 +334,6 @@ console.log("JS FUNCIONANDO");
             setText('res-total', 'Bs. ' + total.toFixed(2));
             formReg.dataset.totalCalculado = total.toFixed(2);
 
-            // Cambiar vista: ocultar formulario, mostrar resumen
             document.getElementById('bloque-formulario').style.display = 'none';
             document.getElementById('bloque-resumen').style.display    = 'block';
             document.getElementById('seccion-qr').style.display        = 'none';
@@ -450,9 +519,22 @@ console.log("JS FUNCIONANDO");
 
         /* ---- MENSAJE FINAL EXITO ---- */
         function mostrarExito(nombre, apellido) {
-            var sec = document.querySelector('.seccion.contenedor');
-            sec.innerHTML =
-                '<div class="mensaje-registro-exitoso">' +
+            /* ocultar formulario y bloques relacionados SIN borrar el buscador */
+            var bloqueForm = document.getElementById('bloque-formulario');
+            var bloqueRes  = document.getElementById('bloque-resumen');
+            var secQR      = document.getElementById('seccion-qr');
+            var avisoQR    = document.querySelector('.aviso-qr');
+
+            if (bloqueForm) bloqueForm.style.display = 'none';
+            if (bloqueRes)  bloqueRes.style.display  = 'none';
+            if (secQR)      secQR.style.display      = 'none';
+            if (avisoQR)    avisoQR.style.display    = 'none';
+
+            /* crear el mensaje de exito e insertarlo antes del buscador */
+            var buscador   = document.querySelector('.buscador-estado');
+            var mensajeDiv = document.createElement('div');
+            mensajeDiv.className = 'mensaje-registro-exitoso';
+            mensajeDiv.innerHTML =
                 '<div class="mre-icono"><i class="fa-solid fa-circle-check"></i></div>' +
                 '<h3>Inscripcion enviada, ' + nombre + ' ' + apellido + '!</h3>' +
                 '<p>Tu registro ha sido recibido con estado <strong>PENDIENTE</strong>.</p>' +
@@ -460,71 +542,20 @@ console.log("JS FUNCIONANDO");
                 '<div class="mre-nota">' +
                 '<i class="fa-solid fa-envelope"></i> ' +
                 'Se envio un aviso a la tesorera con tu comprobante adjunto.' +
-                '</div>' +
-                '</div>' +
-
-                /* buscador de estado incluido en el mensaje de exito */
-                '<div class="seccion-form caja buscador-estado" style="margin-top:30px;">' +
-                '<h4><i class="fa-solid fa-magnifying-glass"></i> Consulta el estado de tu inscripcion</h4>' +
-                '<p style="text-align:center;color:#666;font-size:0.9em;">Ingresa tu carnet o celular para ver si ya fue confirmada</p>' +
-                '<div class="campo" style="max-width:400px;margin:0 auto;">' +
-                '<label>Carnet o Celular</label>' +
-                '<input type="text" id="buscar-inscrito" placeholder="Ej: 1234567 o 70000000">' +
-                '</div>' +
-                '<div style="text-align:center;margin-top:10px;">' +
-                '<button type="button" id="btn-buscar" class="button hollow">' +
-                '<i class="fa-solid fa-search"></i> Consultar Estado' +
-                '</button>' +
-                '</div>' +
-                '<div id="resultado-busqueda" style="margin-top:20px;"></div>' +
                 '</div>';
 
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-
-            /* reactiva el buscador que se acaba de inyectar */
-            document.getElementById('btn-buscar').addEventListener('click', function() {
-                var busqueda  = document.getElementById('buscar-inscrito').value.trim();
-                var resultado = document.getElementById('resultado-busqueda');
-                if (!busqueda) { resultado.innerHTML = '<p style="color:#da002b;text-align:center;">Ingresa tu carnet o celular</p>'; return; }
-
-                this.disabled  = true;
-                this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Buscando...';
-                var self = this;
-
-                var fd = new FormData();
-                fd.append('accion', 'buscar_estado');
-                fd.append('busqueda', busqueda);
-
-                fetch('guardar_inscripcion.php', { method: 'POST', body: fd })
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    self.disabled  = false;
-                    self.innerHTML = '<i class="fa-solid fa-search"></i> Consultar Estado';
-                    if (data.ok) {
-                        var d   = data.datos;
-                        var est = d.estado_pago === 'confirmado'
-                            ? '<span class="estado-confirmado"><i class="fa-solid fa-circle-check"></i> CONFIRMADO</span>'
-                            : '<span class="estado-pendiente"><i class="fa-solid fa-clock"></i> PENDIENTE — en espera de verificacion</span>';
-                        resultado.innerHTML =
-                            '<div class="card-resultado-estado">' +
-                            '<p><strong><i class="fa-solid fa-user"></i> ' + d.nombre + ' ' + d.apellido + '</strong></p>' +
-                            '<p><i class="fa-solid fa-id-card"></i> Carnet: ' + d.carnet + '</p>' +
-                            '<p><i class="fa-solid fa-box"></i> Paquete: ' + d.paquete + '</p>' +
-                            '<p><i class="fa-solid fa-calendar"></i> Registrado: ' + d.fecha + '</p>' +
-                            '<p>Estado: ' + est + '</p>' +
-                            (d.estado_pago === 'pendiente'
-                                ? '<p class="aviso-pendiente-msg">Tu comprobante esta siendo revisado por la tesorera. Para saber si fue confirmada pregunta a tu lider local o distrital.</p>'
-                                : '<p class="aviso-confirmado-msg">Tu inscripcion esta confirmada. Nos vemos en el encuentro!</p>') +
-                            '</div>';
-                    } else {
-                        resultado.innerHTML = '<div class="aviso-inscrito-existente" style="display:block;"><i class="fa-solid fa-circle-info"></i> ' + data.msg + '</div>';
-                    }
-                })
-                .catch(function() {
-                    self.disabled  = false;
-                    self.innerHTML = '<i class="fa-solid fa-search"></i> Consultar Estado';
-                });
-            });
+            if (buscador) {
+                /* insertar el mensaje justo antes del buscador existente */
+                buscador.parentNode.insertBefore(mensajeDiv, buscador);
+                /* asegurar que el buscador sea visible */
+                buscador.style.display = 'block';
+                mensajeDiv.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                /* si no encuentra el buscador lo agrega al contenedor */
+                var sec = document.querySelector('.seccion.contenedor');
+                if (sec) sec.appendChild(mensajeDiv);
+                mensajeDiv.scrollIntoView({ behavior: 'smooth' });
+            }
         }
 
         /* ==========================================
@@ -621,19 +652,18 @@ console.log("JS FUNCIONANDO");
             var p = f.split('-');
             return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : f;
         }
+
         /* permite al usuario corregir sus datos y volver a intentar */
         window.cerrarAvisoInscrito = function() {
             var div = document.getElementById('aviso-ya-inscrito');
             if (div) div.style.display = 'none';
 
-            /* reactiva el boton calcular */
             var btn = document.getElementById('btn-calcular');
             if (btn) {
                 btn.disabled  = false;
                 btn.innerHTML = '<i class="fa-solid fa-eye"></i> Ver Resumen y Continuar al Pago';
-           }
+            }
 
-            /* sube al formulario para que pueda corregir */
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 

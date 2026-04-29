@@ -1,0 +1,273 @@
+/* ============================================================
+   CONFIRMAR QR — CSS COMPLETO
+   ============================================================ */
+
+/* ── STATS MINI ── */
+.qr-stats-mini {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.qr-stat-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  background: var(--orange-light);
+  border: 1px solid var(--orange);
+  border-radius: 20px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #92400e;
+  white-space: nowrap;
+}
+
+.qr-stat-item.qr-stat-ok {
+  background: var(--green-light);
+  border-color: var(--green);
+  color: #065f46;
+}
+
+.qr-total-lbl {
+  font-size: 12px;
+  color: var(--txt-xsoft);
+  font-weight: 500;
+}
+
+/* ── FILTROS ── */
+.qr-filtros {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: #fff;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.qr-filtro-grupo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0 12px;
+  flex: 1;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.qr-filtro-grupo i {
+  color: var(--txt-xsoft);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.qr-filtro-grupo input {
+  border: none;
+  background: transparent;
+  padding: 9px 0;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--txt);
+  outline: none;
+  width: 100%;
+  min-width: 0;
+}
+
+.qr-filtro-grupo span {
+  color: var(--txt-xsoft);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+/* ── CARD ── */
+.card {
+  overflow: visible !important;
+  min-width: 0;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* ── TABLA WRAP ── */
+.tabla-wrap {
+  display: block !important;
+  width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.tabla-wrap::-webkit-scrollbar {
+  height: 6px;
+}
+.tabla-wrap::-webkit-scrollbar-track {
+  background: var(--bg);
+  border-radius: 3px;
+}
+.tabla-wrap::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+.tabla-wrap::-webkit-scrollbar-thumb:hover {
+  background: var(--txt-xsoft);
+}
+
+/* ── TABLA ── */
+#tabla-qr {
+  width: max-content !important;
+  min-width: 1100px !important;
+  border-collapse: collapse;
+  table-layout: auto !important;
+}
+
+#tabla-qr thead th {
+  padding: 9px 10px;
+  font-size: 10.5px;
+  white-space: nowrap;
+  letter-spacing: .5px;
+}
+
+#tabla-qr tbody td {
+  padding: 8px 10px;
+  font-size: 12px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+#tabla-qr .participante-avatar {
+  width: 26px;
+  height: 26px;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+#tabla-qr .participante-nombre {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+#tabla-qr .participante-cell {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+#tabla-qr .badge {
+  padding: 2px 7px;
+  font-size: 10px;
+}
+
+#tabla-qr .btn-accion {
+  width: 26px;
+  height: 26px;
+  font-size: 11px;
+}
+
+/* columna # fija */
+#tabla-qr thead th:nth-child(1),
+#tabla-qr tbody td:nth-child(1) {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--card-bg);
+}
+#tabla-qr thead th:nth-child(1) {
+  background: var(--sidebar-bg);
+  z-index: 3;
+}
+
+/* columna participante fija */
+#tabla-qr thead th:nth-child(2),
+#tabla-qr tbody td:nth-child(2) {
+  position: sticky;
+  left: 38px;
+  z-index: 2;
+  background: var(--card-bg);
+  box-shadow: 3px 0 6px rgba(0,0,0,.06);
+}
+#tabla-qr thead th:nth-child(2) {
+  background: var(--sidebar-bg);
+  z-index: 3;
+}
+
+/* ── PAGE HEADER ── */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .page-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .qr-stats-mini {
+    width: 100%;
+    gap: 8px;
+  }
+
+  .qr-stat-item {
+    flex: 1;
+    justify-content: center;
+    min-width: 120px;
+  }
+
+  .qr-filtros {
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .qr-filtro-grupo {
+    width: 100%;
+    flex: unset;
+  }
+
+  #qr-estado,
+  #btn-limpiar-filtros {
+    width: 100%;
+  }
+
+  #main-content {
+    padding: 14px 10px 30px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #tabla-qr thead th,
+  #tabla-qr tbody td {
+    padding: 7px 8px;
+    font-size: 11px;
+  }
+
+  .page-title {
+    font-size: 20px !important;
+  }
+}
+
+/* fix scroll horizontal en paginas con tabla */
+@media (max-width: 900px) {
+  body.sidebar-collapsed .main-wrapper {
+    margin-left: 0;
+    width: 100%;
+    max-width: 100vw;
+  }
+}
