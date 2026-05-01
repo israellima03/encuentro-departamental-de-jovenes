@@ -2,21 +2,15 @@
 include_once 'includes/templates/header.php';
 require_once('includes/funciones/bd_conexion.php');
 
-/* ============================================
-   CARGA DE COMBOS Y DATOS
-   ============================================ */
-
-$ministerios = [];
+$iglesias = [];
 $res = $conn->query("
-    SELECT m.id, m.nombre AS ministerio,
-           i.id AS iglesia_id, i.nombre AS iglesia,
+    SELECT i.id, i.nombre AS iglesia,
            d.id AS distrito_id, d.nombre AS distrito
-    FROM ministerios m
-    LEFT JOIN iglesias i ON m.iglesia_id = i.id
+    FROM iglesias i
     LEFT JOIN distritos d ON i.distrito_id = d.id
-    ORDER BY m.nombre
+    ORDER BY i.nombre
 ");
-while($r = $res->fetch_assoc()) $ministerios[] = $r;
+while($r = $res->fetch_assoc()) $iglesias[] = $r;
 
 $tipos = [];
 $res = $conn->query("SELECT id, nombre FROM tipos_inscrito ORDER BY id");
@@ -40,9 +34,10 @@ $productos = [];
 $res = $conn->query("SELECT id, nombre, precio, tipo, cupos_disponibles, imagen FROM productos WHERE cupos_disponibles > 0 ORDER BY nombre");
 while($r = $res->fetch_assoc()) $productos[] = $r;
 
-$regalos = [];
-$res = $conn->query("SELECT id, nombre FROM regalos WHERE cupos_disponibles > 0 ORDER BY nombre");
-while($r = $res->fetch_assoc()) $regalos[] = $r;
+$regalo_fijo_id     = 2;
+$regalo_fijo_nombre = 'Boligrafo y folder';
+$res_r = $conn->query("SELECT id, nombre FROM regalos WHERE id = $regalo_fijo_id LIMIT 1");
+if($res_r && $row_r = $res_r->fetch_assoc()) $regalo_fijo_nombre = $row_r['nombre'];
 ?>
 
 <section class="seccion contenedor">
@@ -54,11 +49,9 @@ while($r = $res->fetch_assoc()) $regalos[] = $r;
     Completa todos los datos, revisa el resumen, escanea el QR, sube tu comprobante y tu inscripcion quedara como <strong>PENDIENTE</strong> hasta que la tesorera la confirme.
   </div>
 
-  <!-- ====================== FORMULARIO ====================== -->
   <div id="bloque-formulario">
     <form id="form-registro" novalidate>
 
-      <!-- DATOS PERSONALES -->
       <div class="seccion-form caja">
         <h4><i class="fa-solid fa-user"></i> Datos Personales</h4>
         <div class="grid-campos">
@@ -109,44 +102,32 @@ while($r = $res->fetch_assoc()) $regalos[] = $r;
             <span class="campo-error" id="err-tipo"></span>
           </div>
 
-          <!-- MINISTERIO: al elegir se derivan iglesia y distrito automáticamente -->
           <div class="campo campo-ancho">
-            <label>Ministerio <span class="req">*</span></label>
-            <select id="ministerio_id">
-              <option value="">-- Selecciona tu ministerio --</option>
-              <?php foreach($ministerios as $m): ?>
-                <option value="<?php echo $m['id']; ?>"
-                        data-iglesia-id="<?php echo $m['iglesia_id']; ?>"
-                        data-iglesia="<?php echo htmlspecialchars($m['iglesia']); ?>"
-                        data-distrito-id="<?php echo $m['distrito_id']; ?>"
-                        data-distrito="<?php echo htmlspecialchars($m['distrito']); ?>">
-                  <?php echo htmlspecialchars($m['ministerio']); ?>
+            <label>Iglesia <span class="req">*</span></label>
+            <select id="iglesia_id">
+              <option value="">-- Selecciona tu iglesia --</option>
+              <?php foreach($iglesias as $ig): ?>
+                <option value="<?php echo $ig['id']; ?>"
+                        data-distrito-id="<?php echo $ig['distrito_id'] ?? ''; ?>"
+                        data-distrito="<?php echo htmlspecialchars($ig['distrito'] ?? ''); ?>">
+                  <?php echo htmlspecialchars($ig['iglesia']); ?>
                 </option>
               <?php endforeach; ?>
             </select>
-            <span class="campo-error" id="err-ministerio"></span>
+            <span class="campo-error" id="err-iglesia"></span>
           </div>
 
-          <!-- Iglesia y Distrito: se muestran automáticamente (solo lectura) -->
-          <div class="campo">
-            <label>Iglesia</label>
-            <input type="text" id="iglesia_nombre" placeholder="Se completa al elegir ministerio" readonly class="campo-derivado">
-          </div>
-
-          <div class="campo" style="display:none;"><!-- campo oculto -->
-            <input type="hidden" id="iglesia_id" value="">
-            <input type="hidden" id="distrito_id" value="">
-          </div>
+          <input type="hidden" id="distrito_id" value="">
+          <input type="hidden" id="ministerio_id" value="0">
 
           <div class="campo">
             <label>Distrito</label>
-            <input type="text" id="distrito_nombre" placeholder="Se completa al elegir ministerio" readonly class="campo-derivado">
+            <input type="text" id="distrito_nombre" placeholder="Se completa al elegir iglesia" readonly class="campo-derivado">
           </div>
 
-        </div><!-- grid-campos -->
+        </div>
       </div>
 
-      <!-- PAQUETES -->
       <div class="seccion-form">
         <h3 style="text-align:center;margin-bottom:8px;">Elige tu Paquete</h3>
         <p class="texto-paquete">Solo puedes elegir un paquete</p>
@@ -190,30 +171,11 @@ while($r = $res->fetch_assoc()) $regalos[] = $r;
                   <?php echo $paq['cupos_disponibles']; ?> / <?php echo $paq['cupo_total']; ?> cupos
                 </p>
 
-                <!-- lista de beneficios segun id del paquete -->
                 <ul class="lista-beneficios">
                   <?php
                     $bens = [
-                      1 => [
-                        'Todas las conferencias',
-                        'Recuerdo del encuentro',
-                        'Tours Tarija',
-                        'Encuentro deportivo',
-                      ],
-                      2 => [
-                        'Todas las conferencias',
-                        'Recuerdo del encuentro',
-                        'Tours Tarija',
-                        'Encuentro deportivo',
-                        'Alojamiento en iglesia',
-                      ],
-                      3 => [
-                        'Todas las conferencias',
-                        'Recuerdo del encuentro',
-                        'Tours Tarija',
-                        'Encuentro deportivo',
-                        'Habitacion en alojamiento',
-                      ],
+                      1 => ['Todas las conferencias','Recuerdo del encuentro','Tours Tarija','Encuentro deportivo'],
+                      3 => ['Todas las conferencias','Recuerdo del encuentro','Tours Tarija','Encuentro deportivo','Alojamiento en iglesia'],
                     ];
                     $lista = $bens[$paq['id']] ?? ['Entrada al encuentro'];
                     foreach($lista as $b): ?>
@@ -230,7 +192,6 @@ while($r = $res->fetch_assoc()) $regalos[] = $r;
         </ul>
       </div>
 
-      <!-- PRODUCTOS -->
       <?php if(!empty($productos)): ?>
       <div class="seccion-form seccion-productos">
         <h3>Productos Adicionales</h3>
@@ -258,16 +219,39 @@ while($r = $res->fetch_assoc()) $regalos[] = $r;
                          data-precio="<?php echo $prod['precio']; ?>">
                 </div>
                 <div class="producto-talla" style="display:none;">
-                 <label>Talla:</label>
-                  <select class="select-talla" data-id="<?php echo $prod['id']; ?>"
-                          data-tipo="<?php echo htmlspecialchars(strtolower(trim($prod['tipo']))); ?>">
+                  <?php $tipo_prod = strtolower(trim($prod['tipo'])); ?>
+
+                  <?php if($tipo_prod !== 'gorra'): ?>
+                    <label>Género:</label>
+                    <div class="genero-opciones">
+                      <label class="genero-opt">
+                        <input type="radio" name="genero_<?php echo $prod['id']; ?>"
+                               class="radio-genero" value="hombre" checked
+                               data-prod-id="<?php echo $prod['id']; ?>">
+                        <i class="fa-solid fa-mars"></i> Hombre
+                      </label>
+                      <label class="genero-opt">
+                        <input type="radio" name="genero_<?php echo $prod['id']; ?>"
+                               class="radio-genero" value="mujer"
+                               data-prod-id="<?php echo $prod['id']; ?>">
+                        <i class="fa-solid fa-venus"></i> Mujer
+                      </label>
+                    </div>
+                  <?php else: ?>
+                    <p style="font-size:0.82em;color:#666;margin-bottom:6px;">
+                      <i class="fa-solid fa-circle-info" style="color:#0089e4;"></i>
+                      Talla unisex — válida para hombre y mujer
+                    </p>
+                  <?php endif; ?>
+
+                  <label style="margin-top:8px;display:block;">Talla:</label>
+                  <select class="select-talla"
+                          data-id="<?php echo $prod['id']; ?>"
+                          data-tipo="<?php echo htmlspecialchars($tipo_prod); ?>">
                     <option value="">-- Talla --</option>
-                    <?php
-                      $tipo_prod = strtolower(trim($prod['tipo']));
-                      if($tipo_prod === 'gorra'):
-                    ?>
-                      <option value="Chica">Chica</option>
-                      <option value="Medio">Medio</option>
+                    <?php if($tipo_prod === 'gorra'): ?>
+                      <option value="Pequeño">Pequeño</option>
+                      <option value="Mediano">Mediano</option>
                       <option value="Grande">Grande</option>
                       <option value="Extra Grande">Extra Grande</option>
                     <?php else: ?>
@@ -279,8 +263,22 @@ while($r = $res->fetch_assoc()) $regalos[] = $r;
                       <option value="XXL">XXL</option>
                     <?php endif; ?>
                   </select>
+
+                  <!-- tabla de medidas solo para no-gorras -->
+                  <?php if($tipo_prod !== 'gorra'): ?>
+                  <div class="tabla-medidas-wrap" style="display:none;">
+                    <table class="tabla-medidas">
+                      <thead>
+                        <tr><th>Talla</th><th>Ancho cm</th><th>Alto cm</th></tr>
+                      </thead>
+                      <tbody class="tbody-medidas"></tbody>
+                    </table>
+                  </div>
+                  <?php endif; ?>
+
                   <span class="campo-error error-talla"></span>
                 </div>
+
               </div>
             </div>
           <?php endforeach; ?>
@@ -288,22 +286,15 @@ while($r = $res->fetch_assoc()) $regalos[] = $r;
       </div>
       <?php endif; ?>
 
-      <!-- REGALO -->
       <div class="seccion-form caja">
-        <h4><i class="fa-solid fa-gift"></i> Selecciona tu Regalo</h4>
-        <div class="campo" style="max-width:400px;">
-          <label>Regalo <span class="req">*</span></label>
-          <select id="regalo_id">
-            <option value="">-- Selecciona un regalo --</option>
-            <?php foreach($regalos as $r): ?>
-              <option value="<?php echo $r['id']; ?>"><?php echo htmlspecialchars($r['nombre']); ?></option>
-            <?php endforeach; ?>
-          </select>
-          <span class="campo-error" id="err-regalo"></span>
+        <h4><i class="fa-solid fa-gift"></i> Regalo del Encuentro</h4>
+        <div class="aviso-regalo">
+          <i class="fa-solid fa-box-open"></i>
+          Todos los inscritos reciben: <strong><?php echo htmlspecialchars($regalo_fijo_nombre); ?></strong>
         </div>
+        <input type="hidden" id="regalo_id" value="<?php echo $regalo_fijo_id; ?>">
       </div>
 
-      <!-- BOTON CALCULAR -->
       <div class="seccion-form resumen">
         <h3>Resumen de tu Inscripcion</h3>
         <div class="caja" style="text-align:center;padding:25px;">
@@ -315,16 +306,12 @@ while($r = $res->fetch_assoc()) $regalos[] = $r;
       </div>
 
     </form>
-  </div><!-- fin bloque-formulario -->
+  </div>
 
-  <!-- ====================== BLOQUE RESUMEN (oculto hasta calcular) ====================== -->
   <div id="bloque-resumen" style="display:none;">
-
     <div class="resumen-completo caja">
       <h4><i class="fa-solid fa-clipboard-list"></i> Verifica tus Datos Antes de Pagar</h4>
-
       <div class="resumen-grid">
-        <!-- columna izquierda: datos personales -->
         <div class="resumen-col">
           <h5 class="resumen-subtitulo"><i class="fa-solid fa-user"></i> Datos Personales</h5>
           <table class="tabla-resumen">
@@ -335,37 +322,29 @@ while($r = $res->fetch_assoc()) $regalos[] = $r;
             <tr><td class="lbl">Celular</td><td id="res-celular">—</td></tr>
             <tr><td class="lbl">Tipo de inscrito</td><td id="res-tipo">—</td></tr>
           </table>
-
           <h5 class="resumen-subtitulo" style="margin-top:20px;"><i class="fa-solid fa-church"></i> Datos de Iglesia</h5>
           <table class="tabla-resumen">
-            <tr><td class="lbl">Ministerio</td><td id="res-ministerio">—</td></tr>
             <tr><td class="lbl">Iglesia</td><td id="res-iglesia">—</td></tr>
             <tr><td class="lbl">Distrito</td><td id="res-distrito">—</td></tr>
           </table>
         </div>
-
-        <!-- columna derecha: paquete, productos, regalo, total -->
         <div class="resumen-col">
           <h5 class="resumen-subtitulo"><i class="fa-solid fa-box-open"></i> Inscripcion</h5>
           <table class="tabla-resumen">
             <tr><td class="lbl">Paquete</td><td id="res-paquete">—</td></tr>
             <tr><td class="lbl">Precio paquete</td><td id="res-precio-paquete">—</td></tr>
-            <tr><td class="lbl">Regalo elegido</td><td id="res-regalo">—</td></tr>
+            <tr><td class="lbl">Regalo incluido</td><td><?php echo htmlspecialchars($regalo_fijo_nombre); ?></td></tr>
           </table>
-
           <div id="res-productos-wrap" style="display:none;">
             <h5 class="resumen-subtitulo" style="margin-top:20px;"><i class="fa-solid fa-shirt"></i> Productos Adicionales</h5>
             <table class="tabla-resumen" id="res-productos-tabla"></table>
           </div>
-
           <div class="resumen-total-wrap">
             <span class="resumen-total-lbl">TOTAL A PAGAR</span>
             <span class="resumen-total-num" id="res-total">Bs. 0.00</span>
           </div>
         </div>
-      </div><!-- resumen-grid -->
-
-      <!-- botones de acción -->
+      </div>
       <div class="resumen-acciones">
         <button type="button" id="btn-editar" class="button hollow">
           <i class="fa-solid fa-pen-to-square"></i> Editar mis datos
@@ -375,48 +354,38 @@ while($r = $res->fetch_assoc()) $regalos[] = $r;
         </button>
       </div>
     </div>
+  </div>
 
-  </div><!-- fin bloque-resumen -->
-
-  <!-- ====================== QR ====================== -->
   <div id="seccion-qr" style="display:none;">
     <div class="seccion-qr">
       <h3><i class="fa-solid fa-qrcode"></i> Realiza tu Pago por QR</h3>
       <div class="qr-contenido">
-
         <div class="qr-imagen-wrap">
-          <p class="qr-instruccion"><i class="fa-solid fa-circle-info"></i>Descarga y Escanea este QR con tu app de banca movil no olvides poner tu nombre en el comprobante</p>
+          <p class="qr-instruccion"><i class="fa-solid fa-circle-info"></i> Descarga y Escanea este QR con tu app de banca movil, no olvides poner tu nombre en el comprobante</p>
           <img src="img/comprobante1.jpeg" alt="QR de pago" class="qr-imagen">
           <a href="img/comprobante1.jpeg" download="QR-Encuentro.jpeg" class="button hollow">
             <i class="fa-solid fa-download"></i> Descargar QR
           </a>
         </div>
-
         <div class="qr-subir">
           <p class="qr-instruccion"><i class="fa-solid fa-upload"></i> Luego sube aqui tu comprobante:</p>
-
           <div class="campo">
             <label>Comprobante de pago <span class="req">*</span></label>
             <input type="file" id="comprobante" accept="image/*,.pdf">
             <span class="campo-error" id="err-comprobante"></span>
           </div>
-
           <button type="button" id="btn-subir" class="button" disabled>
             <i class="fa-solid fa-upload"></i> Subir Comprobante
           </button>
-
           <div id="msg-subida" style="display:none;"></div>
-
           <button type="button" id="btn-registrar" class="button" disabled style="margin-top:15px;width:100%;">
             <i class="fa-solid fa-check"></i> Confirmar Inscripcion
           </button>
         </div>
-
       </div>
     </div>
   </div>
 
-  <!-- ====================== BUSCADOR DE ESTADO ====================== -->
   <div class="seccion-form caja buscador-estado" style="margin-top:50px;">
     <h4><i class="fa-solid fa-magnifying-glass"></i> Consulta el estado de tu inscripcion</h4>
     <p style="text-align:center;color:#666;font-size:0.9em;">Ingresa tu carnet o celular para ver si tu inscripcion fue confirmada</p>

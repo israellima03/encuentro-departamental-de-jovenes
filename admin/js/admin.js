@@ -71,7 +71,25 @@
       submenuAdmin.classList.toggle('open');
     });
   }
+  /* submenú inscripciones */
+  var toggleInscripciones = document.getElementById('nav-inscripciones-toggle');
+  var submenuInscripciones = document.getElementById('submenu-inscripciones');
+  if (toggleInscripciones && submenuInscripciones) {
+    toggleInscripciones.addEventListener('click', function () {
+      this.classList.toggle('open');
+      submenuInscripciones.classList.toggle('open');
+    });
+  }
 
+  /* submenú preguntas */
+  var togglePreguntas = document.getElementById('nav-preguntas-toggle');
+  var submenuPreguntas = document.getElementById('submenu-preguntas');
+  if (togglePreguntas && submenuPreguntas) {
+    togglePreguntas.addEventListener('click', function () {
+      this.classList.toggle('open');
+      submenuPreguntas.classList.toggle('open');
+    });
+  }
   /* ══════════════════════════════════════
      TOGGLE SIDEBAR
   ══════════════════════════════════════ */

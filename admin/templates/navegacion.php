@@ -1,16 +1,9 @@
 <?php
-
-
-
-/* roles con acceso completo — exactamente como estan en tu BD */
-$admin_full = ['Administrador', 'Lider departamental', 'tesorera'];
-
-/* roles con acceso solo a dashboard + preguntas */
+$admin_full  = ['Administrador', 'Lider departamental', 'tesorera'];
 $solo_basico = ['Lider distrital', 'Lider local', 'secretario', 'Equipo departamental'];
 ?>
 
 <body>
-
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <div class="brand-icon"><i class="fa-solid fa-dove"></i></div>
@@ -22,26 +15,43 @@ $solo_basico = ['Lider distrital', 'Lider local', 'secretario', 'Equipo departam
 
     <nav class="sidebar-nav">
 
-      <!-- DASHBOARD — todos los roles -->
+      <!-- PRINCIPAL — todos los roles -->
       <div class="nav-section-label">Principal</div>
       <a href="admin-encuentro.php" class="nav-item">
         <i class="fa-solid fa-chart-pie"></i>
-        <span>Inscritos</span>
+        <span>Dashboard</span>
       </a>
 
       <!-- CONFIRMAR QR — solo admin full -->
       <?php if(puede($admin_full)): ?>
-      <a href="confirmar-qr.php" class="nav-item"">
+      <a href="confirmar-qr.php" class="nav-item">
         <i class="fa-solid fa-qrcode"></i>
         <span>Confirmar QR</span>
-        
       </a>
+      <?php endif; ?>
+
+      <!-- INSCRIPCIONES — solo admin full -->
+      <?php if(puede($admin_full)): ?>
+      <div class="nav-section-label">Inscripciones</div>
+      <div class="nav-item nav-parent" id="nav-inscripciones-toggle">
+        <i class="fa-solid fa-clipboard-list"></i>
+        <span>Inscripciones</span>
+        <i class="fa-solid fa-chevron-down nav-arrow"></i>
+      </div>
+      <div class="nav-submenu" id="submenu-inscripciones">
+        <a href="#" class="nav-subitem">
+          <i class="fa-solid fa-users-gear"></i> Editar Cupos
+        </a>
+        <a href="#" class="nav-subitem">
+          <i class="fa-solid fa-pen-to-square"></i> Editar Inscripciones
+        </a>
+      </div>
       <?php endif; ?>
 
       <!-- GESTION — solo admin full -->
       <?php if(puede($admin_full)): ?>
       <div class="nav-section-label">Gestión</div>
-      <a href="#" class="nav-item" ">
+      <a href="#" class="nav-item">
         <i class="fa-solid fa-chart-bar"></i>
         <span>Reportes</span>
       </a>
@@ -49,7 +59,7 @@ $solo_basico = ['Lider distrital', 'Lider local', 'secretario', 'Equipo departam
         <i class="fa-solid fa-clock-rotate-left"></i>
         <span>Historial</span>
       </a>
-      <a href="#" class="nav-item" >
+      <a href="productos.php" class="nav-item">
         <i class="fa-solid fa-shirt"></i>
         <span>Productos</span>
       </a>
@@ -67,24 +77,43 @@ $solo_basico = ['Lider distrital', 'Lider local', 'secretario', 'Equipo departam
         <a href="#" class="nav-subitem">
           <i class="fa-solid fa-microphone"></i> Invitados
         </a>
-        <a href="#" class="nav-subitem" >
+        <a href="#" class="nav-subitem">
           <i class="fa-solid fa-book-open"></i> Temas
         </a>
-        <a href="#" class="nav-subitem" >
-          <i class="fa-solid fa-list-check"></i> Agenda
+        <a href="#" class="nav-subitem">
+          <i class="fa-solid fa-calendar-check"></i> Eventos
+        </a>
+        <a href="#" class="nav-subitem">
+          <i class="fa-solid fa-folder-open"></i> Material
+        </a>
+        <a href="#" class="nav-subitem">
+          <i class="fa-solid fa-person-chalkboard"></i> Moderadores
         </a>
       </div>
       <?php endif; ?>
 
       <!-- SISTEMA — todos los roles -->
       <div class="nav-section-label">Sistema</div>
-      <a href="#" class="nav-item">
+
+      <!-- PREGUNTAS — submenú con dos niveles de acceso -->
+      <div class="nav-item nav-parent" id="nav-preguntas-toggle">
         <i class="fa-solid fa-circle-question"></i>
         <span>Preguntas</span>
-      </a>
+        <i class="fa-solid fa-chevron-down nav-arrow"></i>
+      </div>
+      <div class="nav-submenu" id="submenu-preguntas">
+        <?php if(puede($admin_full)): ?>
+        <a href="#" class="nav-subitem">
+          <i class="fa-solid fa-toggle-on"></i> Habilitar Preguntas
+        </a>
+        <?php endif; ?>
+        <a href="#" class="nav-subitem">
+          <i class="fa-solid fa-list-ul"></i> Ver Preguntas
+        </a>
+      </div>
 
-      <!-- ADMINISTRADORES — solo Administrador -->
-      <?php if(puede(['Administrador'])): ?>
+      <!-- ADMINISTRADORES — solo Administrador, Lider departamental -->
+      <?php if(puede(['Administrador', 'Lider departamental'])): ?>
       <div class="nav-section-label">Administradores</div>
       <div class="nav-item nav-parent" id="nav-administradores-toggle">
         <i class="fa-solid fa-user-shield"></i>
@@ -95,9 +124,11 @@ $solo_basico = ['Lider distrital', 'Lider local', 'secretario', 'Equipo departam
         <a href="administradores.php" class="nav-subitem">
           <i class="fa-solid fa-users"></i> Ver Todos
         </a>
+        <?php if(puede(['Administrador'])): ?>
         <a href="crear-admin.php" class="nav-subitem">
           <i class="fa-solid fa-user-plus"></i> Agregar
         </a>
+        <?php endif; ?>
       </div>
       <?php endif; ?>
 

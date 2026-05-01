@@ -279,17 +279,20 @@ switch ($accion) {
 
             /* -- 3. INSERTAR PRODUCTOS -- */
             foreach ($productos as $prod) {
-                $pid   = intval($prod['id']       ?? 0);
-                $cant  = intval($prod['cantidad'] ?? 0);
-                $talla = limpiar($prod['talla']   ?? '');
+                $pid    = intval($prod['id']       ?? 0);
+                $cant   = intval($prod['cantidad'] ?? 0);
+                $talla  = limpiar($prod['talla']   ?? '');
+                $genero = trim(strtolower($prod['genero'] ?? 'hombre'));
+                if(!in_array($genero, ['hombre','mujer','unisex'])) $genero = 'hombre';
+
                 if ($pid > 0 && $cant > 0) {
                     $stmtProd = $conn->prepare("
                         INSERT INTO inscripcion_productos
-                            (inscripcion_id, producto_id, cantidad, talla)
-                        VALUES (?,?,?,?)
+                            (inscripcion_id, producto_id, cantidad, talla, genero)
+                        VALUES (?,?,?,?,?)
                     ");
                     if ($stmtProd) {
-                        $stmtProd->bind_param('iiis', $inscripcion_id, $pid, $cant, $talla);
+                        $stmtProd->bind_param('iiiss', $inscripcion_id, $pid, $cant, $talla, $genero);
                         if (!$stmtProd->execute()) {
                             throw new RuntimeException('Error al guardar producto: ' . $stmtProd->error);
                         }
@@ -487,7 +490,7 @@ switch ($accion) {
 
         } catch (Exception $e) {
             /* el correo fallo pero la inscripcion ya se guardo — no interrumpir */
-            error_log('PHPMailer error inscripcion ' . $inscrito_id . ': ' . $mail->ErrorInfo);
+            error_log('PHPMailer error inscripcion ' . $inscrito_id . ': ' . $e->getMessage());
         }
 
         echo json_encode([
@@ -495,14 +498,42 @@ switch ($accion) {
             'msg' => 'Tu inscripcion fue recibida. Estado: PENDIENTE. La tesorera revisara tu comprobante.'
         ]);
         exit;
+    
+
 
     /* ================================================================
-       ACCION NO RECONOCIDA
+       LISTAR TALLAS POR PRODUCTO Y GÉNERO (para registro público)
        ================================================================ */
-    default:
-        echo json_encode(['ok' => false, 'msg' => 'Accion no valida']);
-        exit;
-}
+    case 'listar_tallas_publico':
+        $pid    = intval($_POST['producto_id'] ?? 0);
+        $genero = trim($_POST['genero'] ?? 'hombre');
+        if(!$pid){ echo json_encode(['ok'=>false]); exit; }
+
+        /* intentar buscar por el genero pedido, si no hay buscar unisex */
+        $stmt = $conn->prepare("SELECT talla, ancho_cm, alto_cm, genero FROM producto_tallas WHERE producto_id=? AND genero=? ORDER BY id");
+        $stmt->bind_param('is', $pid, $genero);
+        $stmt->execute();
+        $rows = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+
+        /* si no trajo nada, intentar con unisex */
+        if(empty($rows)){
+            $stmt2 = $conn->prepare("SELECT talla, ancho_cm, alto_cm, genero FROM producto_tallas WHERE producto_id=? AND genero='unisex' ORDER BY id");
+            $stmt2->bind_param('i', $pid);
+            $stmt2->execute();
+            $rows = $stmt2->get_result()->fetch_all(MYSQLI_ASSOC);
+            $stmt2->close();
+        }
+
+        echo json_encode(['ok'=>true, 'tallas'=>$rows]);
+        exit; 
+        /* ================================================================
+           ACCION NO RECONOCIDA
+           ================================================================ */
+        default:
+            echo json_encode(['ok' => false, 'msg' => 'Accion no valida']);
+            exit;
+    }
 
 /* ══════════════════════════════════════════════════════════════════
    FUNCIONES AUXILIARES

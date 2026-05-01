@@ -58,7 +58,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
             <p class="ciudad"><i class="fa-solid fa-location-dot"></i>Tarija, Bolivia</p>
           </div>
           <h1 class="nombre-sitio">Encuentro departamental de Jovenes</h1>
-          <p class="slogan">lema del encuentro o versiculo <span>GALATAS 2:20</span></p>
+          <p class="slogan">SIN FILTROS  <span>  1 SAMUEL 16:7</span></p>
         </div>
 
       </div><!-- fin contenido-header -->
