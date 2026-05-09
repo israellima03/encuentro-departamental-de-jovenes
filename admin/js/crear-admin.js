@@ -308,7 +308,7 @@
   function verificarUsuario(usuario, inputEl, hintEl) {
     if (hintEl) hintEl.textContent = 'Verificando...';
 
-    fetch('../admin_api.php?accion=verificar_usuario&usuario=' + encodeURIComponent(usuario))
+    fetch('api_admins.php?accion=verificar_usuario&usuario=' + encodeURIComponent(usuario))
       .then(function (r) { return r.json(); })
       .then(function (data) {
         if (data.disponible) {

@@ -184,7 +184,7 @@
         <li>
           <div class="invitado">
             <?php if(!empty($exp['imagen'])): ?>
-              <img src="<?php echo htmlspecialchars($exp['imagen']); ?>" 
+              <img src="img/<?php echo htmlspecialchars($exp['imagen']); ?>" 
                    alt="<?php echo htmlspecialchars($exp['nombre']); ?>">
             <?php else: ?>
               <img src="invitado1.jpg" alt="invitado">
@@ -334,37 +334,45 @@
     </div>
   </section>
 
+  <?php
+  $aloj1_nombre = $cfg['mapa_aloj1_nombre'] ?? 'Alojamiento 1';
+  $aloj1_link   = $cfg['mapa_aloj1_link']   ?? '#';
+  $aloj2_nombre = $cfg['mapa_aloj2_nombre'] ?? 'Alojamiento 2';
+  $aloj2_link   = $cfg['mapa_aloj2_link']   ?? '#';
+  $evento_link  = $cfg['mapa_evento_link']  ?? '#';
+  ?>
   <section class="seccion-mapa">
-    <h2>Ubicacion del evento</h2>
+    <h2>Ubicación del Evento</h2>
     <p class="texto-mapa">
-      <i class="fa-solid fa-location-dot"></i> 
-      Haz click en el mapa para abrir en Google Maps y obtener direcciones
+      <i class="fa-solid fa-location-dot"></i>
+      Haz click en el mapa para abrir en Google Maps
     </p>
     <div class="contenedor-mapa">
-      <a href="https://maps.google.com/?q=-21.541682,-64.726782" target="_blank" class="link-mapa">
-        <iframe 
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3203.750919665405!2d-64.72678242144536!3d-21.541682100000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9406475233b071dd%3A0xdbb1f8dbcd3f54bc!2sPunto%20de%20Venta%20Loter%C3%ADa%20%22Kiosko%20Ex.%20Terminal%22!5e1!3m2!1ses-419!2sbo!4v1776045310858!5m2!1ses-419!2sbo" 
-          width="100%" 
-          height="100%" 
-          style="border:0;pointer-events:none;" 
-          allowfullscreen="" 
-          loading="lazy">
-        </iframe>
+      <a href="<?php echo htmlspecialchars($evento_link); ?>" target="_blank" class="link-mapa">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3203.750919665405!2d-64.72678242144536!3d-21.541682100000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9406475233b071dd%3A0xdbb1f8dbcd3f54bc!2sPunto%20de%20Venta%20Loter%C3%ADa%20%22Kiosko%20Ex.%20Terminal%22!5e1!3m2!1ses-419!2sbo!4v1776045310858!5m2!1ses-419!2sbo"
+                width="100%" height="100%" style="border:0;pointer-events:none;" allowfullscreen="" loading="lazy"></iframe>
         <div class="overlay-mapa">
           <i class="fa-solid fa-location-dot"></i>
           <p>Click para abrir en Google Maps</p>
         </div>
       </a>
     </div>
+
+    <!-- LUGARES DE ALOJAMIENTO -->
+    <div class="lugares-alojamiento">
+      <a href="<?php echo htmlspecialchars($aloj1_link); ?>" target="_blank" class="lugar-item">
+        <i class="fa-solid fa-bed"></i>
+        <span><?php echo htmlspecialchars($aloj1_nombre); ?></span>
+        <small><i class="fa-solid fa-arrow-up-right-from-square"></i> Ver en Maps</small>
+      </a>
+      <a href="<?php echo htmlspecialchars($aloj2_link); ?>" target="_blank" class="lugar-item">
+        <i class="fa-solid fa-bed"></i>
+        <span><?php echo htmlspecialchars($aloj2_nombre); ?></span>
+        <small><i class="fa-solid fa-arrow-up-right-from-square"></i> Ver en Maps</small>
+      </a>
+    </div>
   </section>
 
-  <div class="newsletter parallax">
-    <div class="contenido contenedor">
-      <p>Registrate para el</p>
-      <h3>Encuentro departamental</h3>
-      <a href="tipo_inscripciones.php" class="button trasparente">Registro</a>
-    </div>
-  </div>
 
   <section class="seccion">
     <h2>Faltan</h2>

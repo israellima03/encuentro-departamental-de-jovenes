@@ -288,8 +288,8 @@ switch ($accion) {
                 if ($pid > 0 && $cant > 0) {
                     $stmtProd = $conn->prepare("
                         INSERT INTO inscripcion_productos
-                            (inscripcion_id, producto_id, cantidad, talla, genero)
-                        VALUES (?,?,?,?,?)
+                            (inscripcion_id, producto_id, cantidad, talla, genero, producto_entregado, producto_entregado_por)
+                        VALUES (?,?,?,?,?,0,NULL)
                     ");
                     if ($stmtProd) {
                         $stmtProd->bind_param('iiiss', $inscripcion_id, $pid, $cant, $talla, $genero);
@@ -309,8 +309,8 @@ switch ($accion) {
             /* -- 4. INSERTAR REGALO -- */
             if ($regalo_id > 0) {
                 $stmtR = $conn->prepare("
-                    INSERT INTO inscripcion_regalos (inscripcion_id, regalo_id)
-                    VALUES (?,?)
+                    INSERT INTO inscripcion_regalos (inscripcion_id, regalo_id, material_entregado, material_entregado_por)
+                    VALUES (?,?,0,NULL)
                 ");
                 $stmtR->bind_param('ii', $inscripcion_id, $regalo_id);
                 if (!$stmtR->execute()) {

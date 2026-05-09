@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="css/crear-admin.css">
   <link rel="stylesheet" href="css/confirmar-qr.css">
   <link rel="stylesheet" href="css/productos.css">
+  <link rel="stylesheet" href="css/editar-cupos.css">
 
 </head>
 

@@ -619,7 +619,28 @@ nav.navegacion-principal a.nav-activo {
   border-color: #da002b !important;
   color: #fff !important;
 }
-
+.lema-txt {
+  font-family: 'Oswald', sans-serif;
+  font-size: 2.2em;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  display: block;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(218,0,43,.6);
+}
+.versiculo-txt {
+  font-size: 1.1em;
+  font-weight: bold;
+  background: linear-gradient(90deg, #f00e1c, #ec323d, #f00e1c);
+  background-size: 300%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: ola 10s linear infinite;
+  display: block;
+  margin-top: 6px;
+}
 /**Alabanzas**/
 section.programa {
   position: relative;
@@ -1127,6 +1148,35 @@ div.overlay-mapa p {
 a.link-mapa:hover div.overlay-mapa {
   background-color: rgba(218, 0, 43, 0.9);
 }
+/* ── ALOJAMIENTOS ── */
+.lugares-alojamiento {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.lugar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 28px;
+  background: #03045e;
+  color: #fff;
+  border-radius: 12px;
+  text-decoration: none;
+  font-family: 'Oswald', sans-serif;
+  transition: all .2s;
+  min-width: 180px;
+  text-align: center;
+}
+.lugar-item i { font-size: 1.6em; color: #da002b; }
+.lugar-item span { font-size: 1.1em; font-weight: 600; text-transform: uppercase; }
+.lugar-item small { font-size: 0.75em; color: rgba(255,255,255,.6); }
+.lugar-item:hover { background: #da002b; transform: translateY(-2px); }
+.lugar-item:hover i { color: #fff; }
+
 /*testimoniales*/
 div.testimoniales {
   padding-bottom: 20px;
@@ -3365,7 +3415,7 @@ img.card-foto {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: top;   /* ← CAMBIO: centra en la parte superior (caras) */
+  object-position: center top;   /* ← CAMBIO: centra en la parte superior (caras) */
   display: block;
   filter: grayscale(30%);
   transition: filter .4s ease, transform .4s ease;
@@ -3450,8 +3500,66 @@ p.sin-datos {
   grid-column: 1 / -1;
 }
 
+.lista-invitados{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:30px;
+    padding:0;
+    list-style:none;
+}
 
+.invitado{
+    position:relative;
+    overflow:hidden;
+    border-radius:12px;
+    height:420px;
+    background:#000;
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
+}
 
+.invitado img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    transition:transform .4s ease;
+}
+
+.invitado:hover img{
+    transform:scale(1.05);
+}
+
+.invitado p{
+    position:absolute;
+    left:0;
+    bottom:0;
+    width:100%;
+    margin:0;
+    padding:18px;
+    background:rgba(0,0,0,.55);
+    color:#ff0033;
+    font-size:20px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+}
+
+/* CELULAR */
+@media (max-width: 600px){
+    .lista-invitados{
+        grid-template-columns:1fr;
+        gap:20px;
+    }
+
+    .invitado{
+        height:380px;
+    }
+
+    .invitado p{
+        font-size:16px;
+        padding:14px;
+    }
+}
 /* ==========================================
    TIPO DE INSCRIPCION
    ========================================== */

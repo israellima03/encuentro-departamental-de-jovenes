@@ -94,14 +94,24 @@ $iconos_mat = [
               <!-- INFO EXPOSITOR -->
               <div class="info-conferencia">
                 <div class="foto-expositor">
+
                   <?php if(!empty($ev['expositor_imagen'])): ?>
-                    <img src="<?php echo htmlspecialchars($ev['expositor_imagen']); ?>"
+
+                    <?php
+                    $imagen = str_replace('img/', '', $ev['expositor_imagen']);
+                    ?>
+
+                    <img src="img/<?php echo htmlspecialchars($imagen); ?>"
                          alt="<?php echo htmlspecialchars($ev['expositor_nombre']); ?>">
+
                   <?php else: ?>
+
                     <div style="width:80px;height:80px;border-radius:50%;background:#03045e;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.8em;">
                       <i class="fa-solid fa-user"></i>
                     </div>
+
                   <?php endif; ?>
+
                 </div>
 
                 <div class="datos-conferencia">
@@ -141,10 +151,20 @@ $iconos_mat = [
                       $meta   = $iconos_mat[$mat['tipo']] ?? $iconos_mat['enlace'];
                       $esDesc = in_array($mat['tipo'], ['pdf','ppt','zip','img']);
                     ?>
-                      <a href="<?php echo htmlspecialchars($mat['url']); ?>"
+                      <?php
+                       $url_mat = $mat['url'];
+                        /* si no empieza con http es un archivo local en /material/ */
+                        if(!empty($url_mat) && !str_starts_with($url_mat,'http')){
+                          $url_mat = 'material/' . $url_mat;
+                        }
+                        /* verificar descarga_activa */
+                        $descarga_ok = !isset($mat['descarga_activa']) || $mat['descarga_activa'] == '1';
+                      ?>
+                      <a href="<?php echo $descarga_ok ? htmlspecialchars($url_mat) : '#'; ?>"
                          class="material-item"
                          target="_blank"
-                         <?php echo $esDesc ? 'download' : ''; ?>>
+                         <?php echo ($esDesc && $descarga_ok) ? 'download' : ''; ?>
+                         <?php echo !$descarga_ok ? 'onclick="return false;" style="opacity:.5;cursor:not-allowed;"' : ''; ?>>
                         <div class="icono-material <?php echo $meta['clase']; ?>">
                           <i class="<?php echo $meta['icono']; ?>"></i>
                         </div>
@@ -158,7 +178,11 @@ $iconos_mat = [
                             <?php endif; ?>
                           </span>
                         </div>
-                        <i class="fa-solid <?php echo $esDesc ? 'fa-download' : 'fa-external-link'; ?> icono-accion"></i>
+                        <?php if(!$descarga_ok): ?>
+                          <span style="font-size:10px;color:#999;white-space:nowrap;"><i class="fa-solid fa-lock"></i> Durante el evento</span>
+                        <?php else: ?>
+                          <i class="fa-solid <?php echo $esDesc ? 'fa-download' : 'fa-external-link'; ?> icono-accion"></i>
+                        <?php endif; ?>
                       </a>
                     <?php endforeach; ?>
                   </div>

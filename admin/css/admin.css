@@ -182,7 +182,7 @@ body { display: flex; min-height: 100vh; }
   overflow: hidden;
   transition: max-height .3s ease;
 }
-.nav-submenu.open { max-height: 200px; }
+.nav-submenu.open { max-height: 400px; }
 .nav-subitem {
   display: flex;
   align-items: center;
@@ -896,4 +896,172 @@ body.sidebar-collapsed .main-wrapper { margin-left: 0; }
 @media (max-width: 540px) {
   .stats-grid { grid-template-columns: 1fr; }
   body.sidebar-collapsed .main-wrapper { margin-left: 0; }
+}
+
+
+/* ── Columnas especiales tabla ── */
+.col-productos { max-width:120px; white-space:normal; font-size:11px; }
+.col-entrega   { text-align:center; white-space:nowrap; }
+.col-usuario   { font-size:11px; color:var(--txt-soft); white-space:nowrap; }
+.col-acciones  { white-space:nowrap; }
+ 
+/* ── Métodos de pago ── */
+.metodo-efectivo { color:var(--green); font-weight:600; }
+.metodo-qr       { color:var(--blue);  font-weight:600; }
+ 
+/* ── Badges entrega ── */
+.badge-ent {
+  display:inline-flex; align-items:center; gap:4px;
+  padding:3px 9px; border-radius:20px; border:none;
+  font-size:11px; font-weight:700; cursor:pointer;
+  transition:opacity .2s;
+}
+.badge-ent:hover { opacity:.8; }
+.badge-ent-si  { background:#d1fae5; color:#065f46; border:1px solid #10b981; }
+.badge-ent-no  { background:#fee2e2; color:#991b1b; border:1px solid #ef4444; }
+.ent-na        { color:var(--txt-xsoft); font-size:12px; }
+ 
+/* ── Botón credencial ── */
+.btn-credencial { color:var(--green); border-color:var(--green); }
+.btn-credencial:hover { background:var(--green); color:#fff; border-color:var(--green); }
+ 
+/* ── Buscador credencial ── */
+.cred-resultado {
+  padding:8px 10px; border:1px solid var(--border); border-radius:6px;
+  margin-bottom:4px; cursor:pointer; font-size:13px; transition:background .2s;
+}
+.cred-resultado:hover { background:var(--bg); }
+ 
+/* ── Card header tools ── */
+.card-header-tools { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.total-lbl-txt { font-size:12px; color:var(--txt-xsoft); }
+ 
+/* ── Credencial buscador ── */
+.credencial-buscador {
+  padding:20px; display:flex; gap:12px;
+  align-items:flex-start; flex-wrap:wrap;
+}
+ 
+/* ── Responsive tabla ── */
+@media(max-width:900px){
+  .col-usuario { display:none; }
+}
+@media(max-width:700px){
+  .col-productos { display:none; }
+  .btn-txt-label { display:none; }
+  .stat-num { font-size:22px; }
+}
+@media(max-width:480px){
+  .filtros-rapidos { flex-direction:column; }
+  .filtros-rapidos .input-filtro,
+  .filtros-rapidos .select-filtro { min-width:100%; }
+  .credencial-buscador { flex-direction:column; }
+  .credencial-buscador button { width:100%; }
+}
+
+/* ── TABLA RESPONSIVA EN MÓVIL ── */
+@media (max-width: 768px) {
+
+  /* ocultar columnas menos importantes */
+  .tabla-inscritos thead th:nth-child(7),  /* Productos */
+  .tabla-inscritos tbody td:nth-child(7),
+  .tabla-inscritos thead th:nth-child(13), /* Registró */
+  .tabla-inscritos tbody td:nth-child(13),
+  .tabla-inscritos thead th:nth-child(14), /* Confirmó */
+  .tabla-inscritos tbody td:nth-child(14) {
+    display: none;
+  }
+}
+
+@media (max-width: 540px) {
+
+  /* ocultar más columnas en móvil pequeño */
+  .tabla-inscritos thead th:nth-child(4),  /* Iglesia */
+  .tabla-inscritos tbody td:nth-child(4),
+  .tabla-inscritos thead th:nth-child(5),  /* Distrito */
+  .tabla-inscritos tbody td:nth-child(5),
+  .tabla-inscritos thead th:nth-child(10), /* Producto ent */
+  .tabla-inscritos tbody td:nth-child(10),
+  .tabla-inscritos thead th:nth-child(11), /* Material ent */
+  .tabla-inscritos tbody td:nth-child(11),
+  .tabla-inscritos thead th:nth-child(12), /* Fecha */
+  .tabla-inscritos tbody td:nth-child(12) {
+    display: none;
+  }
+
+  /* compactar celdas visibles */
+  .tabla-inscritos tbody td,
+  .tabla-inscritos thead th {
+    padding: 8px 6px;
+    font-size: 11px;
+  }
+
+  .participante-avatar {
+    width: 26px;
+    height: 26px;
+    font-size: 10px;
+  }
+
+  .participante-nombre { font-size: 12px; }
+  .participante-tipo   { font-size: 10px; }
+
+  /* filtros en columna */
+  .filtros-rapidos {
+    flex-direction: column;
+  }
+  .filtros-rapidos .input-filtro,
+  .filtros-rapidos .select-filtro {
+    width: 100%;
+    min-width: unset;
+  }
+
+  /* stats en 2 columnas */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* page header en columna */
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* botón nueva inscripción ancho completo */
+  #btn-nueva-inscripcion {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* modal ancho completo */
+  .modal {
+    max-width: 100% !important;
+    margin: 0;
+    border-radius: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .modal-body {
+    max-height: calc(100vh - 130px);
+  }
+
+  /* modal grid 1 columna */
+  .modal-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .modal-field.full {
+    grid-column: span 1 !important;
+  }
+  .modal-section-title {
+    grid-column: span 1 !important;
+  }
+
+  /* credencial buscador en columna */
+  .credencial-buscador {
+    flex-direction: column;
+  }
+  .credencial-buscador button {
+    width: 100%;
+    justify-content: center;
+  }
 }

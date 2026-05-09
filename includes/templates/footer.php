@@ -1,38 +1,37 @@
+<?php
+if(!isset($cfg))    $cfg     = get_config($conn);
+if(!isset($redes))  $redes   = get_redes($conn);
+$noticias  = get_noticias($conn);
+$pie_titulo = $cfg['footer_titulo']      ?? 'Sobre Nosotros';
+$pie_desc   = $cfg['footer_descripcion'] ?? '';
+?>
+
 <footer class="site-footer">
     <div class="contenedor">
-
       <div class="footer-informacion">
-        <h3>Sobre <span>Mins De Jovenes Oruro</span></h3>
-        <p>Aqui ira informacion del ministerio dependiendo al mensaje que quiera poner el hermano Julio o el equipo departamental.</p>
+        <h3><?php echo htmlspecialchars($pie_titulo); ?></h3>
+        <p><?php echo htmlspecialchars($pie_desc); ?></p>
       </div>
 
       <div class="Ultimas-tweets">
-        <h3>Ultimas <span>Noticias</span></h3>
+        <h3>Últimas <span>Noticias</span></h3>
         <ul>
-          <li>Aqui iran las ultimas noticias y avisos del encuentro.</li>
-          <li>Que llevar, quien es el medico, horarios actualizados.</li>
-          <li>Cualquier novedad importante para los participantes.</li>
+          <?php foreach($noticias as $n): ?>
+            <li><?php echo htmlspecialchars($n); ?></li>
+          <?php endforeach; ?>
         </ul>
       </div>
 
       <div class="menu">
         <h3>Redes <span>Sociales</span></h3>
         <nav class="redes-sociales">
-          <a href="https://www.facebook.com/share/1EG8kSZLUZ/" target="_blank" title="Facebook">
-            <i class="fa-brands fa-facebook-f"></i>
-          </a>
-          <a href="https://www.instagram.com/" target="_blank" title="Instagram">
-            <i class="fa-brands fa-instagram"></i>
-          </a>
-          <a href="https://www.tiktok.com/@mj.iddp.oruro" target="_blank" title="TikTok">
-            <i class="fa-brands fa-tiktok"></i>
-          </a>
-          <a href="https://chat.whatsapp.com/DDCPO9QTnhqFyCJnjwSOUC" target="_blank" title="Grupo WhatsApp">
-            <i class="fa-brands fa-whatsapp"></i>
-          </a>
+          <?php foreach($redes as $r): ?>
+            <a href="<?php echo htmlspecialchars($r['url']); ?>" target="_blank" title="<?php echo htmlspecialchars($r['nombre']); ?>">
+              <i class="<?php echo htmlspecialchars($r['icono']); ?>"></i>
+            </a>
+          <?php endforeach; ?>
         </nav>
       </div>
-
     </div>
     <p class="copyright">
       Todos los derechos Reservados Lima technology cel 68319277

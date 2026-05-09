@@ -1,4 +1,30 @@
-<?php include_once 'includes/templates/header.php'; ?>
+<?php include_once 'includes/templates/header.php';
+require_once('includes/funciones/bd_conexion.php');
+
+/* líderes distritales */
+$lideres_dist = [];
+$res = $conn->query("
+  SELECT u.nombre, u.telefono, d.nombre AS distrito
+  FROM usuarios u
+  INNER JOIN usuario_roles ur ON ur.usuario_id = u.id
+  INNER JOIN roles r ON r.id = ur.rol_id AND r.nombre = 'Lider distrital'
+  LEFT JOIN distritos d ON d.id = u.distrito_id
+  ORDER BY d.nombre, u.nombre
+");
+if($res) while($r = $res->fetch_assoc()) $lideres_dist[] = $r;
+
+/* líderes departamentales */
+$lideres_dep = [];
+$res = $conn->query("
+  SELECT u.nombre, u.telefono, d.nombre AS distrito
+  FROM usuarios u
+  INNER JOIN usuario_roles ur ON ur.usuario_id = u.id
+  INNER JOIN roles r ON r.id = ur.rol_id AND r.nombre = 'Lider departamental'
+  LEFT JOIN distritos d ON d.id = u.distrito_id
+  ORDER BY u.nombre
+");
+if($res) while($r = $res->fetch_assoc()) $lideres_dep[] = $r;
+?>
 
 <section class="seccion contenedor">
   <h2>Tipo de Inscripción</h2>
@@ -42,77 +68,61 @@
         por tu líder local o distrital. Contáctalos por WhatsApp:
       </p>
 
-      <!-- LIDERES LOCALES -->
-      <div class="lideres-grupo">
-        <h4 class="lideres-titulo">
-          <i class="fa-solid fa-users"></i> Líderes Locales
-        </h4>
-        <ul class="lista-lideres">
-          <li class="lider-item">
-            <div class="lider-info">
-              <span class="lider-nombre">Hno. Joel Paredez</span>
-              <span class="lider-zona">Iglesia Vinto</span>
-            </div>
-            <a href="https://wa.me/59168319277?text=Hola%20soy%20un%20joven%20interesado%20en%20el%20encuentro%20y%20quiero%20más%20información" target="_blank" class="boton-whatsapp">
-              <i class="fa-brands fa-whatsapp"></i> 68319277
-            </a>
-          </li>
-          <li class="lider-item">
-            <div class="lider-info">
-              <span class="lider-nombre">Gabriel Mariscal</span>
-              <span class="lider-zona">Iglesia San Isidro</span>
-            </div>
-            <a href="https://wa.me/59168319277?text=Hola%20soy%20un%20joven%20interesado%20en%20el%20encuentro%20y%20quiero%20más%20información" target="_blank" class="boton-whatsapp">
-              <i class="fa-brands fa-whatsapp"></i> 68319277
-            </a>
-          </li>
-          <li class="lider-item">
-            <div class="lider-info">
-              <span class="lider-nombre">Nombre los demas lideres</span>
-              <span class="lider-zona">Iglesia Sur Oruro</span>
-            </div>
-            <a href="https://wa.me/59168319277?text=Hola%20soy%20un%20joven%20interesado%20en%20el%20encuentro%20y%20quiero%20más%20información" target="_blank" class="boton-whatsapp">
-              <i class="fa-brands fa-whatsapp"></i> 68319277
-            </a>
-          </li>
-        </ul>
-      </div>
-
       <!-- LIDERES DISTRITALES -->
+      <?php if(!empty($lideres_dist)): ?>
       <div class="lideres-grupo">
         <h4 class="lideres-titulo">
           <i class="fa-solid fa-building-columns"></i> Líderes Distritales
         </h4>
         <ul class="lista-lideres">
+          <?php foreach($lideres_dist as $l): ?>
           <li class="lider-item">
             <div class="lider-info">
-              <span class="lider-nombre">Hrn Iddy Acno</span>
-              <span class="lider-zona">Distrito 1</span>
+              <span class="lider-nombre"><?php echo htmlspecialchars($l['nombre']); ?></span>
+              <span class="lider-zona"><?php echo htmlspecialchars($l['distrito'] ?? 'Sin distrito'); ?></span>
             </div>
-            <a href="https://wa.me/59168319277?text=Hola%20soy%20un%20joven%20interesado%20en%20el%20encuentro%20y%20quiero%20más%20información" target="_blank" class="boton-whatsapp">
-              <i class="fa-brands fa-whatsapp"></i> 68319277
+            <?php if(!empty($l['telefono'])): ?>
+            <a href="https://wa.me/591<?php echo preg_replace('/\D/','',$l['telefono']); ?>?text=Hola%2C+quiero+información+sobre+el+encuentro"
+               target="_blank" class="boton-whatsapp">
+              <i class="fa-brands fa-whatsapp"></i> <?php echo htmlspecialchars($l['telefono']); ?>
             </a>
+            <?php else: ?>
+            <span class="boton-whatsapp" style="opacity:.5;cursor:default;">Sin número</span>
+            <?php endif; ?>
           </li>
-          <li class="lider-item">
-            <div class="lider-info">
-              <span class="lider-nombre">Hrn Josue Beltran</span>
-              <span class="lider-zona">Distrito 2</span>
-            </div>
-            <a href="https://wa.me/59168319277?text=Hola%20soy%20un%20joven%20interesado%20en%20el%20encuentro%20y%20quiero%20más%20información" target="_blank" class="boton-whatsapp">
-              <i class="fa-brands fa-whatsapp"></i> 68319277
-            </a>
-          </li>
-          <li class="lider-item">
-            <div class="lider-info">
-              <span class="lider-nombre">Hrn Jhuliza Espinoza</span>
-              <span class="lider-zona">Distrito 2 (lider de adolencentes)</span>
-            </div>
-            <a href="https://wa.me/59168319277?text=Hola%20soy%20un%20joven%20interesado%20en%20el%20encuentro%20y%20quiero%20más%20información" target="_blank" class="boton-whatsapp">
-              <i class="fa-brands fa-whatsapp"></i> 68319277
-            </a>
-          </li>
+          <?php endforeach; ?>
         </ul>
       </div>
+      <?php endif; ?>
+
+      <!-- LIDERES DEPARTAMENTALES -->
+      <?php if(!empty($lideres_dep)): ?>
+      <div class="lideres-grupo">
+        <h4 class="lideres-titulo">
+          <i class="fa-solid fa-star"></i> Líderes Departamentales
+        </h4>
+        <ul class="lista-lideres">
+          <?php foreach($lideres_dep as $l): ?>
+          <li class="lider-item">
+            <div class="lider-info">
+              <span class="lider-nombre"><?php echo htmlspecialchars($l['nombre']); ?></span>
+              <span class="lider-zona">Lider Departamental</span>
+            </div>
+            <?php if(!empty($l['telefono'])): ?>
+            <a href="https://wa.me/591<?php echo preg_replace('/\D/','',$l['telefono']); ?>?text=Hola%2C+quiero+información+sobre+el+encuentro"
+               target="_blank" class="boton-whatsapp">
+              <i class="fa-brands fa-whatsapp"></i> <?php echo htmlspecialchars($l['telefono']); ?>
+            </a>
+            <?php else: ?>
+            <span class="boton-whatsapp" style="opacity:.5;cursor:default;">Sin número</span>
+            <?php endif; ?>
+          </li>
+          <?php endforeach; ?>
+        </ul>
+      </div>
+      <?php endif; ?>
+
+      
 
       <div class="aviso-efectivo">
         <i class="fa-solid fa-triangle-exclamation"></i>

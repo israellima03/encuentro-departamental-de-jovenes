@@ -1,6 +1,14 @@
 <?php 
 include_once 'includes/templates/header.php';
 require_once('includes/funciones/bd_conexion.php');
+/* verificar si inscripciones están activas */
+$cfg = $conn->query("SELECT valor FROM config_sistema WHERE clave='inscripciones_activas' LIMIT 1")->fetch_assoc();
+if($cfg && $cfg['valor'] == '0'){
+  die('<div style="text-align:center;padding:60px;font-family:sans-serif;">
+    <h2 style="color:#dc2626;">⚠ Inscripciones temporalmente suspendidas</h2>
+    <p>El sistema está en mantenimiento. Vuelve más tarde.</p>
+  </div>');
+}
 
 $iglesias = [];
 $res = $conn->query("
@@ -356,14 +364,34 @@ if($res_r && $row_r = $res_r->fetch_assoc()) $regalo_fijo_nombre = $row_r['nombr
     </div>
   </div>
 
+  <?php
+  /* leer imagen QR de la BD */
+  $qr_imagen = 'comprobante1.jpeg'; /* valor por defecto */
+  $res_qr = $conn->query("SELECT valor FROM config_sistema WHERE clave='qr_imagen' LIMIT 1");
+  if($res_qr && $row_qr = $res_qr->fetch_assoc()){
+      $qr_imagen = $row_qr['valor'];
+  }
+  $qr_src = 'img/' . htmlspecialchars($qr_imagen);
+  ?>
+
+  <?php
+  /* leer imagen QR de la BD */
+  $qr_imagen = 'comprobante1.jpeg';
+  $res_qr = $conn->query("SELECT valor FROM config_sistema WHERE clave='qr_imagen' LIMIT 1");
+  if($res_qr && $row_qr = $res_qr->fetch_assoc()){
+      $qr_imagen = $row_qr['valor'];
+  }
+  $qr_src = 'img/' . htmlspecialchars($qr_imagen);
+  ?>
+
   <div id="seccion-qr" style="display:none;">
     <div class="seccion-qr">
       <h3><i class="fa-solid fa-qrcode"></i> Realiza tu Pago por QR</h3>
       <div class="qr-contenido">
         <div class="qr-imagen-wrap">
           <p class="qr-instruccion"><i class="fa-solid fa-circle-info"></i> Descarga y Escanea este QR con tu app de banca movil, no olvides poner tu nombre en el comprobante</p>
-          <img src="img/comprobante1.jpeg" alt="QR de pago" class="qr-imagen">
-          <a href="img/comprobante1.jpeg" download="QR-Encuentro.jpeg" class="button hollow">
+          <img src="<?php echo $qr_src; ?>" alt="QR de pago" class="qr-imagen">
+          <a href="<?php echo $qr_src; ?>" download="QR-Encuentro.jpeg" class="button hollow">
             <i class="fa-solid fa-download"></i> Descargar QR
           </a>
         </div>

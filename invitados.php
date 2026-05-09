@@ -38,15 +38,21 @@
         <!-- FOTO -->
         <div class="card-foto-wrap">
           <?php if (!empty($exp['imagen'])): ?>
+
+            <?php $imagen = str_replace('img/', '', $exp['imagen']); ?>
+
             <img
-              src="<?php echo htmlspecialchars($exp['imagen']); ?>"
+              src="img/<?php echo htmlspecialchars($imagen); ?>"
               alt="<?php echo htmlspecialchars($exp['nombre'] . ' ' . $exp['apellido']); ?>"
               class="card-foto"
             >
+
           <?php else: ?>
+
             <div class="card-foto-placeholder">
               <i class="fa-solid fa-user"></i>
             </div>
+
           <?php endif; ?>
 
           <!-- RANGO BADGE SOBRE LA FOTO -->

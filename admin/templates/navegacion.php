@@ -39,11 +39,11 @@ $solo_basico = ['Lider distrital', 'Lider local', 'secretario', 'Equipo departam
         <i class="fa-solid fa-chevron-down nav-arrow"></i>
       </div>
       <div class="nav-submenu" id="submenu-inscripciones">
-        <a href="#" class="nav-subitem">
+        <a href="editar-cupos.php" class="nav-subitem">
           <i class="fa-solid fa-users-gear"></i> Editar Cupos
         </a>
-        <a href="#" class="nav-subitem">
-          <i class="fa-solid fa-pen-to-square"></i> Editar Inscripciones
+        <a href="configurar-sistema.php" class="nav-subitem">
+          <i class="fa-solid fa-pen-to-square"></i> Configurar Sistema
         </a>
       </div>
       <?php endif; ?>
@@ -51,13 +51,13 @@ $solo_basico = ['Lider distrital', 'Lider local', 'secretario', 'Equipo departam
       <!-- GESTION — solo admin full -->
       <?php if(puede($admin_full)): ?>
       <div class="nav-section-label">Gestión</div>
-      <a href="#" class="nav-item">
+      <a href="reportes.php" class="nav-item">
         <i class="fa-solid fa-chart-bar"></i>
         <span>Reportes</span>
       </a>
       <a href="#" class="nav-item">
         <i class="fa-solid fa-clock-rotate-left"></i>
-        <span>Historial</span>
+        <span>Iglesias</span>
       </a>
       <a href="productos.php" class="nav-item">
         <i class="fa-solid fa-shirt"></i>
@@ -74,19 +74,19 @@ $solo_basico = ['Lider distrital', 'Lider local', 'secretario', 'Equipo departam
         <i class="fa-solid fa-chevron-down nav-arrow"></i>
       </div>
       <div class="nav-submenu" id="submenu-programa">
-        <a href="#" class="nav-subitem">
+        <a href="programa.php?tab=expositores" class="nav-subitem">
           <i class="fa-solid fa-microphone"></i> Invitados
         </a>
-        <a href="#" class="nav-subitem">
+        <a href="programa.php?tab=temas" class="nav-subitem">
           <i class="fa-solid fa-book-open"></i> Temas
         </a>
-        <a href="#" class="nav-subitem">
+        <a href="programa.php?tab=eventos" class="nav-subitem">
           <i class="fa-solid fa-calendar-check"></i> Eventos
         </a>
-        <a href="#" class="nav-subitem">
+        <a href="programa.php?tab=material" class="nav-subitem">
           <i class="fa-solid fa-folder-open"></i> Material
         </a>
-        <a href="#" class="nav-subitem">
+        <a href="programa.php?tab=moderadores" class="nav-subitem">
           <i class="fa-solid fa-person-chalkboard"></i> Moderadores
         </a>
       </div>
@@ -103,11 +103,11 @@ $solo_basico = ['Lider distrital', 'Lider local', 'secretario', 'Equipo departam
       </div>
       <div class="nav-submenu" id="submenu-preguntas">
         <?php if(puede($admin_full)): ?>
-        <a href="#" class="nav-subitem">
+        <a href="preguntas.php?seccion=habilitar" class="nav-subitem">
           <i class="fa-solid fa-toggle-on"></i> Habilitar Preguntas
         </a>
         <?php endif; ?>
-        <a href="#" class="nav-subitem">
+        <a href="preguntas.php?seccion=ver" class="nav-subitem">
           <i class="fa-solid fa-list-ul"></i> Ver Preguntas
         </a>
       </div>
@@ -121,7 +121,7 @@ $solo_basico = ['Lider distrital', 'Lider local', 'secretario', 'Equipo departam
         <i class="fa-solid fa-chevron-down nav-arrow"></i>
       </div>
       <div class="nav-submenu" id="submenu-administradores">
-        <a href="administradores.php" class="nav-subitem">
+        <a href="ver-admin.php" class="nav-subitem">
           <i class="fa-solid fa-users"></i> Ver Todos
         </a>
         <?php if(puede(['Administrador'])): ?>

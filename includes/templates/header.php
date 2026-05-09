@@ -1,7 +1,15 @@
 <?php
-/* detecta la pagina actual para marcar el menu */
+require_once __DIR__.'/../funciones/bd_conexion.php';
+require_once __DIR__.'/../funciones/config_sitio.php';
+$cfg    = get_config($conn);
+$redes  = get_redes($conn);
+$nombre = $cfg['evento_nombre'] ?? 'Encuentro Departamental de Jóvenes';
+$lema   = $cfg['evento_lema']   ?? 'SIN FILTROS';
+$versiculo = $cfg['evento_versiculo'] ?? '1 Samuel 16:7';
 $pagina_actual = basename($_SERVER['PHP_SELF']);
 ?>
+
+
 <!doctype html>
 <html class="no-js" lang="">
 
@@ -57,8 +65,11 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
             <p class="fecha"><i class="fa-solid fa-calendar"></i>10/07/2026</p>
             <p class="ciudad"><i class="fa-solid fa-location-dot"></i>Tarija, Bolivia</p>
           </div>
-          <h1 class="nombre-sitio">Encuentro departamental de Jovenes</h1>
-          <p class="slogan">SIN FILTROS  <span>  1 SAMUEL 16:7</span></p>
+          <h1 class="nombre-sitio"><?php echo htmlspecialchars($nombre); ?></h1>
+          <p class="slogan">
+            <strong class="lema-txt"><?php echo htmlspecialchars($lema); ?></strong>
+            <span class="versiculo-txt"><?php echo htmlspecialchars($versiculo); ?></span>
+          </p>
         </div>
 
       </div><!-- fin contenido-header -->
