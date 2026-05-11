@@ -1,7 +1,5 @@
 /* ============================================================
-   ADMIN-ENCUENTRO.JS — Solo lógica del dashboard
-   La navegación (submenús, hamburguesa, cerrar sesión)
-   está en admin.js que se carga desde footer.php
+   ADMIN-ENCUENTRO.JS
    ============================================================ */
 (function(){
 'use strict';
@@ -12,18 +10,13 @@ var paginaTabla        = 1;
 var porPagina          = 15;
 var inscritoCredencial = null;
 
-/* ══════════════════════════════════════
-   INIT
-══════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', function(){
 
-  /* ── Cerrar modales al click fuera ── */
   ['modal-inscripcion-overlay','modal-editar-overlay','modal-entrega-overlay'].forEach(function(id){
     var el=document.getElementById(id);
     if(el) el.addEventListener('click',function(e){ if(e.target===this) this.style.display='none'; });
   });
 
-  /* ── ESC cierra modales ── */
   document.addEventListener('keydown',function(e){
     if(e.key==='Escape'){
       ['modal-inscripcion-overlay','modal-editar-overlay','modal-entrega-overlay'].forEach(function(id){
@@ -40,7 +33,152 @@ document.addEventListener('DOMContentLoaded', function(){
   initCredencial();
   initExportarPDF();
   initModalEntrega();
+  initDatePickers();
 });
+
+/* ══════════════════════════════════════
+   DATE PICKER TIPO RULETA
+══════════════════════════════════════ */
+function initDatePickers(){
+  crearDatePicker('ni-fecha','ni-fecha-display','ni-fecha-btn');
+  crearDatePicker('edit-fecha','edit-fecha-display','edit-fecha-btn');
+}
+
+function crearDatePicker(inputId, displayId, btnId){
+  var input   = document.getElementById(inputId);
+  var display = document.getElementById(displayId);
+  var btn     = document.getElementById(btnId);
+  if(!input||!display||!btn) return;
+
+  var hoy = new Date();
+  var selY = hoy.getFullYear()-18, selM = hoy.getMonth()+1, selD = hoy.getDate();
+
+  /* si el input ya tiene valor, úsalo */
+  if(input.value){
+    var parts = input.value.split('-');
+    selY=parseInt(parts[0]); selM=parseInt(parts[1]); selD=parseInt(parts[2]);
+  }
+
+
+  var picker = document.getElementById(inputId+'-picker');
+  if(!picker){
+    picker = document.createElement('div');
+    picker.id = inputId+'-picker';
+    picker.className = 'date-picker-popup';
+    picker.style.display = 'none';
+    /* insertar dentro del div contenedor del botón */
+    var contenedor = btn.parentNode;
+    contenedor.style.position = 'relative';
+    contenedor.appendChild(picker);
+  }
+
+  function diasEnMes(y,m){ return new Date(y,m,0).getDate(); }
+  var meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+  function render(){
+    var dMax = diasEnMes(selY,selM);
+    if(selD>dMax) selD=dMax;
+    var years=[], anioActual=hoy.getFullYear();
+    for(var y=anioActual;y>=anioActual-100;y--) years.push(y);
+
+    picker.innerHTML =
+      '<div class="dp-header">Seleccionar Fecha</div>'+
+      '<div class="dp-cols">'+
+        /* DÍA */
+        '<div class="dp-col">'+
+          '<button class="dp-arrow" data-col="d" data-dir="-1">▲</button>'+
+          '<div class="dp-items" id="'+inputId+'-dcol">'+
+            [selD-1,selD,selD+1].map(function(d,i){
+              var real = ((d-1+dMax)%dMax)+1;
+              return '<div class="dp-item'+(i===1?' dp-sel':'')+'" data-col="d" data-val="'+real+'">'+pad(real)+'</div>';
+            }).join('')+
+          '</div>'+
+          '<button class="dp-arrow" data-col="d" data-dir="1">▼</button>'+
+          '<div class="dp-label">Día</div>'+
+        '</div>'+
+        /* MES */
+        '<div class="dp-col">'+
+          '<button class="dp-arrow" data-col="m" data-dir="-1">▲</button>'+
+          '<div class="dp-items">'+
+            [selM-1,selM,selM+1].map(function(m,i){
+              var real = ((m-1+12)%12)+1;
+              return '<div class="dp-item'+(i===1?' dp-sel':'')+'" data-col="m" data-val="'+real+'">'+meses[real-1].substring(0,3)+'</div>';
+            }).join('')+
+          '</div>'+
+          '<button class="dp-arrow" data-col="m" data-dir="1">▼</button>'+
+          '<div class="dp-label">Mes</div>'+
+        '</div>'+
+        /* AÑO */
+        '<div class="dp-col dp-col-wide">'+
+          '<button class="dp-arrow" data-col="y" data-dir="-1">▲</button>'+
+          '<div class="dp-items">'+
+            [years.indexOf(selY)-1,years.indexOf(selY),years.indexOf(selY)+1].map(function(idx,i){
+              var y = years[Math.max(0,Math.min(idx,years.length-1))];
+              return '<div class="dp-item'+(i===1?' dp-sel':'')+'" data-col="y" data-val="'+y+'">'+y+'</div>';
+            }).join('')+
+          '</div>'+
+          '<button class="dp-arrow" data-col="y" data-dir="1">▼</button>'+
+          '<div class="dp-label">Año</div>'+
+        '</div>'+
+      '</div>'+
+      '<button class="dp-ok" id="'+inputId+'-ok">Confirmar</button>';
+
+    /* eventos flechas e items */
+    picker.querySelectorAll('.dp-arrow').forEach(function(el){
+      el.addEventListener('click',function(e){
+        e.stopPropagation();
+        var col=this.dataset.col, dir=parseInt(this.dataset.dir);
+        if(col==='d'){ selD=((selD-1+dir+dMax)%dMax)+1; }
+        if(col==='m'){ selM=((selM-1+dir+12)%12)+1; }
+        if(col==='y'){ var idx=years.indexOf(selY); selY=years[Math.max(0,Math.min(idx+dir,years.length-1))]; }
+        render();
+      });
+    });
+    picker.querySelectorAll('.dp-item').forEach(function(el){
+      el.addEventListener('click',function(e){
+        e.stopPropagation();
+        var col=this.dataset.col, v=parseInt(this.dataset.val);
+        if(col==='d') selD=v;
+        if(col==='m') selM=v;
+        if(col==='y') selY=v;
+        render();
+      });
+    });
+    var ok=document.getElementById(inputId+'-ok');
+    if(ok) ok.addEventListener('click',function(e){
+      e.stopPropagation();
+      var val=selY+'-'+pad(selM)+'-'+pad(selD);
+      input.value=val;
+      display.textContent=pad(selD)+'/'+pad(selM)+'/'+selY;
+      picker.style.display='none';
+      /* disparar change para calcular edad */
+      input.dispatchEvent(new Event('change'));
+    });
+  }
+
+  btn.addEventListener('click',function(e){
+    e.stopPropagation();
+    if(picker.style.display==='none'){
+      /* si input tiene valor, sincronizar */
+      if(input.value){
+        var parts=input.value.split('-');
+        selY=parseInt(parts[0]); selM=parseInt(parts[1]); selD=parseInt(parts[2]);
+      }
+      render();
+      picker.style.display='block';
+    } else {
+      picker.style.display='none';
+    }
+  });
+
+  document.addEventListener('click',function(e){
+    if(!picker.contains(e.target) && e.target!==btn && !btn.contains(e.target)){
+      picker.style.display='none';
+    }
+  });
+}
+
+function pad(n){ return n<10?'0'+n:String(n); }
 
 /* ══════════════════════════════════════
    STATS
@@ -104,65 +242,35 @@ function renderTabla(){
       :'<span class="metodo-qr"><i class="fa-solid fa-qrcode"></i> QR</span>';
     var fecha=ins.fecha_pago?ins.fecha_pago.substring(0,10):'—';
 
-    /* columna producto entregado */
     var tieneProductos=ins.productos&&ins.productos!==''&&ins.productos!=='—';
     var prodEnt='<span class="ent-na">—</span>';
-    /* columna producto entregado */
     if(tieneProductos){
       if(String(ins.producto_entregado)==='1'){
         var titulo='Entregado por: '+(ins.producto_entregado_por||'—');
-        if(PUEDE_ENTREGAR){   /* <-- cambiado */
-          prodEnt='<button class="badge-ent badge-ent-si" onclick="abrirEntrega(\'producto\','+ins.inscripcion_id+',0)" title="'+titulo+'"><i class="fa-solid fa-check"></i> Sí</button>';
-        } else {
-          prodEnt='<span class="badge-ent badge-ent-si" title="'+titulo+'"><i class="fa-solid fa-check"></i> Sí</span>';
-        }
+        prodEnt=PUEDE_ENTREGAR
+          ?'<button class="badge-ent badge-ent-si" onclick="abrirEntrega(\'producto\','+ins.inscripcion_id+',0)" title="'+titulo+'"><i class="fa-solid fa-check"></i> Sí</button>'
+          :'<span class="badge-ent badge-ent-si" title="'+titulo+'"><i class="fa-solid fa-check"></i> Sí</span>';
       } else {
-        if(PUEDE_ENTREGAR){   /* <-- cambiado */
-          prodEnt='<button class="badge-ent badge-ent-no" onclick="abrirEntrega(\'producto\','+ins.inscripcion_id+',1)"><i class="fa-solid fa-xmark"></i> No</button>';
-        } else {
-          prodEnt='<span class="badge-ent badge-ent-no"><i class="fa-solid fa-xmark"></i> No</span>';
-        }
+        prodEnt=PUEDE_ENTREGAR
+          ?'<button class="badge-ent badge-ent-no" onclick="abrirEntrega(\'producto\','+ins.inscripcion_id+',1)"><i class="fa-solid fa-xmark"></i> No</button>'
+          :'<span class="badge-ent badge-ent-no"><i class="fa-solid fa-xmark"></i> No</span>';
       }
     }
 
-    /* columna material entregado */
-    if(ins.material_entregado!==null && ins.material_entregado!==undefined){
-      if(String(ins.material_entregado)==='1'){
-        var tituloM='Entregado por: '+(ins.material_entregado_por||'—');
-        if(PUEDE_ENTREGAR){   /* <-- cambiado */
-          matEnt='<button class="badge-ent badge-ent-si" onclick="abrirEntrega(\'material\','+ins.inscripcion_id+',0)" title="'+tituloM+'"><i class="fa-solid fa-check"></i> Sí</button>';
-        } else {
-          matEnt='<span class="badge-ent badge-ent-si" title="'+tituloM+'"><i class="fa-solid fa-check"></i> Sí</span>';
-        }
-      } else {
-        if(PUEDE_ENTREGAR){   /* <-- cambiado */
-          matEnt='<button class="badge-ent badge-ent-no" onclick="abrirEntrega(\'material\','+ins.inscripcion_id+',1)"><i class="fa-solid fa-xmark"></i> No</button>';
-        } else {
-          matEnt='<span class="badge-ent badge-ent-no"><i class="fa-solid fa-xmark"></i> No</span>';
-        }
-      }
-    }
-
-    /* columna material entregado */
     var matEnt='<span class="ent-na">—</span>';
     if(ins.material_entregado!==null && ins.material_entregado!==undefined){
       if(String(ins.material_entregado)==='1'){
         var tituloM='Entregado por: '+(ins.material_entregado_por||'—');
-        if(PUEDE_GESTIONAR){
-          matEnt='<button class="badge-ent badge-ent-si" onclick="abrirEntrega(\'material\','+ins.inscripcion_id+',0)" title="'+tituloM+'"><i class="fa-solid fa-check"></i> Sí</button>';
-        } else {
-          matEnt='<span class="badge-ent badge-ent-si" title="'+tituloM+'"><i class="fa-solid fa-check"></i> Sí</span>';
-        }
+        matEnt=PUEDE_ENTREGAR
+          ?'<button class="badge-ent badge-ent-si" onclick="abrirEntrega(\'material\','+ins.inscripcion_id+',0)" title="'+tituloM+'"><i class="fa-solid fa-check"></i> Sí</button>'
+          :'<span class="badge-ent badge-ent-si" title="'+tituloM+'"><i class="fa-solid fa-check"></i> Sí</span>';
       } else {
-        if(PUEDE_GESTIONAR){
-          matEnt='<button class="badge-ent badge-ent-no" onclick="abrirEntrega(\'material\','+ins.inscripcion_id+',1)"><i class="fa-solid fa-xmark"></i> No</button>';
-        } else {
-          matEnt='<span class="badge-ent badge-ent-no"><i class="fa-solid fa-xmark"></i> No</span>';
-        }
+        matEnt=PUEDE_ENTREGAR
+          ?'<button class="badge-ent badge-ent-no" onclick="abrirEntrega(\'material\','+ins.inscripcion_id+',1)"><i class="fa-solid fa-xmark"></i> No</button>'
+          :'<span class="badge-ent badge-ent-no"><i class="fa-solid fa-xmark"></i> No</span>';
       }
     }
 
-    /* acciones */
     var acciones='';
     if(typeof PUEDE_GESTIONAR!=='undefined'&&PUEDE_GESTIONAR){
       var insJson=encodeURIComponent(JSON.stringify(ins));
@@ -201,7 +309,10 @@ function renderPaginacion(){
   var totalPags=Math.ceil(inscritosFiltrados.length/porPagina);
   if(totalPags<=1){ el.innerHTML=''; return; }
   var html='<button class="pag-btn" '+(paginaTabla<=1?'disabled':'')+' onclick="cambiarPag('+(paginaTabla-1)+')"><i class="fa-solid fa-chevron-left"></i></button>';
-  for(var i=1;i<=totalPags;i++) html+='<button class="pag-btn '+(i===paginaTabla?'active':'')+'" onclick="cambiarPag('+i+')">'+i+'</button>';
+  var inicio=Math.max(1,paginaTabla-2), fin=Math.min(totalPags,paginaTabla+2);
+  if(inicio>1) html+='<button class="pag-btn" onclick="cambiarPag(1)">1</button>'+(inicio>2?'<span style="color:var(--txt-xsoft);padding:0 4px;">…</span>':'');
+  for(var i=inicio;i<=fin;i++) html+='<button class="pag-btn '+(i===paginaTabla?'active':'')+'" onclick="cambiarPag('+i+')">'+i+'</button>';
+  if(fin<totalPags) html+=(fin<totalPags-1?'<span style="color:var(--txt-xsoft);padding:0 4px;">…</span>':'')+'<button class="pag-btn" onclick="cambiarPag('+totalPags+')">'+totalPags+'</button>';
   html+='<button class="pag-btn" '+(paginaTabla>=totalPags?'disabled':'')+' onclick="cambiarPag('+(paginaTabla+1)+')"><i class="fa-solid fa-chevron-right"></i></button>';
   el.innerHTML=html;
 }
@@ -210,6 +321,7 @@ window.cambiarPag=function(p){
   var totalPags=Math.ceil(inscritosFiltrados.length/porPagina);
   if(p<1||p>totalPags) return;
   paginaTabla=p; renderTabla();
+  document.querySelector('.card') && document.querySelector('.card').scrollIntoView({behavior:'smooth',block:'start'});
 };
 
 /* ══════════════════════════════════════
@@ -259,54 +371,32 @@ function initModalEntrega(){
 
 window.abrirEntrega=function(tipo,inscripcionId,nuevoVal){
   _entregaTipo=tipo; _entregaIns=inscripcionId; _entregaVal=nuevoVal;
-
   var detalle=document.getElementById('entrega-detalle');
   var txt=document.getElementById('entrega-txt');
   var accion=nuevoVal===1?'marcar como ENTREGADO':'desmarcar (NO entregado)';
   var item=tipo==='producto'?'los productos':'el material/regalo';
-
   txt.textContent='¿Confirmas '+accion+' '+item+' de este inscrito?';
   detalle.innerHTML='<p style="text-align:center;color:var(--txt-xsoft);font-size:12px;"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</p>';
-
   document.getElementById('modal-entrega-overlay').style.display='grid';
-
-  /* cargar detalle */
   fetch('api_dashboard.php?accion=detalle_entrega&inscripcion_id='+inscripcionId+'&tipo='+tipo)
   .then(function(r){ return r.json(); })
   .then(function(data){
-    if(!data.ok||!data.items||!data.items.length){
-      detalle.innerHTML='';
-      return;
-    }
+    if(!data.ok||!data.items||!data.items.length){ detalle.innerHTML=''; return; }
     var html='<div style="background:var(--bg);border-radius:8px;padding:12px;margin-bottom:4px;">'+
       '<p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--txt-xsoft);margin-bottom:8px;">'+
         (tipo==='producto'?'Productos a entregar:':'Material a entregar:')+
       '</p>'+
       data.items.map(function(it){
-        var genTxt = it.genero==='mujer' ? 'Mujer'
-                   : it.genero==='unisex' ? 'Unisex'
-                   : it.genero ? 'Hombre' : '';
-        var gen = it.genero==='mujer'
-          ? '<i class="fa-solid fa-venus" style="color:#e879a0;"></i> Mujer'
-          : it.genero==='unisex'
-            ? '<i class="fa-solid fa-circle" style="color:#8b5cf6;"></i> Unisex'
-            : it.genero
-              ? '<i class="fa-solid fa-mars" style="color:#4f90d4;"></i> Hombre'
-              : '';
+        var gen=it.genero==='mujer'?'<i class="fa-solid fa-venus" style="color:#e879a0;"></i> Mujer'
+          :it.genero==='unisex'?'<i class="fa-solid fa-circle" style="color:#8b5cf6;"></i> Unisex'
+          :it.genero?'<i class="fa-solid fa-mars" style="color:#4f90d4;"></i> Hombre':'';
         return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">'+
           '<span style="font-weight:600;font-size:13px;">'+esc(it.nombre)+'</span>'+
-          '<span style="font-size:12px;color:var(--txt-soft);">'+
-            'x'+it.cantidad+
-            (it.talla?' | <strong>'+esc(it.talla)+'</strong>':'')+
-            (it.genero?' '+gen:'')+
-          '</span>'+
+          '<span style="font-size:12px;color:var(--txt-soft);">x'+it.cantidad+(it.talla?' | <strong>'+esc(it.talla)+'</strong>':'')+(it.genero?' '+gen:'')+'</span>'+
         '</div>';
-      }).join('')+
-    '</div>';
+      }).join('')+'</div>';
     detalle.innerHTML=html;
-  }).catch(function(){
-    detalle.innerHTML='';
-  });
+  }).catch(function(){ detalle.innerHTML=''; });
 };
 
 /* ══════════════════════════════════════
@@ -319,12 +409,10 @@ function initNuevaInscripcion(){
     document.getElementById('modal-inscripcion-overlay').style.display='grid';
   });
 
+  /* calcular edad al cambiar fecha */
   var elFecha=document.getElementById('ni-fecha');
   if(elFecha) elFecha.addEventListener('change',function(){
-    var hoy=new Date(),nac=new Date(this.value),e=hoy.getFullYear()-nac.getFullYear();
-    var m=hoy.getMonth()-nac.getMonth();
-    if(m<0||(m===0&&hoy.getDate()<nac.getDate())) e--;
-    document.getElementById('ni-edad').value=e>0?e:'';
+    calcularEdad(this.value,'ni-edad');
   });
 
   var elIgl=document.getElementById('ni-iglesia');
@@ -342,6 +430,21 @@ function initNuevaInscripcion(){
 
   var btnConf=document.getElementById('btn-ni-confirmar');
   if(btnConf) btnConf.addEventListener('click',confirmarInscripcionEfectivo);
+
+  /* ruleta cantidad */
+  document.querySelectorAll('.ni-prod-cant').forEach(function(inp){
+    inp.addEventListener('change',function(){ if(parseInt(this.value)<0) this.value=0; });
+  });
+}
+
+function calcularEdad(fechaStr,edadId){
+  if(!fechaStr) return;
+  var hoy=new Date(), nac=new Date(fechaStr);
+  var e=hoy.getFullYear()-nac.getFullYear();
+  var m=hoy.getMonth()-nac.getMonth();
+  if(m<0||(m===0&&hoy.getDate()<nac.getDate())) e--;
+  var el=document.getElementById(edadId);
+  if(el) el.value=e>0?e:'';
 }
 
 function resetModalInscripcion(){
@@ -354,6 +457,7 @@ function resetModalInscripcion(){
     var el=document.getElementById(id); if(el) el.value='';
   });
   var nf=document.getElementById('ni-fecha'); if(nf) nf.value='';
+  var nd=document.getElementById('ni-fecha-display'); if(nd) nd.textContent='';
   var nt=document.getElementById('ni-tipo');  if(nt) nt.value='';
   var ni=document.getElementById('ni-iglesia'); if(ni) ni.value='';
   document.querySelectorAll('input[name="ni-paquete"]').forEach(function(r){ r.checked=false; });
@@ -367,11 +471,11 @@ function validarFormInscripcion(){
     if(!el||!el.value.trim()){ if(el) el.style.borderColor='#dc2626'; ok=false; }
     else if(el) el.style.borderColor='';
   });
-  if(!document.getElementById('ni-fecha').value) ok=false;
+  if(!document.getElementById('ni-fecha').value){ ok=false; toast('Selecciona la fecha de nacimiento','warn'); }
   if(!document.querySelector('input[name="ni-paquete"]:checked')){
     toast('Selecciona un paquete','warn'); ok=false;
   }
-  if(!ok) toast('Completa todos los campos obligatorios','warn');
+  if(!ok && document.getElementById('ni-nombre').value) toast('Completa todos los campos obligatorios','warn');
   return ok;
 }
 
@@ -429,11 +533,7 @@ function confirmarInscripcionEfectivo(){
       var tipo=inp.dataset.tipo||'';
       var tallaEl=document.querySelector('.ni-prod-talla[data-prod-id="'+inp.dataset.prodId+'"]');
       var genEl=document.querySelector('.ni-prod-genero[data-prod-id="'+inp.dataset.prodId+'"]');
-      prods.push({
-        id:inp.dataset.prodId, cantidad:cant,
-        talla:tallaEl?tallaEl.value:'',
-        genero:tipo==='gorra'?'unisex':(genEl?genEl.value:'hombre')
-      });
+      prods.push({id:inp.dataset.prodId,cantidad:cant,talla:tallaEl?tallaEl.value:'',genero:tipo==='gorra'?'unisex':(genEl?genEl.value:'hombre')});
     }
   });
   var fd=new FormData();
@@ -469,10 +569,7 @@ window.cerrarModalInscripcion=function(){
 function initEditarInscrito(){
   var editFecha=document.getElementById('edit-fecha');
   if(editFecha) editFecha.addEventListener('change',function(){
-    var hoy=new Date(),nac=new Date(this.value),e=hoy.getFullYear()-nac.getFullYear();
-    var m=hoy.getMonth()-nac.getMonth();
-    if(m<0||(m===0&&hoy.getDate()<nac.getDate())) e--;
-    document.getElementById('edit-edad').value=e>0?e:'';
+    calcularEdad(this.value,'edit-edad');
   });
   var btnG=document.getElementById('btn-guardar-editar');
   if(btnG) btnG.addEventListener('click',function(){
@@ -497,6 +594,12 @@ window.abrirEditar=function(json){
   document.getElementById('edit-apellido').value=ins.apellido;
   document.getElementById('edit-carnet').value=ins.carnet;
   document.getElementById('edit-fecha').value=ins.fecha_nacimiento||'';
+  /* actualizar display del date picker */
+  var dd=document.getElementById('edit-fecha-display');
+  if(dd && ins.fecha_nacimiento){
+    var p=ins.fecha_nacimiento.split('-');
+    dd.textContent=p[2]+'/'+p[1]+'/'+p[0];
+  }
   document.getElementById('edit-edad').value=ins.edad||'';
   document.getElementById('edit-celular').value=ins.celular||'';
   document.getElementById('modal-editar-overlay').style.display='grid';
@@ -506,17 +609,14 @@ window.cerrarModalEditar=function(){
 };
 
 /* ══════════════════════════════════════
-   CREDENCIAL — buscador y descarga
+   CREDENCIAL
 ══════════════════════════════════════ */
 function initCredencial(){
   var inp=document.getElementById('buscar-credencial');
   var btn=document.getElementById('btn-descargar-credencial');
   var timer;
-
-  /* empezar deshabilitado */
   if(btn) btn.disabled=true;
   inscritoCredencial=null;
-
   if(inp) inp.addEventListener('input',function(){
     clearTimeout(timer);
     var q=this.value.trim();
@@ -536,14 +636,11 @@ function initCredencial(){
         res.innerHTML=data.inscritos.map(function(i){
           return '<div class="cred-resultado" onclick="seleccionarCredencial('+i.id+',\''+esc(i.nombre+' '+i.apellido)+'\')">'+
             '<i class="fa-solid fa-user" style="color:var(--accent);margin-right:6px;"></i>'+
-            esc(i.nombre)+' '+esc(i.apellido)+
-            ' — <small style="color:var(--txt-xsoft);">'+esc(i.carnet)+'</small>'+
-          '</div>';
+            esc(i.nombre)+' '+esc(i.apellido)+' — <small style="color:var(--txt-xsoft);">'+esc(i.carnet)+'</small></div>';
         }).join('');
-      }).catch(function(){ });
+      }).catch(function(){});
     },350);
   });
-
   if(btn) btn.addEventListener('click',function(){
     if(!inscritoCredencial){ toast('Selecciona un inscrito primero','warn'); return; }
     descargarCredencial(inscritoCredencial);
@@ -561,21 +658,17 @@ window.seleccionarCredencial=function(id,nombre){
 window.descargarCredencial=function(inscritoId){
   var btn=document.getElementById('btn-descargar-credencial');
   if(btn){ btn.disabled=true; btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Generando...'; }
-
   var fd=new FormData();
   fd.append('accion','descargar_credencial');
   fd.append('inscrito_id',inscritoId);
-
   fetch('api_dashboard.php',{method:'POST',body:fd})
   .then(function(r){ return r.json(); })
   .then(function(data){
     if(btn){ btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-download"></i> <span class="btn-txt-label"> Descargar Credencial PDF</span>'; }
     if(data.ok&&data.credencial){
       window.open('../credenciales/'+data.credencial,'_blank');
-      toast('Credencial generada — usa el botón Descargar PDF en la nueva pestaña','ok');
-    } else {
-      toast(data.msg||'Error al generar credencial','error');
-    }
+      toast('Credencial generada','ok');
+    } else toast(data.msg||'Error al generar credencial','error');
   }).catch(function(){
     if(btn){ btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-download"></i> <span class="btn-txt-label"> Descargar Credencial PDF</span>'; }
     toast('Error de conexion','error');
@@ -583,56 +676,56 @@ window.descargarCredencial=function(inscritoId){
 };
 
 /* ══════════════════════════════════════
-   EXPORTAR PDF TABLA
+   EXPORTAR PDF — CORREGIDO
 ══════════════════════════════════════ */
 function initExportarPDF(){
   var btn=document.getElementById('btn-exportar-pdf-tabla');
   if(!btn) return;
   btn.addEventListener('click',function(){
-    if(!inscritosFiltrados.length){ toast('No hay datos','warn'); return; }
-    toast('Generando PDF...','');
+    if(!inscritosFiltrados.length){ toast('No hay datos para exportar','warn'); return; }
+    btn.disabled=true;
+    btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Generando...';
     if(window.html2pdf){
-      generarPDFTabla();
+      generarPDFTabla(btn);
     } else {
       var s=document.createElement('script');
       s.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-      s.onload=function(){ setTimeout(generarPDFTabla,200); };
-      s.onerror=function(){ toast('Error al cargar librería PDF','error'); };
+      s.onload=function(){ setTimeout(function(){ generarPDFTabla(btn); },300); };
+      s.onerror=function(){ toast('Error al cargar librería PDF','error'); btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-file-pdf"></i> <span class="btn-txt-label">Exportar PDF</span>'; };
       document.head.appendChild(s);
     }
   });
 }
 
-function generarPDFTabla(){
-  var contenedor=document.createElement('div');
-  contenedor.style.cssText='width:1000px;padding:20px;font-family:Arial,sans-serif;font-size:10px;background:#fff;position:absolute;left:-9999px;top:0;';
-
+function generarPDFTabla(btn){
   var filas=inscritosFiltrados.map(function(ins,i){
     var prodEnt=ins.productos&&ins.productos!=='—'?(String(ins.producto_entregado)==='1'?'✓':'✗'):'—';
     var matEnt=ins.material_entregado!==null&&ins.material_entregado!==undefined?(String(ins.material_entregado)==='1'?'✓':'✗'):'—';
-    return '<tr style="background:'+(i%2===0?'#fff':'#f7f8fc')+';">'+
-      '<td style="padding:5px 4px;border-bottom:1px solid #eee;">'+(i+1)+'</td>'+
-      '<td style="padding:5px 4px;border-bottom:1px solid #eee;font-weight:600;">'+esc(ins.nombre)+' '+esc(ins.apellido)+'</td>'+
-      '<td style="padding:5px 4px;border-bottom:1px solid #eee;">'+esc(ins.carnet)+'</td>'+
-      '<td style="padding:5px 4px;border-bottom:1px solid #eee;">'+esc(ins.celular||'')+'</td>'+
-      '<td style="padding:5px 4px;border-bottom:1px solid #eee;">'+esc(ins.iglesia||'')+'</td>'+
-      '<td style="padding:5px 4px;border-bottom:1px solid #eee;">'+esc(ins.distrito||'')+'</td>'+
-      '<td style="padding:5px 4px;border-bottom:1px solid #eee;">'+esc(ins.paquete||'')+'</td>'+
-      '<td style="padding:5px 4px;border-bottom:1px solid #eee;">'+esc(ins.productos||'—')+'</td>'+
-      '<td style="padding:5px 4px;border-bottom:1px solid #eee;">'+esc(ins.metodo_pago||'')+'</td>'+
-      '<td style="padding:5px 4px;border-bottom:1px solid #eee;font-weight:700;color:'+(ins.estado_pago==='confirmado'?'#065f46':'#713f12')+';">'+esc(ins.estado_pago||'')+'</td>'+
-      '<td style="padding:5px 4px;border-bottom:1px solid #eee;text-align:center;color:'+(prodEnt==='✓'?'#065f46':'#dc2626')+';">'+prodEnt+'</td>'+
-      '<td style="padding:5px 4px;border-bottom:1px solid #eee;text-align:center;color:'+(matEnt==='✓'?'#065f46':'#dc2626')+';">'+matEnt+'</td>'+
-      '<td style="padding:5px 4px;border-bottom:1px solid #eee;">'+(ins.fecha_pago?ins.fecha_pago.substring(0,10):'')+'</td>'+
-      '<td style="padding:5px 4px;border-bottom:1px solid #eee;">'+esc(ins.registro_por||'')+'</td>'+
-      '<td style="padding:5px 4px;border-bottom:1px solid #eee;">'+esc(ins.confirmo_por||'')+'</td>'+
+    var bg=i%2===0?'#ffffff':'#f0f2f8';
+    return '<tr style="background:'+bg+'">'+
+      '<td style="padding:4px 6px;border-bottom:1px solid #e0e0e0;font-size:9px;">'+(i+1)+'</td>'+
+      '<td style="padding:4px 6px;border-bottom:1px solid #e0e0e0;font-size:9px;font-weight:600;">'+esc(ins.nombre)+' '+esc(ins.apellido)+'</td>'+
+      '<td style="padding:4px 6px;border-bottom:1px solid #e0e0e0;font-size:9px;">'+esc(ins.carnet||'')+'</td>'+
+      '<td style="padding:4px 6px;border-bottom:1px solid #e0e0e0;font-size:9px;">'+esc(ins.celular||'')+'</td>'+
+      '<td style="padding:4px 6px;border-bottom:1px solid #e0e0e0;font-size:9px;">'+esc(ins.iglesia||'')+'</td>'+
+      '<td style="padding:4px 6px;border-bottom:1px solid #e0e0e0;font-size:9px;">'+esc(ins.paquete||'')+'</td>'+
+      '<td style="padding:4px 6px;border-bottom:1px solid #e0e0e0;font-size:9px;">'+esc(ins.metodo_pago||'')+'</td>'+
+      '<td style="padding:4px 6px;border-bottom:1px solid #e0e0e0;font-size:9px;font-weight:700;color:'+(ins.estado_pago==='confirmado'?'#065f46':'#92400e')+'">'+esc(ins.estado_pago||'')+'</td>'+
+      '<td style="padding:4px 6px;border-bottom:1px solid #e0e0e0;font-size:9px;text-align:center;color:'+(prodEnt==='✓'?'#065f46':'#dc2626')+'">'+prodEnt+'</td>'+
+      '<td style="padding:4px 6px;border-bottom:1px solid #e0e0e0;font-size:9px;text-align:center;color:'+(matEnt==='✓'?'#065f46':'#dc2626')+'">'+matEnt+'</td>'+
+      '<td style="padding:4px 6px;border-bottom:1px solid #e0e0e0;font-size:9px;">'+(ins.fecha_pago?ins.fecha_pago.substring(0,10):'')+'</td>'+
     '</tr>';
   }).join('');
 
-  contenedor.innerHTML=
-    '<div style="display:flex;justify-content:space-between;border-bottom:3px solid #03045e;padding-bottom:10px;margin-bottom:14px;">'+
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+
+    '<style>body{font-family:Arial,sans-serif;margin:0;padding:0;}'+
+    'table{width:100%;border-collapse:collapse;}'+
+    'th{background:#03045e;color:#fff;padding:6px;font-size:9px;text-align:left;}'+
+    '</style></head><body>'+
+    '<div style="padding:16px;">'+
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #03045e;padding-bottom:10px;margin-bottom:14px;">'+
       '<div>'+
-        '<div style="font-size:15px;font-weight:700;color:#03045e;">Inscritos — Encuentro Departamental de Jóvenes 2026</div>'+
+        '<div style="font-size:16px;font-weight:700;color:#03045e;">Inscritos — Encuentro Departamental de Jóvenes 2026</div>'+
         '<div style="font-size:10px;color:#666;margin-top:2px;">IDDP Oruro · Tarija, julio 2026</div>'+
       '</div>'+
       '<div style="text-align:right;font-size:10px;color:#666;">'+
@@ -640,43 +733,33 @@ function generarPDFTabla(){
         'Total: '+inscritosFiltrados.length+' registros'+
       '</div>'+
     '</div>'+
-    '<table style="width:100%;border-collapse:collapse;font-size:8.5px;">'+
-    '<thead><tr style="background:#03045e;">'+
-      '<th style="padding:5px 4px;color:#fff;text-align:left;">#</th>'+
-      '<th style="padding:5px 4px;color:#fff;text-align:left;">Nombre</th>'+
-      '<th style="padding:5px 4px;color:#fff;">Carnet</th>'+
-      '<th style="padding:5px 4px;color:#fff;">Celular</th>'+
-      '<th style="padding:5px 4px;color:#fff;">Iglesia</th>'+
-      '<th style="padding:5px 4px;color:#fff;">Distrito</th>'+
-      '<th style="padding:5px 4px;color:#fff;">Paquete</th>'+
-      '<th style="padding:5px 4px;color:#fff;">Productos</th>'+
-      '<th style="padding:5px 4px;color:#fff;">Pago</th>'+
-      '<th style="padding:5px 4px;color:#fff;">Estado</th>'+
-      '<th style="padding:5px 4px;color:#fff;text-align:center;">Prod.Ent.</th>'+
-      '<th style="padding:5px 4px;color:#fff;text-align:center;">Mat.Ent.</th>'+
-      '<th style="padding:5px 4px;color:#fff;">Fecha</th>'+
-      '<th style="padding:5px 4px;color:#fff;">Registró</th>'+
-      '<th style="padding:5px 4px;color:#fff;">Confirmó</th>'+
+    '<table>'+
+    '<thead><tr>'+
+      '<th>#</th><th>Nombre Completo</th><th>Carnet</th><th>Celular</th>'+
+      '<th>Iglesia</th><th>Paquete</th><th>Método</th><th>Estado</th>'+
+      '<th>Prod.</th><th>Mat.</th><th>Fecha</th>'+
     '</tr></thead><tbody>'+filas+'</tbody></table>'+
-    '<div style="margin-top:12px;text-align:center;font-size:8px;color:#aaa;border-top:1px solid #eee;padding-top:6px;">'+
+    '<div style="margin-top:14px;text-align:center;font-size:8px;color:#aaa;border-top:1px solid #eee;padding-top:6px;">'+
       'Sistema de inscripciones — IDDP Oruro · Lima Technology'+
-    '</div>';
+    '</div>'+
+    '</div></body></html>';
 
-  document.body.appendChild(contenedor);
-
-  html2pdf().set({
+  var opt={
     margin:[8,6,8,6],
-    filename:'inscritos_encuentro_'+new Date().toISOString().substring(0,10)+'.pdf',
+    filename:'inscritos_'+new Date().toISOString().substring(0,10)+'.pdf',
     image:{type:'jpeg',quality:0.95},
-    html2canvas:{scale:1.5,useCORS:true,logging:false},
+    html2canvas:{scale:2,useCORS:true,logging:false,backgroundColor:'#ffffff'},
     jsPDF:{unit:'mm',format:'letter',orientation:'landscape'}
-  }).from(contenedor).save().then(function(){
-    document.body.removeChild(contenedor);
+  };
+
+  html2pdf().set(opt).from(html).save()
+  .then(function(){
     toast('PDF descargado correctamente','ok');
+    if(btn){ btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-file-pdf"></i> <span class="btn-txt-label">Exportar PDF</span>'; }
   }).catch(function(e){
-    document.body.removeChild(contenedor);
-    toast('Error al generar PDF','error');
     console.error(e);
+    toast('Error al generar PDF','error');
+    if(btn){ btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-file-pdf"></i> <span class="btn-txt-label">Exportar PDF</span>'; }
   });
 }
 

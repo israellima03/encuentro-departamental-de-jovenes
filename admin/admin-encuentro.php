@@ -229,7 +229,14 @@ while($r = $res->fetch_assoc()) $distritos_modal[] = $r;
           </div>
           <div class="modal-field">
             <span class="modal-label">Fecha de Nacimiento *</span>
-            <input type="date" id="ni-fecha" class="input-filtro" style="width:100%;">
+            <input type="hidden" id="ni-fecha">
+            <div style="display:flex;gap:8px;align-items:center;position:relative;">
+              <span id="ni-fecha-display" style="font-size:14px;font-weight:600;color:var(--txt);min-width:100px;"></span>
+              <button type="button" id="ni-fecha-btn" class="btn-secondary" style="padding:7px 14px;font-size:12px;white-space:nowrap;">
+                <i class="fa-solid fa-calendar"></i> Seleccionar fecha
+              </button>
+            </div>
+
           </div>
           <div class="modal-field">
             <span class="modal-label">Edad (automático)</span>
@@ -322,16 +329,28 @@ while($r = $res->fetch_assoc()) $distritos_modal[] = $r;
                   <option value="M">M</option><option value="L">L</option>
                   <option value="XL">XL</option><option value="XXL">XXL</option>
                 </select>
-                <input type="number" class="ni-prod-cant input-filtro"
-                       data-prod-id="<?php echo $prod['id']; ?>"
-                       data-nombre="<?php echo htmlspecialchars($prod['nombre']); ?>"
-                       data-precio="<?php echo $prod['precio']; ?>"
-                       data-tipo="<?php echo $tipo_p; ?>"
-                       min="0" max="<?php echo $prod['cupos_disponibles']; ?>"
-                       value="0" style="width:70px;">
+                <div class="cantidad-ruleta" style="display:flex;align-items:center;gap:6px;">
+                  <button type="button" class="btn-cant-menos"
+                          data-prod-id="<?php echo $prod['id']; ?>"
+                          style="width:28px;height:28px;border:1px solid var(--border);border-radius:6px;background:var(--card-bg);font-size:16px;cursor:pointer;display:grid;place-items:center;">−</button>
+                  <span class="ni-prod-cant-display"
+                        data-prod-id="<?php echo $prod['id']; ?>"
+                        style="min-width:24px;text-align:center;font-weight:700;font-size:15px;">0</span>
+                  <input type="hidden" class="ni-prod-cant"
+                         data-prod-id="<?php echo $prod['id']; ?>"
+                         data-nombre="<?php echo htmlspecialchars($prod['nombre']); ?>"
+                         data-precio="<?php echo $prod['precio']; ?>"
+                         data-tipo="<?php echo $tipo_p; ?>"
+                         value="0">
+                  <button type="button" class="btn-cant-mas"
+                          data-prod-id="<?php echo $prod['id']; ?>"
+                          data-max="<?php echo $prod['cupos_disponibles']; ?>"
+                          style="width:28px;height:28px;border:1px solid var(--border);border-radius:6px;background:var(--card-bg);font-size:16px;cursor:pointer;display:grid;place-items:center;">+</button>
+                </div>
+ 
               </div>
               <?php else: ?>
-              <div style="display:flex;gap:8px;margin-top:6px;align-items:center;">
+              <div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap;">
                 <select class="ni-prod-talla select-filtro"
                         data-prod-id="<?php echo $prod['id']; ?>"
                         data-tipo="gorra" style="width:130px;">
@@ -341,13 +360,23 @@ while($r = $res->fetch_assoc()) $distritos_modal[] = $r;
                   <option value="Grande">Grande</option>
                   <option value="Extra Grande">Extra Grande</option>
                 </select>
-                <input type="number" class="ni-prod-cant input-filtro"
-                       data-prod-id="<?php echo $prod['id']; ?>"
-                       data-nombre="<?php echo htmlspecialchars($prod['nombre']); ?>"
-                       data-precio="<?php echo $prod['precio']; ?>"
-                       data-tipo="gorra"
-                       min="0" max="<?php echo $prod['cupos_disponibles']; ?>"
-                       value="0" style="width:70px;">
+                <div class="cantidad-ruleta" style="display:flex;align-items:center;gap:6px;">
+                  <button type="button" class="btn-cant-menos"
+                          data-prod-id="<?php echo $prod['id']; ?>"
+                          style="width:28px;height:28px;border:1px solid var(--border);border-radius:6px;background:var(--card-bg);font-size:16px;cursor:pointer;display:grid;place-items:center;">−</button>
+                  <span class="ni-prod-cant-display"
+                        style="min-width:24px;text-align:center;font-weight:700;font-size:15px;">0</span>
+                  <input type="hidden" class="ni-prod-cant"
+                         data-prod-id="<?php echo $prod['id']; ?>"
+                         data-nombre="<?php echo htmlspecialchars($prod['nombre']); ?>"
+                         data-precio="<?php echo $prod['precio']; ?>"
+                         data-tipo="gorra"
+                         value="0">
+                  <button type="button" class="btn-cant-mas"
+                          data-prod-id="<?php echo $prod['id']; ?>"
+                          data-max="<?php echo $prod['cupos_disponibles']; ?>"
+                          style="width:28px;height:28px;border:1px solid var(--border);border-radius:6px;background:var(--card-bg);font-size:16px;cursor:pointer;display:grid;place-items:center;">+</button>
+                </div>
               </div>
               <?php endif; ?>
             </div>
@@ -416,7 +445,13 @@ while($r = $res->fetch_assoc()) $distritos_modal[] = $r;
         </div>
         <div class="modal-field">
           <span class="modal-label">Fecha Nacimiento</span>
-          <input type="date" id="edit-fecha" class="input-filtro" style="width:100%;">
+          <input type="hidden" id="edit-fecha">
+          <div style="display:flex;gap:8px;align-items:center;position:relative;">
+            <span id="edit-fecha-display" style="font-size:13px;font-weight:600;color:var(--txt);min-width:90px;"></span>
+            <button type="button" id="edit-fecha-btn" class="btn-secondary" style="padding:6px 12px;font-size:12px;">
+              <i class="fa-solid fa-calendar"></i> Cambiar
+            </button>
+          </div>
         </div>
         <div class="modal-field">
           <span class="modal-label">Edad</span>
@@ -469,3 +504,36 @@ while($r = $res->fetch_assoc()) $distritos_modal[] = $r;
 </script>
 <script src="js/admin-encuentro.js"></script>
 <?php include_once 'templates/footer.php'; ?>
+
+<script>
+/* ══ INIT RULETA CANTIDAD ══ */
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('.btn-cant-menos').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var pid  = this.dataset.prodId;
+      var contenedor = this.closest('.cantidad-ruleta');
+      if(!contenedor) return;
+      var inp  = contenedor.querySelector('.ni-prod-cant');
+      var disp = contenedor.querySelector('.ni-prod-cant-display');
+      if(!inp) return;
+      var v = Math.max(0, parseInt(inp.value||0) - 1);
+      inp.value = v;
+      if(disp) disp.textContent = v;
+    });
+  });
+
+  document.querySelectorAll('.btn-cant-mas').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var contenedor = this.closest('.cantidad-ruleta');
+      if(!contenedor) return;
+      var inp  = contenedor.querySelector('.ni-prod-cant');
+      var disp = contenedor.querySelector('.ni-prod-cant-display');
+      var max  = parseInt(this.dataset.max||999);
+      if(!inp) return;
+      var v = Math.min(max, parseInt(inp.value||0) + 1);
+      inp.value = v;
+      if(disp) disp.textContent = v;
+    });
+  });
+});
+</script>
