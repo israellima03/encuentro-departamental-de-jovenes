@@ -32,77 +32,61 @@ $v = function($archivo){
   <meta name="theme-color" content="#fafafa">
 </head>
 
-<body>
+<body <?php echo ($pagina_actual !== 'index.php') ? 'class="pagina-interior"' : ''; ?>>
   <!--[if IE]>
     <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
   <![endif]-->
 
-  <header class="site-header">
-    <div class="hero">
-
-      <div class="logos-laterales">
-        <img src="img/escudoidpo.png" class="logo-izq" alt="logo izquierda">
-        <img src="img/escudomjo.png" class="logo-der" alt="logo derecha">
-      </div>
-
-      <div class="contenido-header">
-
-        <!-- REDES SOCIALES -->
-        <nav class="redes-sociales">
-          <a href="https://www.facebook.com/share/1EG8kSZLUZ/" target="_blank" title="Facebook">
-            <i class="fa-brands fa-facebook-f"></i>
-          </a>
-          <a href="https://www.instagram.com/" target="_blank" title="Instagram">
-            <i class="fa-brands fa-instagram"></i>
-          </a>
-          <a href="https://www.tiktok.com/@mj.iddp.oruro" target="_blank" title="TikTok">
-            <i class="fa-brands fa-tiktok"></i>
-          </a>
-          <a href="https://chat.whatsapp.com/DDCPO9QTnhqFyCJnjwSOUC" target="_blank" title="Grupo WhatsApp">
-            <i class="fa-brands fa-whatsapp"></i>
-          </a>
-        </nav>
-
-        <div class="informacion-evento">
-          <div class="clearfix">
-            <p class="fecha"><i class="fa-solid fa-calendar"></i>10/07/2026</p>
-            <p class="ciudad"><i class="fa-solid fa-location-dot"></i>Tarija, Bolivia</p>
+  <?php if($pagina_actual === 'index.php'): ?>
+    <header class="site-header">
+      <div class="hero">
+        <div class="logos-laterales">
+          <img src="img/escudoidpo.png" class="logo-izq" alt="logo izquierda">
+          <img src="img/escudomjo.png" class="logo-der" alt="logo derecha">
+        </div>
+        <div class="contenido-header">
+          <nav class="redes-sociales">
+            <a href="https://www.facebook.com/share/1EG8kSZLUZ/" target="_blank" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/" target="_blank" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://www.tiktok.com/@mj.iddp.oruro" target="_blank" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+            <a href="https://chat.whatsapp.com/DDCPO9QTnhqFyCJnjwSOUC" target="_blank" title="Grupo WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+          </nav>
+          <div class="informacion-evento">
+            <div class="clearfix">
+              <p class="fecha"><i class="fa-solid fa-calendar"></i>10/07/2026</p>
+              <p class="ciudad"><i class="fa-solid fa-location-dot"></i>Tarija, Bolivia</p>
+            </div>
+            <h1 class="nombre-sitio"><?php echo htmlspecialchars($nombre); ?></h1>
+            <p class="slogan">
+              <strong class="lema-txt"><?php echo htmlspecialchars($lema); ?></strong>
+              <span class="versiculo-txt"><?php echo htmlspecialchars($versiculo); ?></span>
+            </p>
           </div>
-          <h1 class="nombre-sitio"><?php echo htmlspecialchars($nombre); ?></h1>
-          <p class="slogan">
-            <strong class="lema-txt"><?php echo htmlspecialchars($lema); ?></strong>
-            <span class="versiculo-txt"><?php echo htmlspecialchars($versiculo); ?></span>
-          </p>
         </div>
-
-      </div><!-- fin contenido-header -->
-
-      <!-- FLECHA DESLIZAR -->
-      <div class="scroll-down">
-        <p class="scroll-texto">Desliza</p>
-        <div class="scroll-flechas">
-          <i class="fa-solid fa-chevron-down"></i>
-          <i class="fa-solid fa-chevron-down"></i>
-          <i class="fa-solid fa-chevron-down"></i>
+        <div class="scroll-down">
+          <p class="scroll-texto">Desliza</p>
+          <div class="scroll-flechas">
+            <i class="fa-solid fa-chevron-down"></i>
+            <i class="fa-solid fa-chevron-down"></i>
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
         </div>
       </div>
-
-    </div><!--.hero-->
-  </header>
+    </header>
+  <?php endif; ?>
 
   <div class="barra">
     <div class="contenedor clearfix">
-      <div class="logo">
-        <a href="index.php">
-          <img src="img/logo2.svg" alt="logo mjoruro">
-        </a>
-      </div>
       <div class="menu-movil">
         <span></span>
         <span></span>
         <span></span>
       </div>
       <nav class="navegacion-principal clearfix">
+        <a href="index.php"
+           <?php echo $pagina_actual === 'index.php' ? 'class="nav-activo"' : ''; ?>>
+          Inicio
+        </a>
         <a href="conferencia.php"
            <?php echo $pagina_actual === 'conferencia.php' ? 'class="nav-activo"' : ''; ?>>
           Conferencia
@@ -121,4 +105,4 @@ $v = function($archivo){
         </a>
       </nav>
     </div>
-  </div><!--barra-->
+  </div>

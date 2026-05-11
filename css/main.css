@@ -278,13 +278,15 @@ div.hero {
     margin-top: 120px; /*  baja debajo de logos */
   }
 }
+
+
 div.contenido-header {
-  padding-top: 40px;
+  padding-top: 80px;
 }
 
 @media only screen and (min-width:768px) {
   div.contenido-header {
-    padding-top: 120px;
+    padding-top: 140px;
   }
 }
 
@@ -415,160 +417,207 @@ p.slogan span {
   }
 }
 
-/**barra **/
+
+/* ══════════════════════════════════════
+   BARRA — debajo del hero, sube al scroll
+══════════════════════════════════════ */
 div.barra {
-  background-color: #353535;
-  padding: 20px 0;
+  position: relative;
+  z-index: 1000;
+  background: linear-gradient(135deg, #03045e 0%, #0077b6 100%);
+  border-bottom: 1px solid rgba(0,137,228,0.4);
+  padding: 12px 0;
+  transition: all 0.4s ease;
 }
 
-.logo {
-  flex: 0 0 auto;
+div.barra.sticky {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, rgba(3,4,94,0.97) 0%, rgba(0,119,182,0.97) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
 }
 
-
-/** para el tamaño del logo para celular**/
-.logo img {
-  width: 300px;
-}
-/** para el tamaño del logo para pc**/
-@media (min-width:768px) {
-  .logo img {
-    width: 600px;
-  }
+.barra .contenedor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-wrap: nowrap;
 }
 
-@media only screen and (min-width: 768px) {
-  div.logo {
-    max-width: 60%;
-  }
-}
-
-/**navegacion principal**/
-
+/* ── NAVEGACION PC ── */
 nav.navegacion-principal {
-  display: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
+
 nav.navegacion-principal a {
   font-family: "Oswald", sans-serif;
-  color: #ffff;
-  font-size: 1em;
+  color: rgba(255,255,255,0.9);
+  font-size: 0.88em;
   text-transform: uppercase;
   text-decoration: none;
-  transition: all .6s ease;
-  width: 100%;
-  display: block;
-  text-align: center;
-  padding: 10px;
-  margin-bottom: 20px;
-  
-}
-
-.navegacion-principal {
-  width: 100%;
-}
-
-
-
-@media only screen and (min-width:768px) {
-
-  .barra .contenedor {
-    flex-wrap: nowrap;
-  }
-
-  .menu-movil {
-    display: none;
-  }
-
-  nav.navegacion-principal {
-    width: auto;
-    display: block;
-    flex: 1;
-    text-align: right;
-  }
-
-  nav.navegacion-principal a {
-    padding: 10px 10px;
-    width: auto;
-    display: inline-block;
-    text-align: center;
-    margin: 0 10px 0 0;
-    
-  }
+  letter-spacing: 1px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: all 0.25s ease;
+  white-space: nowrap;
 }
 
 nav.navegacion-principal a:hover {
-  background-color: #03045e;
-  border: 2px solid #03045e;
-}
-
-nav.navegacion-principal a:last-child {
-  border: 2px solid #da002b;
-  color: #da002b;
-}
-
-nav.navegacion-principal a:last-child:hover
-{
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.2);
   color: #fff;
-} 
-
-
-/** Menu Movil**/
-div.menu-movil {
-  flex: unset;
-
-  width: 40px;
 }
 
+/* quitar color rojo de inscripciones */
+nav.navegacion-principal a:last-child {
+  background: transparent;
+  border-color: transparent;
+  color: rgba(255,255,255,0.9);
+  font-weight: 400;
+}
 
+nav.navegacion-principal a:last-child:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.2);
+  box-shadow: none;
+  transform: none;
+}
+
+nav.navegacion-principal a.nav-activo {
+  background: rgba(218,0,43,0.25) !important;
+  border-color: #da002b !important;
+  color: #fff !important;
+}
+
+/* ── HAMBURGUESA ── */
+div.menu-movil {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
 
 div.menu-movil:hover {
-  cursor: pointer;
-}
-
-@media only screen and (min-width:768px) {
-  div.menu-movil {
-    display: none;
-  }
+  background: rgba(255,255,255,0.1);
 }
 
 div.menu-movil span {
-  height: 8px;
-  margin-bottom: 6px;
-  background-color: white;
+  height: 2px;
+  background: #fff;
   display: block;
-
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  transform-origin: center;
 }
 
-/* hamburguesa activa - se convierte en X */
 div.menu-movil.activo span:nth-child(1) {
-  transform: rotate(45deg) translate(10px, 10px);
-  transition: all .3s ease;
+  transform: translateY(7px) rotate(45deg);
 }
-
 div.menu-movil.activo span:nth-child(2) {
   opacity: 0;
-  transition: all .3s ease;
+  transform: scaleX(0);
 }
-
 div.menu-movil.activo span:nth-child(3) {
-  transform: rotate(-45deg) translate(10px, -10px);
-  transition: all .3s ease;
+  transform: translateY(-7px) rotate(-45deg);
 }
 
-div.menu-movil span {
-  transition: all .3s ease;
-}
+/* ── MENU MOVIL ── */
+@media (max-width: 767px) {
+  div.menu-movil {
+    display: flex;
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
 
-/* menu visible en celular cuando tiene clase activo */
-@media only screen and (max-width: 768px) {
+  .barra .contenedor {
+    position: relative;
+    justify-content: center;
+    padding: 4px 0;
+  }
+
+nav.navegacion-principal {
+    display: none;
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 85%;
+    max-width: 300px;
+    background: rgba(0, 30, 80, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 9999;
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(0,137,228,0.3);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
   nav.navegacion-principal.activo {
     display: flex;
-    flex-direction: column;
+    animation: menuEntrar 0.25s ease;
+  }
+
+  nav.navegacion-principal a {
+    font-size: 0.88em;
+    padding: 10px 20px;
     width: 100%;
-    background-color: #353535;
-    padding: 10px 0;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.05);
+  }
+
+  nav.navegacion-principal a:hover,
+  nav.navegacion-principal a.nav-activo {
+    background: rgba(0,137,228,0.3) !important;
+    border-color: rgba(0,137,228,0.5) !important;
+    color: #fff !important;
+  }
+
+  @keyframes menuEntrar {
+      from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
   }
 }
+
+@media (min-width: 768px) {
+  div.menu-movil {
+    display: none !important;
+  }
+}
+
+/* ── COMPENSAR BARRA EN PÁGINAS INTERIORES ── */
+body.pagina-interior {
+  padding-top: 0;
+}
+
+
+
 /* ---- flecha deslizar ---- */
 div.scroll-down {
   position: absolute;
