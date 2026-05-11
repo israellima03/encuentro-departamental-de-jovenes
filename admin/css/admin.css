@@ -820,10 +820,18 @@ body.sidebar-collapsed .main-wrapper { margin-left: 0; }
 .modal-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  padding: 16px 22px;
+  gap: 8px;
+  padding: 14px 20px;
   border-top: 1px solid var(--border);
   background: var(--bg);
+  flex-wrap: nowrap;  /* <-- cambia a nowrap */
+}
+.modal-footer .btn-primary,
+.modal-footer .btn-secondary {
+  flex: 0 0 auto;      /* <-- cambia a no crecer */
+  min-width: unset;
+  justify-content: center;
+  white-space: nowrap;
 }
 
 /* ── COMING SOON ── */
@@ -1220,6 +1228,19 @@ body.sidebar-collapsed .main-wrapper { margin-left: 0; }
   .modal-field.full { grid-column: span 1 !important; }
   .modal-section-title { grid-column: span 1 !important; }
   .date-picker-popup { position: fixed; top: auto; bottom: 0; left: 0; right: 0; border-radius: 16px 16px 0 0; min-width: unset; }
+
+  .modal-footer {
+    overflow-x: auto;
+    justify-content: flex-start;
+    gap: 6px;
+    padding: 12px 16px;
+  }
+  .modal-footer .btn-primary,
+  .modal-footer .btn-secondary {
+    flex-shrink: 0;
+    padding: 9px 14px;
+    font-size: 12px;
+  }
 }
 
 

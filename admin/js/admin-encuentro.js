@@ -1,5 +1,5 @@
 /* ============================================================
-   ADMIN-ENCUENTRO.JS
+   ADMIN-ENCUENTRO.JS — Solo lógica del dashboard
    ============================================================ */
 (function(){
 'use strict';
@@ -10,6 +10,207 @@ var paginaTabla        = 1;
 var porPagina          = 15;
 var inscritoCredencial = null;
 
+/* ══════════════════════════════════════
+   HELPERS GLOBALES (definidos primero)
+══════════════════════════════════════ */
+function pad(n){ return n<10?'0'+n:String(n); }
+function setText(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; }
+function val(id){ var el=document.getElementById(id); return el?el.value.trim():''; }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function toast(msg,tipo){
+  var el=document.getElementById('toast-dashboard'); if(!el) return;
+  el.textContent=msg;
+  el.className='toast show'+(tipo?' toast-'+tipo:'');
+  clearTimeout(toast._t);
+  toast._t=setTimeout(function(){ el.classList.remove('show'); },3500);
+}
+function calcularEdad(fechaStr,edadId){
+  if(!fechaStr) return;
+  var hoy=new Date(), nac=new Date(fechaStr);
+  var e=hoy.getFullYear()-nac.getFullYear();
+  var m=hoy.getMonth()-nac.getMonth();
+  if(m<0||(m===0&&hoy.getDate()<nac.getDate())) e--;
+  var el=document.getElementById(edadId);
+  if(el) el.value=e>0?e:'';
+}
+
+/* ══════════════════════════════════════
+   DATE PICKER
+══════════════════════════════════════ */
+function crearDatePicker(inputId, displayId, btnId){
+  var input   = document.getElementById(inputId);
+  var display = document.getElementById(displayId);
+  var btn     = document.getElementById(btnId);
+  if(!input||!display||!btn) return;
+
+  var hoy = new Date();
+  var selY = hoy.getFullYear()-18, selM = hoy.getMonth()+1, selD = hoy.getDate();
+
+  if(input.value){
+    var parts = input.value.split('-');
+    if(parts.length===3){
+      selY=parseInt(parts[0]); selM=parseInt(parts[1]); selD=parseInt(parts[2]);
+    }
+  }
+
+  /* eliminar picker anterior si existe */
+  var pickerAnterior = document.getElementById(inputId+'-picker');
+  if(pickerAnterior) pickerAnterior.parentNode.removeChild(pickerAnterior);
+
+  var picker = document.createElement('div');
+  picker.id = inputId+'-picker';
+  picker.className = 'date-picker-popup';
+  picker.style.cssText = 'display:none;position:fixed;z-index:99999;';
+  document.body.appendChild(picker);
+
+  function posicionarPicker(){
+    var rect = btn.getBoundingClientRect();
+    var pickerH = 300;
+    var spaceAbajo = window.innerHeight - rect.bottom;
+    if(spaceAbajo < pickerH && rect.top > pickerH){
+      picker.style.top  = (rect.top - pickerH - 6) + 'px';
+    } else {
+      picker.style.top  = (rect.bottom + 6) + 'px';
+    }
+    var left = rect.left;
+    if(left + 280 > window.innerWidth) left = window.innerWidth - 290;
+    picker.style.left = Math.max(4, left) + 'px';
+  }
+
+  function diasEnMes(y,m){ return new Date(y,m,0).getDate(); }
+  var meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+             'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+  function render(){
+    var dMax = diasEnMes(selY,selM);
+    if(selD>dMax) selD=dMax;
+    var years=[], anioActual=hoy.getFullYear();
+    for(var y=anioActual;y>=anioActual-100;y--) years.push(y);
+    var yIdx = years.indexOf(selY);
+    if(yIdx<0){ years.push(selY); years.sort(function(a,b){return b-a;}); yIdx=years.indexOf(selY); }
+
+    picker.innerHTML =
+      '<div class="dp-header">Seleccionar Fecha</div>'+
+      '<div class="dp-cols">'+
+        /* DÍA */
+        '<div class="dp-col">'+
+          '<button type="button" class="dp-arrow" data-col="d" data-dir="-1">▲</button>'+
+          '<div class="dp-items">'+
+            [selD-1,selD,selD+1].map(function(d,i){
+              var real = ((d-1+dMax)%dMax)+1;
+              return '<div class="dp-item'+(i===1?' dp-sel':'')+'" data-col="d" data-val="'+real+'">'+pad(real)+'</div>';
+            }).join('')+
+          '</div>'+
+          '<button type="button" class="dp-arrow" data-col="d" data-dir="1">▼</button>'+
+          '<div class="dp-label">Día</div>'+
+        '</div>'+
+        /* MES */
+        '<div class="dp-col">'+
+          '<button type="button" class="dp-arrow" data-col="m" data-dir="-1">▲</button>'+
+          '<div class="dp-items">'+
+            [selM-1,selM,selM+1].map(function(m,i){
+              var real = ((m-1+12)%12)+1;
+              return '<div class="dp-item'+(i===1?' dp-sel':'')+'" data-col="m" data-val="'+real+'">'+meses[real-1].substring(0,3)+'</div>';
+            }).join('')+
+          '</div>'+
+          '<button type="button" class="dp-arrow" data-col="m" data-dir="1">▼</button>'+
+          '<div class="dp-label">Mes</div>'+
+        '</div>'+
+        /* AÑO */
+        '<div class="dp-col dp-col-wide">'+
+          '<button type="button" class="dp-arrow" data-col="y" data-dir="-1">▲</button>'+
+          '<div class="dp-items">'+
+            [yIdx-1,yIdx,yIdx+1].map(function(idx,i){
+              var y = years[Math.max(0,Math.min(idx,years.length-1))];
+              return '<div class="dp-item'+(i===1?' dp-sel':'')+'" data-col="y" data-val="'+y+'">'+y+'</div>';
+            }).join('')+
+          '</div>'+
+          '<button type="button" class="dp-arrow" data-col="y" data-dir="1">▼</button>'+
+          '<div class="dp-label">Año</div>'+
+        '</div>'+
+      '</div>'+
+      '<button type="button" class="dp-ok" id="'+inputId+'-dp-ok">Confirmar</button>';
+
+    /* eventos flechas */
+    picker.querySelectorAll('.dp-arrow').forEach(function(arrow){
+      arrow.addEventListener('click',function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        var col=this.dataset.col, dir=parseInt(this.dataset.dir);
+        if(col==='d'){ selD=((selD-1+dir+dMax)%dMax)+1; }
+        if(col==='m'){ selM=((selM-1+dir+12)%12)+1; }
+        if(col==='y'){
+          var idx=years.indexOf(selY);
+          selY=years[Math.max(0,Math.min(idx+dir,years.length-1))];
+        }
+        render();
+      });
+    });
+
+    /* eventos items */
+    picker.querySelectorAll('.dp-item').forEach(function(item){
+      item.addEventListener('click',function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        var col=this.dataset.col, v=parseInt(this.dataset.val);
+        if(col==='d') selD=v;
+        if(col==='m') selM=v;
+        if(col==='y') selY=v;
+        render();
+      });
+    });
+
+    /* confirmar */
+    var okBtn=document.getElementById(inputId+'-dp-ok');
+    if(okBtn) okBtn.addEventListener('click',function(e){
+      e.stopPropagation();
+      e.preventDefault();
+      var v=selY+'-'+pad(selM)+'-'+pad(selD);
+      input.value=v;
+      display.textContent=pad(selD)+'/'+pad(selM)+'/'+selY;
+      picker.style.display='none';
+      input.dispatchEvent(new Event('change'));
+    });
+  }
+
+  /* abrir/cerrar */
+  btn.addEventListener('click',function(e){
+    e.stopPropagation();
+    e.preventDefault();
+    /* cerrar otros pickers */
+    document.querySelectorAll('.date-picker-popup').forEach(function(p){
+      if(p.id !== picker.id) p.style.display='none';
+    });
+    if(picker.style.display==='none'||picker.style.display===''){
+      if(input.value){
+        var parts=input.value.split('-');
+        if(parts.length===3){
+          selY=parseInt(parts[0]); selM=parseInt(parts[1]); selD=parseInt(parts[2]);
+        }
+      }
+      render();
+      posicionarPicker();
+      picker.style.display='block';
+    } else {
+      picker.style.display='none';
+    }
+  });
+
+  /* cerrar al click fuera */
+  document.addEventListener('click',function(e){
+    if(picker.style.display==='none') return;
+    if(!picker.contains(e.target) && e.target!==btn && !btn.contains(e.target)){
+      picker.style.display='none';
+    }
+  });
+
+  /* evitar cierre al click dentro */
+  picker.addEventListener('click',function(e){ e.stopPropagation(); });
+}
+
+/* ══════════════════════════════════════
+   INIT
+══════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', function(){
 
   ['modal-inscripcion-overlay','modal-editar-overlay','modal-entrega-overlay'].forEach(function(id){
@@ -22,6 +223,7 @@ document.addEventListener('DOMContentLoaded', function(){
       ['modal-inscripcion-overlay','modal-editar-overlay','modal-entrega-overlay'].forEach(function(id){
         var el=document.getElementById(id); if(el) el.style.display='none';
       });
+      document.querySelectorAll('.date-picker-popup').forEach(function(p){ p.style.display='none'; });
     }
   });
 
@@ -33,152 +235,7 @@ document.addEventListener('DOMContentLoaded', function(){
   initCredencial();
   initExportarPDF();
   initModalEntrega();
-  initDatePickers();
 });
-
-/* ══════════════════════════════════════
-   DATE PICKER TIPO RULETA
-══════════════════════════════════════ */
-function initDatePickers(){
-  crearDatePicker('ni-fecha','ni-fecha-display','ni-fecha-btn');
-  crearDatePicker('edit-fecha','edit-fecha-display','edit-fecha-btn');
-}
-
-function crearDatePicker(inputId, displayId, btnId){
-  var input   = document.getElementById(inputId);
-  var display = document.getElementById(displayId);
-  var btn     = document.getElementById(btnId);
-  if(!input||!display||!btn) return;
-
-  var hoy = new Date();
-  var selY = hoy.getFullYear()-18, selM = hoy.getMonth()+1, selD = hoy.getDate();
-
-  /* si el input ya tiene valor, úsalo */
-  if(input.value){
-    var parts = input.value.split('-');
-    selY=parseInt(parts[0]); selM=parseInt(parts[1]); selD=parseInt(parts[2]);
-  }
-
-
-  var picker = document.getElementById(inputId+'-picker');
-  if(!picker){
-    picker = document.createElement('div');
-    picker.id = inputId+'-picker';
-    picker.className = 'date-picker-popup';
-    picker.style.display = 'none';
-    /* insertar dentro del div contenedor del botón */
-    var contenedor = btn.parentNode;
-    contenedor.style.position = 'relative';
-    contenedor.appendChild(picker);
-  }
-
-  function diasEnMes(y,m){ return new Date(y,m,0).getDate(); }
-  var meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-
-  function render(){
-    var dMax = diasEnMes(selY,selM);
-    if(selD>dMax) selD=dMax;
-    var years=[], anioActual=hoy.getFullYear();
-    for(var y=anioActual;y>=anioActual-100;y--) years.push(y);
-
-    picker.innerHTML =
-      '<div class="dp-header">Seleccionar Fecha</div>'+
-      '<div class="dp-cols">'+
-        /* DÍA */
-        '<div class="dp-col">'+
-          '<button class="dp-arrow" data-col="d" data-dir="-1">▲</button>'+
-          '<div class="dp-items" id="'+inputId+'-dcol">'+
-            [selD-1,selD,selD+1].map(function(d,i){
-              var real = ((d-1+dMax)%dMax)+1;
-              return '<div class="dp-item'+(i===1?' dp-sel':'')+'" data-col="d" data-val="'+real+'">'+pad(real)+'</div>';
-            }).join('')+
-          '</div>'+
-          '<button class="dp-arrow" data-col="d" data-dir="1">▼</button>'+
-          '<div class="dp-label">Día</div>'+
-        '</div>'+
-        /* MES */
-        '<div class="dp-col">'+
-          '<button class="dp-arrow" data-col="m" data-dir="-1">▲</button>'+
-          '<div class="dp-items">'+
-            [selM-1,selM,selM+1].map(function(m,i){
-              var real = ((m-1+12)%12)+1;
-              return '<div class="dp-item'+(i===1?' dp-sel':'')+'" data-col="m" data-val="'+real+'">'+meses[real-1].substring(0,3)+'</div>';
-            }).join('')+
-          '</div>'+
-          '<button class="dp-arrow" data-col="m" data-dir="1">▼</button>'+
-          '<div class="dp-label">Mes</div>'+
-        '</div>'+
-        /* AÑO */
-        '<div class="dp-col dp-col-wide">'+
-          '<button class="dp-arrow" data-col="y" data-dir="-1">▲</button>'+
-          '<div class="dp-items">'+
-            [years.indexOf(selY)-1,years.indexOf(selY),years.indexOf(selY)+1].map(function(idx,i){
-              var y = years[Math.max(0,Math.min(idx,years.length-1))];
-              return '<div class="dp-item'+(i===1?' dp-sel':'')+'" data-col="y" data-val="'+y+'">'+y+'</div>';
-            }).join('')+
-          '</div>'+
-          '<button class="dp-arrow" data-col="y" data-dir="1">▼</button>'+
-          '<div class="dp-label">Año</div>'+
-        '</div>'+
-      '</div>'+
-      '<button class="dp-ok" id="'+inputId+'-ok">Confirmar</button>';
-
-    /* eventos flechas e items */
-    picker.querySelectorAll('.dp-arrow').forEach(function(el){
-      el.addEventListener('click',function(e){
-        e.stopPropagation();
-        var col=this.dataset.col, dir=parseInt(this.dataset.dir);
-        if(col==='d'){ selD=((selD-1+dir+dMax)%dMax)+1; }
-        if(col==='m'){ selM=((selM-1+dir+12)%12)+1; }
-        if(col==='y'){ var idx=years.indexOf(selY); selY=years[Math.max(0,Math.min(idx+dir,years.length-1))]; }
-        render();
-      });
-    });
-    picker.querySelectorAll('.dp-item').forEach(function(el){
-      el.addEventListener('click',function(e){
-        e.stopPropagation();
-        var col=this.dataset.col, v=parseInt(this.dataset.val);
-        if(col==='d') selD=v;
-        if(col==='m') selM=v;
-        if(col==='y') selY=v;
-        render();
-      });
-    });
-    var ok=document.getElementById(inputId+'-ok');
-    if(ok) ok.addEventListener('click',function(e){
-      e.stopPropagation();
-      var val=selY+'-'+pad(selM)+'-'+pad(selD);
-      input.value=val;
-      display.textContent=pad(selD)+'/'+pad(selM)+'/'+selY;
-      picker.style.display='none';
-      /* disparar change para calcular edad */
-      input.dispatchEvent(new Event('change'));
-    });
-  }
-
-  btn.addEventListener('click',function(e){
-    e.stopPropagation();
-    if(picker.style.display==='none'){
-      /* si input tiene valor, sincronizar */
-      if(input.value){
-        var parts=input.value.split('-');
-        selY=parseInt(parts[0]); selM=parseInt(parts[1]); selD=parseInt(parts[2]);
-      }
-      render();
-      picker.style.display='block';
-    } else {
-      picker.style.display='none';
-    }
-  });
-
-  document.addEventListener('click',function(e){
-    if(!picker.contains(e.target) && e.target!==btn && !btn.contains(e.target)){
-      picker.style.display='none';
-    }
-  });
-}
-
-function pad(n){ return n<10?'0'+n:String(n); }
 
 /* ══════════════════════════════════════
    STATS
@@ -309,9 +366,9 @@ function renderPaginacion(){
   var totalPags=Math.ceil(inscritosFiltrados.length/porPagina);
   if(totalPags<=1){ el.innerHTML=''; return; }
   var html='<button class="pag-btn" '+(paginaTabla<=1?'disabled':'')+' onclick="cambiarPag('+(paginaTabla-1)+')"><i class="fa-solid fa-chevron-left"></i></button>';
-  var inicio=Math.max(1,paginaTabla-2), fin=Math.min(totalPags,paginaTabla+2);
-  if(inicio>1) html+='<button class="pag-btn" onclick="cambiarPag(1)">1</button>'+(inicio>2?'<span style="color:var(--txt-xsoft);padding:0 4px;">…</span>':'');
-  for(var i=inicio;i<=fin;i++) html+='<button class="pag-btn '+(i===paginaTabla?'active':'')+'" onclick="cambiarPag('+i+')">'+i+'</button>';
+  var ini=Math.max(1,paginaTabla-2), fin=Math.min(totalPags,paginaTabla+2);
+  if(ini>1) html+='<button class="pag-btn" onclick="cambiarPag(1)">1</button>'+(ini>2?'<span style="color:var(--txt-xsoft);padding:0 4px;">…</span>':'');
+  for(var i=ini;i<=fin;i++) html+='<button class="pag-btn '+(i===paginaTabla?'active':'')+'" onclick="cambiarPag('+i+')">'+i+'</button>';
   if(fin<totalPags) html+=(fin<totalPags-1?'<span style="color:var(--txt-xsoft);padding:0 4px;">…</span>':'')+'<button class="pag-btn" onclick="cambiarPag('+totalPags+')">'+totalPags+'</button>';
   html+='<button class="pag-btn" '+(paginaTabla>=totalPags?'disabled':'')+' onclick="cambiarPag('+(paginaTabla+1)+')"><i class="fa-solid fa-chevron-right"></i></button>';
   el.innerHTML=html;
@@ -321,7 +378,8 @@ window.cambiarPag=function(p){
   var totalPags=Math.ceil(inscritosFiltrados.length/porPagina);
   if(p<1||p>totalPags) return;
   paginaTabla=p; renderTabla();
-  document.querySelector('.card') && document.querySelector('.card').scrollIntoView({behavior:'smooth',block:'start'});
+  var card=document.querySelector('.card');
+  if(card) card.scrollIntoView({behavior:'smooth',block:'start'});
 };
 
 /* ══════════════════════════════════════
@@ -407,9 +465,12 @@ function initNuevaInscripcion(){
   if(btnAbrir) btnAbrir.addEventListener('click',function(){
     resetModalInscripcion();
     document.getElementById('modal-inscripcion-overlay').style.display='grid';
+    /* inicializar picker al abrir el modal */
+    setTimeout(function(){
+      crearDatePicker('ni-fecha','ni-fecha-display','ni-fecha-btn');
+    },50);
   });
 
-  /* calcular edad al cambiar fecha */
   var elFecha=document.getElementById('ni-fecha');
   if(elFecha) elFecha.addEventListener('change',function(){
     calcularEdad(this.value,'ni-edad');
@@ -430,21 +491,6 @@ function initNuevaInscripcion(){
 
   var btnConf=document.getElementById('btn-ni-confirmar');
   if(btnConf) btnConf.addEventListener('click',confirmarInscripcionEfectivo);
-
-  /* ruleta cantidad */
-  document.querySelectorAll('.ni-prod-cant').forEach(function(inp){
-    inp.addEventListener('change',function(){ if(parseInt(this.value)<0) this.value=0; });
-  });
-}
-
-function calcularEdad(fechaStr,edadId){
-  if(!fechaStr) return;
-  var hoy=new Date(), nac=new Date(fechaStr);
-  var e=hoy.getFullYear()-nac.getFullYear();
-  var m=hoy.getMonth()-nac.getMonth();
-  if(m<0||(m===0&&hoy.getDate()<nac.getDate())) e--;
-  var el=document.getElementById(edadId);
-  if(el) el.value=e>0?e:'';
 }
 
 function resetModalInscripcion(){
@@ -458,10 +504,12 @@ function resetModalInscripcion(){
   });
   var nf=document.getElementById('ni-fecha'); if(nf) nf.value='';
   var nd=document.getElementById('ni-fecha-display'); if(nd) nd.textContent='';
-  var nt=document.getElementById('ni-tipo');  if(nt) nt.value='';
+  var nt=document.getElementById('ni-tipo'); if(nt) nt.value='';
   var ni=document.getElementById('ni-iglesia'); if(ni) ni.value='';
   document.querySelectorAll('input[name="ni-paquete"]').forEach(function(r){ r.checked=false; });
   document.querySelectorAll('.ni-prod-cant').forEach(function(i){ i.value='0'; });
+  /* resetear displays de ruleta */
+  document.querySelectorAll('.ni-prod-cant-display').forEach(function(d){ d.textContent='0'; });
 }
 
 function validarFormInscripcion(){
@@ -471,11 +519,15 @@ function validarFormInscripcion(){
     if(!el||!el.value.trim()){ if(el) el.style.borderColor='#dc2626'; ok=false; }
     else if(el) el.style.borderColor='';
   });
-  if(!document.getElementById('ni-fecha').value){ ok=false; toast('Selecciona la fecha de nacimiento','warn'); }
+  if(!document.getElementById('ni-fecha').value){
+    ok=false; toast('Selecciona la fecha de nacimiento','warn');
+  }
   if(!document.querySelector('input[name="ni-paquete"]:checked')){
     toast('Selecciona un paquete','warn'); ok=false;
   }
-  if(!ok && document.getElementById('ni-nombre').value) toast('Completa todos los campos obligatorios','warn');
+  if(!ok && document.getElementById('ni-nombre') && document.getElementById('ni-nombre').value){
+    toast('Completa todos los campos obligatorios','warn');
+  }
   return ok;
 }
 
@@ -533,7 +585,11 @@ function confirmarInscripcionEfectivo(){
       var tipo=inp.dataset.tipo||'';
       var tallaEl=document.querySelector('.ni-prod-talla[data-prod-id="'+inp.dataset.prodId+'"]');
       var genEl=document.querySelector('.ni-prod-genero[data-prod-id="'+inp.dataset.prodId+'"]');
-      prods.push({id:inp.dataset.prodId,cantidad:cant,talla:tallaEl?tallaEl.value:'',genero:tipo==='gorra'?'unisex':(genEl?genEl.value:'hombre')});
+      prods.push({
+        id:inp.dataset.prodId, cantidad:cant,
+        talla:tallaEl?tallaEl.value:'',
+        genero:tipo==='gorra'?'unisex':(genEl?genEl.value:'hombre')
+      });
     }
   });
   var fd=new FormData();
@@ -561,6 +617,7 @@ function confirmarInscripcionEfectivo(){
 
 window.cerrarModalInscripcion=function(){
   document.getElementById('modal-inscripcion-overlay').style.display='none';
+  document.querySelectorAll('.date-picker-popup').forEach(function(p){ p.style.display='none'; });
 };
 
 /* ══════════════════════════════════════
@@ -574,7 +631,8 @@ function initEditarInscrito(){
   var btnG=document.getElementById('btn-guardar-editar');
   if(btnG) btnG.addEventListener('click',function(){
     var fd=new FormData();
-    fd.append('accion','editar_inscrito'); fd.append('id',val('edit-inscrito-id'));
+    fd.append('accion','editar_inscrito');
+    fd.append('id',val('edit-inscrito-id'));
     fd.append('nombre',val('edit-nombre')); fd.append('apellido',val('edit-apellido'));
     fd.append('carnet',val('edit-carnet')); fd.append('fecha_nacimiento',val('edit-fecha'));
     fd.append('edad',val('edit-edad')); fd.append('celular',val('edit-celular'));
@@ -594,18 +652,23 @@ window.abrirEditar=function(json){
   document.getElementById('edit-apellido').value=ins.apellido;
   document.getElementById('edit-carnet').value=ins.carnet;
   document.getElementById('edit-fecha').value=ins.fecha_nacimiento||'';
-  /* actualizar display del date picker */
   var dd=document.getElementById('edit-fecha-display');
   if(dd && ins.fecha_nacimiento){
     var p=ins.fecha_nacimiento.split('-');
-    dd.textContent=p[2]+'/'+p[1]+'/'+p[0];
+    if(p.length===3) dd.textContent=p[2]+'/'+p[1]+'/'+p[0];
   }
   document.getElementById('edit-edad').value=ins.edad||'';
   document.getElementById('edit-celular').value=ins.celular||'';
   document.getElementById('modal-editar-overlay').style.display='grid';
+  /* inicializar picker del editar */
+  setTimeout(function(){
+    crearDatePicker('edit-fecha','edit-fecha-display','edit-fecha-btn');
+  },50);
 };
+
 window.cerrarModalEditar=function(){
   document.getElementById('modal-editar-overlay').style.display='none';
+  document.querySelectorAll('.date-picker-popup').forEach(function(p){ p.style.display='none'; });
 };
 
 /* ══════════════════════════════════════
@@ -676,95 +739,185 @@ window.descargarCredencial=function(inscritoId){
 };
 
 /* ══════════════════════════════════════
-   EXPORTAR PDF — CORREGIDO
+   EXPORTAR PDF
+══════════════════════════════════════ */
+/* ══════════════════════════════════════
+   EXPORTAR PDF
 ══════════════════════════════════════ */
 function initExportarPDF(){
-  var btn=document.getElementById('btn-exportar-pdf-tabla');
+  var btn = document.getElementById('btn-exportar-pdf-tabla');
   if(!btn) return;
-  btn.addEventListener('click',function(){
+  btn.addEventListener('click', function(){
     if(!inscritosFiltrados.length){ toast('No hay datos para exportar','warn'); return; }
-    btn.disabled=true;
-    btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Generando...';
-    if(window.html2pdf){
-      generarPDFTabla(btn);
-    } else {
-      var s=document.createElement('script');
-      s.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-      s.onload=function(){ setTimeout(function(){ generarPDFTabla(btn); },300); };
-      s.onerror=function(){ toast('Error al cargar librería PDF','error'); btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-file-pdf"></i> <span class="btn-txt-label">Exportar PDF</span>'; };
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generando...';
+
+    function cargarScript(src, cb){
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload = cb;
+      s.onerror = function(){
+        toast('Error al cargar librería PDF','error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-file-pdf"></i> <span class="btn-txt-label">Exportar PDF</span>';
+      };
       document.head.appendChild(s);
     }
+
+    function intentarGenerar(){
+      if(window.jspdf && window.jspdf.jsPDF && window.jspdf.jsPDF.API && window.jspdf.jsPDF.API.autoTable){
+        generarPDFTabla(btn);
+      } else if(window.jspdf && window.jspdf.jsPDF){
+        /* jsPDF cargó pero falta autoTable */
+        cargarScript(
+          'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js',
+          function(){ setTimeout(function(){ generarPDFTabla(btn); }, 100); }
+        );
+      } else {
+        /* cargar jsPDF primero */
+        cargarScript(
+          'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+          function(){
+            cargarScript(
+              'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js',
+              function(){ setTimeout(function(){ generarPDFTabla(btn); }, 100); }
+            );
+          }
+        );
+      }
+    }
+    intentarGenerar();
   });
 }
 
 function generarPDFTabla(btn){
-  var filas=inscritosFiltrados.map(function(ins,i){
-    var prodEnt=ins.productos&&ins.productos!=='—'?(String(ins.producto_entregado)==='1'?'✓':'✗'):'—';
-    var matEnt=ins.material_entregado!==null&&ins.material_entregado!==undefined?(String(ins.material_entregado)==='1'?'✓':'✗'):'—';
-    var bg=i%2===0?'#ffffff':'#f0f2f8';
-    return '<tr style="background:'+bg+'">'+
-      '<td style="padding:4px 6px;border-bottom:1px solid #e0e0e0;font-size:9px;">'+(i+1)+'</td>'+
-      '<td style="padding:4px 6px;border-bottom:1px solid #e0e0e0;font-size:9px;font-weight:600;">'+esc(ins.nombre)+' '+esc(ins.apellido)+'</td>'+
-      '<td style="padding:4px 6px;border-bottom:1px solid #e0e0e0;font-size:9px;">'+esc(ins.carnet||'')+'</td>'+
-      '<td style="padding:4px 6px;border-bottom:1px solid #e0e0e0;font-size:9px;">'+esc(ins.celular||'')+'</td>'+
-      '<td style="padding:4px 6px;border-bottom:1px solid #e0e0e0;font-size:9px;">'+esc(ins.iglesia||'')+'</td>'+
-      '<td style="padding:4px 6px;border-bottom:1px solid #e0e0e0;font-size:9px;">'+esc(ins.paquete||'')+'</td>'+
-      '<td style="padding:4px 6px;border-bottom:1px solid #e0e0e0;font-size:9px;">'+esc(ins.metodo_pago||'')+'</td>'+
-      '<td style="padding:4px 6px;border-bottom:1px solid #e0e0e0;font-size:9px;font-weight:700;color:'+(ins.estado_pago==='confirmado'?'#065f46':'#92400e')+'">'+esc(ins.estado_pago||'')+'</td>'+
-      '<td style="padding:4px 6px;border-bottom:1px solid #e0e0e0;font-size:9px;text-align:center;color:'+(prodEnt==='✓'?'#065f46':'#dc2626')+'">'+prodEnt+'</td>'+
-      '<td style="padding:4px 6px;border-bottom:1px solid #e0e0e0;font-size:9px;text-align:center;color:'+(matEnt==='✓'?'#065f46':'#dc2626')+'">'+matEnt+'</td>'+
-      '<td style="padding:4px 6px;border-bottom:1px solid #e0e0e0;font-size:9px;">'+(ins.fecha_pago?ins.fecha_pago.substring(0,10):'')+'</td>'+
-    '</tr>';
-  }).join('');
+  try {
+    var doc = new window.jspdf.jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
 
-  var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+
-    '<style>body{font-family:Arial,sans-serif;margin:0;padding:0;}'+
-    'table{width:100%;border-collapse:collapse;}'+
-    'th{background:#03045e;color:#fff;padding:6px;font-size:9px;text-align:left;}'+
-    '</style></head><body>'+
-    '<div style="padding:16px;">'+
-    '<div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #03045e;padding-bottom:10px;margin-bottom:14px;">'+
-      '<div>'+
-        '<div style="font-size:16px;font-weight:700;color:#03045e;">Inscritos — Encuentro Departamental de Jóvenes 2026</div>'+
-        '<div style="font-size:10px;color:#666;margin-top:2px;">IDDP Oruro · Tarija, julio 2026</div>'+
-      '</div>'+
-      '<div style="text-align:right;font-size:10px;color:#666;">'+
-        'Generado: '+new Date().toLocaleString('es-BO')+'<br>'+
-        'Total: '+inscritosFiltrados.length+' registros'+
-      '</div>'+
-    '</div>'+
-    '<table>'+
-    '<thead><tr>'+
-      '<th>#</th><th>Nombre Completo</th><th>Carnet</th><th>Celular</th>'+
-      '<th>Iglesia</th><th>Paquete</th><th>Método</th><th>Estado</th>'+
-      '<th>Prod.</th><th>Mat.</th><th>Fecha</th>'+
-    '</tr></thead><tbody>'+filas+'</tbody></table>'+
-    '<div style="margin-top:14px;text-align:center;font-size:8px;color:#aaa;border-top:1px solid #eee;padding-top:6px;">'+
-      'Sistema de inscripciones — IDDP Oruro · Lima Technology'+
-    '</div>'+
-    '</div></body></html>';
+    /* ── cabecera ── */
+    doc.setFillColor(3, 4, 94);
+    doc.rect(0, 0, 297, 18, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(11);
+    doc.setFont('helvetica','bold');
+    doc.text('Inscritos — Encuentro Departamental de Jóvenes 2026', 10, 7);
+    doc.setFontSize(8);
+    doc.setFont('helvetica','normal');
+    doc.text('IDDP Oruro · Tarija, julio 2026', 10, 13);
+    var fecha = new Date().toLocaleString('es-BO');
+    doc.text('Generado: ' + fecha + '   Total: ' + inscritosFiltrados.length + ' registros', 287, 13, { align:'right' });
+    doc.setTextColor(0, 0, 0);
 
-  var opt={
-    margin:[8,6,8,6],
-    filename:'inscritos_'+new Date().toISOString().substring(0,10)+'.pdf',
-    image:{type:'jpeg',quality:0.95},
-    html2canvas:{scale:2,useCORS:true,logging:false,backgroundColor:'#ffffff'},
-    jsPDF:{unit:'mm',format:'letter',orientation:'landscape'}
-  };
+    /* ── filas ── */
+    var body = inscritosFiltrados.map(function(ins, i){
+      var prodEnt = '—';
+      if(ins.productos && ins.productos !== '' && ins.productos !== '—'){
+        prodEnt = String(ins.producto_entregado) === '1' ? '✓' : '✗';
+      }
+      var matEnt = '—';
+      if(ins.material_entregado !== null && ins.material_entregado !== undefined){
+        matEnt = String(ins.material_entregado) === '1' ? '✓' : '✗';
+      }
+      return [
+        i + 1,
+        (ins.nombre || '') + ' ' + (ins.apellido || ''),
+        ins.carnet   || '—',
+        ins.celular  || '—',
+        ins.iglesia  || '—',
+        ins.distrito || '—',
+        ins.paquete  || '—',
+        ins.metodo_pago  || '—',
+        ins.estado_pago  || '—',
+        prodEnt,
+        matEnt,
+        ins.fecha_pago ? ins.fecha_pago.substring(0,10) : '—'
+      ];
+    });
 
-  html2pdf().set(opt).from(html).save()
-  .then(function(){
+    /* ── tabla ── */
+    doc.autoTable({
+      startY: 22,
+      head: [[
+        '#','Nombre Completo','Carnet','Celular',
+        'Iglesia','Distrito','Paquete',
+        'Método','Estado','Prod.','Mat.','Fecha'
+      ]],
+      body: body,
+      styles: {
+        fontSize: 7.5,
+        cellPadding: 2.5,
+        overflow: 'linebreak',
+        valign: 'middle'
+      },
+      headStyles: {
+        fillColor: [3, 4, 94],
+        textColor: 255,
+        fontStyle: 'bold',
+        fontSize: 8
+      },
+      alternateRowStyles: {
+        fillColor: [240, 242, 248]
+      },
+      columnStyles: {
+        0:  { cellWidth: 8,  halign:'center' },   /* # */
+        1:  { cellWidth: 38 },                     /* Nombre */
+        2:  { cellWidth: 18 },                     /* Carnet */
+        3:  { cellWidth: 18 },                     /* Celular */
+        4:  { cellWidth: 28 },                     /* Iglesia */
+        5:  { cellWidth: 22 },                     /* Distrito */
+        6:  { cellWidth: 30 },                     /* Paquete */
+        7:  { cellWidth: 16, halign:'center' },    /* Método */
+        8:  { cellWidth: 20, halign:'center' },    /* Estado */
+        9:  { cellWidth: 12, halign:'center' },    /* Prod */
+        10: { cellWidth: 12, halign:'center' },    /* Mat */
+        11: { cellWidth: 22, halign:'center' }     /* Fecha */
+      },
+      didDrawCell: function(data){
+        /* colorear ✓ en verde y ✗ en rojo */
+        if(data.section === 'body' && (data.column.index === 9 || data.column.index === 10)){
+          var val = String(data.cell.raw);
+          if(val === '✓') data.cell.styles.textColor = [6, 95, 70];
+          if(val === '✗') data.cell.styles.textColor = [220, 0, 43];
+        }
+        /* colorear estado */
+        if(data.section === 'body' && data.column.index === 8){
+          var est = String(data.cell.raw);
+          if(est === 'confirmado') data.cell.styles.textColor = [6, 95, 70];
+          if(est === 'pendiente')  data.cell.styles.textColor = [146, 64, 14];
+        }
+      },
+      margin: { top: 22, left: 7, right: 7, bottom: 10 },
+      tableWidth: 'auto'
+    });
+
+    /* ── pie de página ── */
+    var totalPags = doc.internal.getNumberOfPages();
+    for(var p = 1; p <= totalPags; p++){
+      doc.setPage(p);
+      doc.setFontSize(7);
+      doc.setTextColor(150);
+      doc.text(
+        'Sistema de inscripciones — IDDP Oruro · Lima Technology   |   Pág. ' + p + '/' + totalPags,
+        148.5, 205, { align:'center' }
+      );
+    }
+
+    var nombreArchivo = 'inscritos_' + new Date().toISOString().substring(0,10) + '.pdf';
+    doc.save(nombreArchivo);
+
     toast('PDF descargado correctamente','ok');
-    if(btn){ btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-file-pdf"></i> <span class="btn-txt-label">Exportar PDF</span>'; }
-  }).catch(function(e){
-    console.error(e);
-    toast('Error al generar PDF','error');
-    if(btn){ btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-file-pdf"></i> <span class="btn-txt-label">Exportar PDF</span>'; }
-  });
+  } catch(e){
+    console.error('PDF error:', e);
+    toast('Error al generar PDF: ' + e.message, 'error');
+  } finally {
+    if(btn){
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-file-pdf"></i> <span class="btn-txt-label">Exportar PDF</span>';
+    }
+  }
 }
-
 /* ══════════════════════════════════════
-   HELPERS
+   ANIMACIONES
 ══════════════════════════════════════ */
 function animarNum(id,objetivo){
   var el=document.getElementById(id); if(!el) return;
@@ -776,18 +929,6 @@ function animarNum(id,objetivo){
     if(p<1) requestAnimationFrame(step);
   }
   requestAnimationFrame(step);
-}
-function setText(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; }
-function val(id){ var el=document.getElementById(id); return el?el.value.trim():''; }
-function toast(msg,tipo){
-  var el=document.getElementById('toast-dashboard'); if(!el) return;
-  el.textContent=msg;
-  el.className='toast show'+(tipo?' toast-'+tipo:'');
-  clearTimeout(toast._t);
-  toast._t=setTimeout(function(){ el.classList.remove('show'); },3500);
-}
-function esc(s){
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 })();
