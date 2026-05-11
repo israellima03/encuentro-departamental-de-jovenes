@@ -59,39 +59,50 @@ include_once 'funciones/funciones.php';
     </div>
 
     <!-- TABLA -->
-    <div class="card" style="margin-top:20px;">
+    <div class="card" style="margin-top:20px;overflow:visible;">
       <div class="card-header">
         <h3><i class="fa-solid fa-qrcode"></i> Inscripciones por QR</h3>
         <span class="qr-total-lbl" id="qr-total-lbl">Cargando...</span>
       </div>
-      <div class="tabla-wrap">
-        <table class="tabla-inscritos" id="tabla-qr">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Participante</th>
-              <th>Carnet</th>
-              <th>Celular</th>
-              <th>Iglesia</th>
-              <th>Paquete</th>
-              <th>Precio paquete</th>
-              <th>Productos</th>
-              <th>Descuento</th>
-              <th>Total</th>
-              <th>Fecha registro</th>
-              <th>Comprobante</th>
-              <th>Estado</th>
-              <th>Acción</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-qr">
-            <tr>
-              <td colspan="14" class="tabla-loading">
-                <i class="fa-solid fa-spinner fa-spin"></i> Cargando...
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div style="display:flex;width:100%;overflow:hidden;position:relative;">
+          <div class="tabla-wrap" style="flex:1;min-width:0;overflow-x:auto;display:block;-webkit-overflow-scrolling:touch;">
+          <table class="tabla-inscritos" id="tabla-qr">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Participante</th>
+                <th>Carnet</th>
+                <th>Celular</th>
+                <th>Iglesia</th>
+                <th>Paquete</th>
+                <th>Precio paquete</th>
+                <th>Productos</th>
+                <th>Descuento</th>
+                <th>Total</th>
+                <th>Fecha registro</th>
+                <th>Comprobante</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-qr">
+              <tr>
+                <td colspan="13" class="tabla-loading">
+                  <i class="fa-solid fa-spinner fa-spin"></i> Cargando...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="flex-shrink:0;border-left:2px solid var(--border);background:var(--card-bg);box-shadow:-4px 0 10px rgba(0,0,0,.1);">
+          <table class="tabla-inscritos" id="tabla-acc">
+            <thead>
+              <tr><th>Acción</th></tr>
+            </thead>
+            <tbody id="tbody-acc">
+              <tr><td class="tabla-loading"></td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
       <div class="paginacion" id="paginacion-qr"></div>
     </div>

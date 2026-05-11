@@ -1185,7 +1185,7 @@ body.sidebar-collapsed .main-wrapper { margin-left: 0; }
 }
 /* ── FIX DESBORDAMIENTO HORIZONTAL ── */
 .main-wrapper {
-  overflow-x: hidden;
+  overflow-x: clip;
   max-width: 100%;
 }
 

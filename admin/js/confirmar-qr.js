@@ -44,66 +44,91 @@ function cargar(){
 }
 
 /* ── RENDER TABLA ── */
+
 function renderTabla(){
-    var tbody = document.getElementById('tbody-qr');
-    if(!tbody) return;
+  var tbody    = document.getElementById('tbody-qr');
+  var tbodyAcc = document.getElementById('tbody-acc');
+  var lbl      = document.getElementById('qr-total-lbl');
+  if(!tbody) return;
 
-    if(!filtrados.length){
-        tbody.innerHTML = '<tr><td colspan="14" class="tabla-vacia">' +
-            '<i class="fa-solid fa-inbox" style="display:block;font-size:28px;margin-bottom:8px;"></i>' +
-            'No hay inscripciones con esos filtros</td></tr>';
-        renderPaginacion();
-        return;
-    }
-
-    var inicio = (paginaActual - 1) * porPagina;
-    var pagina = filtrados.slice(inicio, inicio + porPagina);
-
-    tbody.innerHTML = pagina.map(function(ins, i){
-        var iniciales = ((ins.nombre||'')[0]||'') + ((ins.apellido||'')[0]||'');
-        var badge = ins.estado_pago === 'confirmado'
-            ? '<span class="badge badge-confirmado"><i class="fa-solid fa-circle-check"></i> Confirmado</span>'
-            : '<span class="badge badge-pendiente"><i class="fa-solid fa-clock"></i> Pendiente</span>';
-
-        var btnConf = ins.estado_pago === 'pendiente'
-            ? '<button class="btn-accion btn-confirmar" title="Confirmar pago" ' +
-              'onclick="abrirModal(' + (inicio+i) + ')"><i class="fa-solid fa-check"></i></button> '
-            : '';
-
-        return '<tr>' +
-            '<td>' + (inicio+i+1) + '</td>' +
-            '<td><div class="participante-cell">' +
-                '<div class="participante-avatar">' + iniciales.toUpperCase() + '</div>' +
-                '<div><div class="participante-nombre">' +
-                    htmlEsc(ins.nombre) + ' ' + htmlEsc(ins.apellido) +
-                '</div></div></div></td>' +
-            '<td>' + htmlEsc(ins.carnet) + '</td>' +
-            '<td>' + htmlEsc(ins.celular) + '</td>' +
-            '<td>' + htmlEsc(ins.iglesia||'—') + '</td>' +
-            '<td>' + htmlEsc(ins.paquete||'—') + '</td>' +
-            '<td>Bs. ' + fmt(ins.precio_paquete) + '</td>' +
-            '<td>Bs. ' + fmt(ins.precio_productos) + '</td>' +
-            '<td style="color:var(--green);">- Bs. ' + fmt(ins.descuento_aplicado) + '</td>' +
-            '<td><strong>Bs. ' + fmt(ins.precio_final) + '</strong></td>' +
-            '<td>' + formatFecha(ins.fecha_pago) + '</td>' +
-            '<td>' +
-                (ins.comprobante_qr
-                    ? '<button class="btn-accion btn-ver" title="Ver comprobante" ' +
-                      'onclick="verComprobante(\'' + htmlEsc(ins.comprobante_qr) + '\')">' +
-                      '<i class="fa-solid fa-image"></i></button>'
-                    : '<span style="color:var(--txt-xsoft);font-size:11px;">Sin archivo</span>') +
-            '</td>' +
-            '<td>' + badge + '</td>' +
-            '<td>' +
-                btnConf +
-                '<button class="btn-accion btn-ver" title="Ver detalle" ' +
-                'onclick="abrirModal(' + (inicio+i) + ')"><i class="fa-solid fa-eye"></i></button>' +
-            '</td>' +
-        '</tr>';
-    }).join('');
-
+  if(!filtrados.length){
+    tbody.innerHTML    = '<tr><td colspan="13" class="tabla-vacia"><i class="fa-solid fa-inbox" style="display:block;font-size:28px;margin-bottom:8px;"></i>No hay inscripciones</td></tr>';
+    tbodyAcc.innerHTML = '<tr><td>—</td></tr>';
+    if(lbl) lbl.textContent = '0 registros';
     renderPaginacion();
+    return;
+  }
+
+  if(lbl) lbl.textContent = filtrados.length + ' registros';
+  var inicio = (paginaActual - 1) * porPagina;
+  var pagina = filtrados.slice(inicio, inicio + porPagina);
+
+  tbody.innerHTML = pagina.map(function(ins, i){
+    var iniciales = ((ins.nombre||'')[0]||'') + ((ins.apellido||'')[0]||'');
+    var badge = ins.estado_pago === 'confirmado'
+      ? '<span class="badge badge-confirmado"><i class="fa-solid fa-circle-check"></i> Confirmado</span>'
+      : '<span class="badge badge-pendiente"><i class="fa-solid fa-clock"></i> Pendiente</span>';
+
+    return '<tr>' +
+      '<td>' + (inicio+i+1) + '</td>' +
+      '<td><div class="participante-cell">' +
+        '<div class="participante-avatar">' + iniciales.toUpperCase() + '</div>' +
+        '<div class="participante-nombre">' + htmlEsc(ins.nombre) + ' ' + htmlEsc(ins.apellido) + '</div>' +
+      '</div></td>' +
+      '<td>' + htmlEsc(ins.carnet) + '</td>' +
+      '<td>' + htmlEsc(ins.celular) + '</td>' +
+      '<td>' + htmlEsc(ins.iglesia||'—') + '</td>' +
+      '<td>' + htmlEsc(ins.paquete||'—') + '</td>' +
+      '<td>Bs. ' + fmt(ins.precio_paquete) + '</td>' +
+      '<td>Bs. ' + fmt(ins.precio_productos) + '</td>' +
+      '<td style="color:var(--green);">- Bs. ' + fmt(ins.descuento_aplicado) + '</td>' +
+      '<td><strong>Bs. ' + fmt(ins.precio_final) + '</strong></td>' +
+      '<td>' + formatFecha(ins.fecha_pago) + '</td>' +
+      '<td>' +
+        (ins.comprobante_qr
+          ? '<button class="btn-accion btn-ver" onclick="verComprobante(\'' + htmlEsc(ins.comprobante_qr) + '\')"><i class="fa-solid fa-image"></i></button>'
+          : '<span style="color:var(--txt-xsoft);font-size:11px;">—</span>') +
+      '</td>' +
+      '<td>' + badge + '</td>' +
+    '</tr>';
+  }).join('');
+
+  tbodyAcc.innerHTML = pagina.map(function(ins, i){
+    var btnConf = ins.estado_pago === 'pendiente'
+      ? '<button class="btn-accion btn-confirmar" onclick="abrirModal(' + (inicio+i) + ')"><i class="fa-solid fa-check"></i></button> '
+      : '';
+    return '<tr><td>' + btnConf +
+      '<button class="btn-accion btn-ver" onclick="abrirModal(' + (inicio+i) + ')"><i class="fa-solid fa-eye"></i></button>' +
+      '</td></tr>';
+  }).join('');
+
+  /* sincronizar alturas */
+  setTimeout(function(){
+    var trsDatos = tbody.querySelectorAll('tr');
+    var trsAcc   = tbodyAcc.querySelectorAll('tr');
+
+    /* resetear primero */
+    trsAcc.forEach(function(tr){ tr.style.height = ''; });
+
+    trsDatos.forEach(function(tr, i){
+      if(trsAcc[i]){
+        var h = tr.getBoundingClientRect().height;
+        trsAcc[i].style.height = h + 'px';
+        trsAcc[i].style.maxHeight = h + 'px';
+      }
+    });
+
+    /* sincronizar también cabecera */
+    var thDatos = document.querySelector('#tabla-qr thead tr');
+    var thAcc   = document.querySelector('#tabla-acc thead tr');
+    if(thDatos && thAcc){
+      thAcc.style.height = thDatos.getBoundingClientRect().height + 'px';
+    }
+  }, 100);
+
+  renderPaginacion();
 }
+
 
 /* ── PAGINACION ── */
 function renderPaginacion(){
@@ -292,6 +317,8 @@ function mostrarToast(msg, tipo){
     el.className = 'toast show' + (tipo ? ' toast-'+tipo : '');
     setTimeout(function(){ el.classList.remove('show'); }, 3200);
 }
+
+
 
 /* ── INIT ── */
 document.addEventListener('DOMContentLoaded', cargar);
