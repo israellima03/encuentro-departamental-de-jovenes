@@ -7,12 +7,15 @@ $nombre = $cfg['evento_nombre'] ?? 'Encuentro Departamental de Jóvenes';
 $lema   = $cfg['evento_lema']   ?? 'SIN FILTROS';
 $versiculo = $cfg['evento_versiculo'] ?? '1 Samuel 16:7';
 $pagina_actual = basename($_SERVER['PHP_SELF']);
+
+/* cache busting */
+$v = function($archivo){
+  $ruta = $_SERVER['DOCUMENT_ROOT'] . '/' . $archivo;
+  return file_exists($ruta) ? filemtime($ruta) : time();
+};
 ?>
-
-
 <!doctype html>
 <html class="no-js" lang="">
-
 <head>
   <meta charset="utf-8">
   <title>Encuentro Departamental de Jovenes</title>
@@ -20,8 +23,8 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="manifest" href="site.webmanifest">
   <link rel="apple-touch-icon" href="icon.png">
-  <link rel="stylesheet" href="css/normalize.css">
-  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/normalize.css?v=<?php echo $v('css/normalize.css'); ?>">
+  <link rel="stylesheet" href="css/main.css?v=<?php echo $v('css/main.css'); ?>">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

@@ -295,5 +295,5 @@ include_once 'funciones/funciones.php';
 <!-- TOAST -->
 <div class="toast" id="toast-prod"></div>
 
-<script src="js/productos.js"></script>
+<?php $js_pagina = ['productos.js']; ?>
 <?php include_once 'templates/footer.php'; ?>

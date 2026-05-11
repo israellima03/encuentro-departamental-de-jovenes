@@ -228,5 +228,5 @@
 
 </main>
 
-<script src="js/crear-admin.js"></script>
+<?php $js_pagina = ['crear-admin.js']; ?>
 <?php include_once 'templates/footer.php'; ?>

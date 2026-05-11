@@ -349,4 +349,5 @@ function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 })();
 </script>
 
+<?php $js_pagina = []; ?>
 <?php include_once 'templates/footer.php'; ?>

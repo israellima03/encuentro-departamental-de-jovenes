@@ -121,6 +121,5 @@ include_once 'funciones/funciones.php';
 <!-- TOAST -->
 <div class="toast" id="toast-qr"></div>
 
-<script src="js/confirmar-qr.js"></script>
-
+<?php $js_pagina = ['confirmar-qr.js']; ?>
 <?php include_once 'templates/footer.php'; ?>

@@ -637,5 +637,6 @@ textarea.input-filtro { padding:10px 12px; font-family:var(--font-body); }
 <script>
 var PUEDE_EDITAR_PROG = <?php echo $puede_editar ? 'true' : 'false'; ?>;
 </script>
-<script src="js/programa.js"></script>
+
+<?php $js_pagina = ['programa.js']; ?>
 <?php include_once 'templates/footer.php'; ?>

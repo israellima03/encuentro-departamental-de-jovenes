@@ -1,7 +1,6 @@
-  <!-- MODAL VER INSCRITO -->
+<!-- MODAL VER INSCRITO -->
   <div class="modal-overlay" id="modal-overlay">
     <div class="modal" id="modal-inscrito">
-     
       <div class="modal-body" id="modal-body">
         <!-- Se rellena por JS -->
       </div>
@@ -17,6 +16,21 @@
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
 
-  <script src="js/admin.js"></script>
+<?php
+if(!isset($v)){
+  $v = function($archivo){
+    $ruta = $_SERVER['DOCUMENT_ROOT'] . '/admin/' . $archivo;
+    return file_exists($ruta) ? filemtime($ruta) : time();
+  };
+}
+?>
+  <script src="js/admin.js?v=<?php echo $v('js/admin.js'); ?>"></script>
+
+<?php if(!empty($js_pagina)): ?>
+  <?php foreach($js_pagina as $js): ?>
+  <script src="js/<?php echo htmlspecialchars($js); ?>?v=<?php echo $v('js/'.htmlspecialchars($js)); ?>"></script>
+  <?php endforeach; ?>
+<?php endif; ?>
+
 </body>
 </html>

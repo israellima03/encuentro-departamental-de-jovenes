@@ -65,125 +65,101 @@ function crearDatePicker(inputId, displayId, btnId){
 
   function posicionarPicker(){
     var rect = btn.getBoundingClientRect();
-    var pickerH = 300;
+    var pickerH = 160;
     var spaceAbajo = window.innerHeight - rect.bottom;
     if(spaceAbajo < pickerH && rect.top > pickerH){
-      picker.style.top  = (rect.top - pickerH - 6) + 'px';
+      picker.style.top = (rect.top - pickerH - 6) + 'px';
     } else {
-      picker.style.top  = (rect.bottom + 6) + 'px';
+      picker.style.top = (rect.bottom + 6) + 'px';
     }
     var left = rect.left;
-    if(left + 280 > window.innerWidth) left = window.innerWidth - 290;
+    if(left + 300 > window.innerWidth) left = window.innerWidth - 310;
     picker.style.left = Math.max(4, left) + 'px';
   }
 
+  var meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+               'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
   function diasEnMes(y,m){ return new Date(y,m,0).getDate(); }
-  var meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio',
-             'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
   function render(){
-    var dMax = diasEnMes(selY,selM);
-    if(selD>dMax) selD=dMax;
-    var years=[], anioActual=hoy.getFullYear();
-    for(var y=anioActual;y>=anioActual-100;y--) years.push(y);
-    var yIdx = years.indexOf(selY);
-    if(yIdx<0){ years.push(selY); years.sort(function(a,b){return b-a;}); yIdx=years.indexOf(selY); }
+    var dMax = diasEnMes(selY, selM);
+    if(selD > dMax) selD = dMax;
+
+    /* opciones día */
+    var optDias = '';
+    for(var d=1; d<=dMax; d++){
+      optDias += '<option value="'+d+'"'+(d===selD?' selected':'')+'>'+pad(d)+'</option>';
+    }
+
+    /* opciones mes */
+    var optMeses = '';
+    for(var m=1; m<=12; m++){
+      optMeses += '<option value="'+m+'"'+(m===selM?' selected':'')+'>'+meses[m-1]+'</option>';
+    }
+
+    /* opciones año */
+    var optAnios = '';
+    var anioActual = hoy.getFullYear();
+    for(var y=anioActual; y>=anioActual-100; y--){
+      optAnios += '<option value="'+y+'"'+(y===selY?' selected':'')+'>'+y+'</option>';
+    }
 
     picker.innerHTML =
-      '<div class="dp-header">Seleccionar Fecha</div>'+
-      '<div class="dp-cols">'+
-        /* DÍA */
-        '<div class="dp-col">'+
-          '<button type="button" class="dp-arrow" data-col="d" data-dir="-1">▲</button>'+
-          '<div class="dp-items">'+
-            [selD-1,selD,selD+1].map(function(d,i){
-              var real = ((d-1+dMax)%dMax)+1;
-              return '<div class="dp-item'+(i===1?' dp-sel':'')+'" data-col="d" data-val="'+real+'">'+pad(real)+'</div>';
-            }).join('')+
-          '</div>'+
-          '<button type="button" class="dp-arrow" data-col="d" data-dir="1">▼</button>'+
-          '<div class="dp-label">Día</div>'+
+      '<div class="dp-header">Fecha de Nacimiento</div>'+
+      '<div style="display:flex;gap:8px;margin-bottom:12px;">'+
+        '<div style="display:flex;flex-direction:column;gap:4px;flex:0 0 70px;">'+
+          '<label style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--txt-xsoft);">Día</label>'+
+          '<select id="'+inputId+'-sel-d" style="padding:7px 6px;border:1.5px solid var(--border);border-radius:8px;font-family:var(--font-body);font-size:13px;color:var(--txt);background:var(--card-bg);outline:none;cursor:pointer;">'+optDias+'</select>'+
         '</div>'+
-        /* MES */
-        '<div class="dp-col">'+
-          '<button type="button" class="dp-arrow" data-col="m" data-dir="-1">▲</button>'+
-          '<div class="dp-items">'+
-            [selM-1,selM,selM+1].map(function(m,i){
-              var real = ((m-1+12)%12)+1;
-              return '<div class="dp-item'+(i===1?' dp-sel':'')+'" data-col="m" data-val="'+real+'">'+meses[real-1].substring(0,3)+'</div>';
-            }).join('')+
-          '</div>'+
-          '<button type="button" class="dp-arrow" data-col="m" data-dir="1">▼</button>'+
-          '<div class="dp-label">Mes</div>'+
+        '<div style="display:flex;flex-direction:column;gap:4px;flex:1;">'+
+          '<label style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--txt-xsoft);">Mes</label>'+
+          '<select id="'+inputId+'-sel-m" style="padding:7px 6px;border:1.5px solid var(--border);border-radius:8px;font-family:var(--font-body);font-size:13px;color:var(--txt);background:var(--card-bg);outline:none;cursor:pointer;">'+optMeses+'</select>'+
         '</div>'+
-        /* AÑO */
-        '<div class="dp-col dp-col-wide">'+
-          '<button type="button" class="dp-arrow" data-col="y" data-dir="-1">▲</button>'+
-          '<div class="dp-items">'+
-            [yIdx-1,yIdx,yIdx+1].map(function(idx,i){
-              var y = years[Math.max(0,Math.min(idx,years.length-1))];
-              return '<div class="dp-item'+(i===1?' dp-sel':'')+'" data-col="y" data-val="'+y+'">'+y+'</div>';
-            }).join('')+
-          '</div>'+
-          '<button type="button" class="dp-arrow" data-col="y" data-dir="1">▼</button>'+
-          '<div class="dp-label">Año</div>'+
+        '<div style="display:flex;flex-direction:column;gap:4px;flex:0 0 80px;">'+
+          '<label style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--txt-xsoft);">Año</label>'+
+          '<select id="'+inputId+'-sel-y" style="padding:7px 6px;border:1.5px solid var(--border);border-radius:8px;font-family:var(--font-body);font-size:13px;color:var(--txt);background:var(--card-bg);outline:none;cursor:pointer;">'+optAnios+'</select>'+
         '</div>'+
       '</div>'+
       '<button type="button" class="dp-ok" id="'+inputId+'-dp-ok">Confirmar</button>';
 
-    /* eventos flechas */
-    picker.querySelectorAll('.dp-arrow').forEach(function(arrow){
-      arrow.addEventListener('click',function(e){
-        e.stopPropagation();
-        e.preventDefault();
-        var col=this.dataset.col, dir=parseInt(this.dataset.dir);
-        if(col==='d'){ selD=((selD-1+dir+dMax)%dMax)+1; }
-        if(col==='m'){ selM=((selM-1+dir+12)%12)+1; }
-        if(col==='y'){
-          var idx=years.indexOf(selY);
-          selY=years[Math.max(0,Math.min(idx+dir,years.length-1))];
-        }
-        render();
-      });
+    /* eventos selects */
+    document.getElementById(inputId+'-sel-d').addEventListener('change', function(){
+      selD = parseInt(this.value);
     });
-
-    /* eventos items */
-    picker.querySelectorAll('.dp-item').forEach(function(item){
-      item.addEventListener('click',function(e){
-        e.stopPropagation();
-        e.preventDefault();
-        var col=this.dataset.col, v=parseInt(this.dataset.val);
-        if(col==='d') selD=v;
-        if(col==='m') selM=v;
-        if(col==='y') selY=v;
-        render();
-      });
+    document.getElementById(inputId+'-sel-m').addEventListener('change', function(){
+      selM = parseInt(this.value);
+      /* re-renderizar para ajustar días del mes */
+      render();
+    });
+    document.getElementById(inputId+'-sel-y').addEventListener('change', function(){
+      selY = parseInt(this.value);
+      /* re-renderizar para ajustar días (año bisiesto) */
+      render();
     });
 
     /* confirmar */
-    var okBtn=document.getElementById(inputId+'-dp-ok');
-    if(okBtn) okBtn.addEventListener('click',function(e){
+    document.getElementById(inputId+'-dp-ok').addEventListener('click', function(e){
       e.stopPropagation();
       e.preventDefault();
-      var v=selY+'-'+pad(selM)+'-'+pad(selD);
-      input.value=v;
-      display.textContent=pad(selD)+'/'+pad(selM)+'/'+selY;
-      picker.style.display='none';
+      var v = selY+'-'+pad(selM)+'-'+pad(selD);
+      input.value = v;
+      display.textContent = pad(selD)+'/'+pad(selM)+'/'+selY;
+      picker.style.display = 'none';
       input.dispatchEvent(new Event('change'));
     });
   }
 
   /* abrir/cerrar */
-  btn.addEventListener('click',function(e){
+  btn.addEventListener('click', function(e){
     e.stopPropagation();
     e.preventDefault();
-    /* cerrar otros pickers */
     document.querySelectorAll('.date-picker-popup').forEach(function(p){
       if(p.id !== picker.id) p.style.display='none';
     });
     if(picker.style.display==='none'||picker.style.display===''){
       if(input.value){
-        var parts=input.value.split('-');
+        var parts = input.value.split('-');
         if(parts.length===3){
           selY=parseInt(parts[0]); selM=parseInt(parts[1]); selD=parseInt(parts[2]);
         }
@@ -197,15 +173,14 @@ function crearDatePicker(inputId, displayId, btnId){
   });
 
   /* cerrar al click fuera */
-  document.addEventListener('click',function(e){
+  document.addEventListener('click', function(e){
     if(picker.style.display==='none') return;
     if(!picker.contains(e.target) && e.target!==btn && !btn.contains(e.target)){
       picker.style.display='none';
     }
   });
 
-  /* evitar cierre al click dentro */
-  picker.addEventListener('click',function(e){ e.stopPropagation(); });
+  picker.addEventListener('click', function(e){ e.stopPropagation(); });
 }
 
 /* ══════════════════════════════════════

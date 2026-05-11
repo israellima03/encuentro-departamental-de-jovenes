@@ -310,8 +310,10 @@ body.sidebar-collapsed .main-wrapper { margin-left: 0; }
 .content {
   flex: 1;
   padding: 28px 28px 40px;
-  max-width: 1600px;
+  max-width: 100%;
   width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 /* pages */
@@ -958,7 +960,9 @@ body.sidebar-collapsed .main-wrapper { margin-left: 0; }
   .col-productos { display:none; }
   .btn-txt-label { display:none; }
   .stat-num { font-size:22px; }
+  #btn-nueva-inscripcion .btn-txt-label { display:inline; }
 }
+
 @media(max-width:480px){
   .filtros-rapidos { flex-direction:column; }
   .filtros-rapidos .input-filtro,
@@ -988,10 +992,6 @@ body.sidebar-collapsed .main-wrapper { margin-left: 0; }
   .tabla-inscritos tbody td:nth-child(4),
   .tabla-inscritos thead th:nth-child(5),  /* Distrito */
   .tabla-inscritos tbody td:nth-child(5),
-  .tabla-inscritos thead th:nth-child(10), /* Producto ent */
-  .tabla-inscritos tbody td:nth-child(10),
-  .tabla-inscritos thead th:nth-child(11), /* Material ent */
-  .tabla-inscritos tbody td:nth-child(11),
   .tabla-inscritos thead th:nth-child(12), /* Fecha */
   .tabla-inscritos tbody td:nth-child(12) {
     display: none;
@@ -1076,16 +1076,14 @@ body.sidebar-collapsed .main-wrapper { margin-left: 0; }
 
 /* ══ DATE PICKER POPUP ══ */
 .date-picker-popup {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  z-index: 500;
+  position: fixed;
+  z-index: 99999;
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0,0,0,.18);
   padding: 14px;
-  min-width: 260px;
+  min-width: 280px;
 }
 .dp-header {
   font-size: 12px;
@@ -1096,65 +1094,9 @@ body.sidebar-collapsed .main-wrapper { margin-left: 0; }
   text-align: center;
   margin-bottom: 12px;
 }
-.dp-cols {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-}
-.dp-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  min-width: 54px;
-}
-.dp-col-wide { min-width: 68px; }
-.dp-arrow {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  width: 32px; height: 28px;
-  cursor: pointer;
-  font-size: 11px;
-  display: grid; place-items: center;
-  transition: all .15s;
-}
-.dp-arrow:hover { background: var(--sidebar-bg); color: #fff; border-color: var(--sidebar-bg); }
-.dp-items {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
-.dp-item {
-  padding: 5px 10px;
-  border-radius: 6px;
-  font-size: 13px;
-  cursor: pointer;
-  color: var(--txt-xsoft);
-  transition: all .15s;
-  width: 100%;
-  text-align: center;
-}
-.dp-item:hover { background: var(--bg); color: var(--txt); }
-.dp-sel {
-  background: var(--sidebar-bg) !important;
-  color: #fff !important;
-  font-weight: 700;
-  font-size: 15px;
-}
-.dp-label {
-  font-size: 9px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--txt-xsoft);
-  margin-top: 2px;
-}
 .dp-ok {
   display: block;
   width: 100%;
-  margin-top: 12px;
   padding: 9px;
   background: var(--sidebar-bg);
   color: #fff;
@@ -1167,34 +1109,6 @@ body.sidebar-collapsed .main-wrapper { margin-left: 0; }
   transition: background .15s;
 }
 .dp-ok:hover { background: var(--accent); }
- 
-/* ══ RULETA CANTIDAD ══ */
-.btn-cant-menos,
-.btn-cant-mas {
-  width: 30px; height: 30px;
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  background: var(--card-bg);
-  font-size: 18px;
-  font-weight: 700;
-  cursor: pointer;
-  display: grid; place-items: center;
-  color: var(--txt);
-  transition: all .15s;
-  user-select: none;
-  line-height: 1;
-  padding: 0;
-}
-.btn-cant-menos:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
-.btn-cant-mas:hover   { background: var(--green);  color: #fff; border-color: var(--green); }
-.ni-prod-cant-display {
-  min-width: 32px;
-  text-align: center;
-  font-weight: 700;
-  font-size: 16px;
-  color: var(--txt);
-  padding: 0 4px;
-}
  
 /* ══ MODAL FOOTER RESPONSIVO ══ */
 .modal-footer {
@@ -1219,11 +1133,11 @@ body.sidebar-collapsed .main-wrapper { margin-left: 0; }
   .modal {
     max-width: 100% !important;
     border-radius: 16px 16px 0 0 !important;
-    max-height: 92vh;
+    max-height: calc(100vh - 40px);
     overflow-y: auto;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
   }
-  .modal-body { max-height: calc(92vh - 130px); overflow-y: auto; }
+  .modal-body { max-height: calc(100vh - 40px - 130px); overflow-y: auto; }
   .modal-grid { grid-template-columns: 1fr !important; }
   .modal-field.full { grid-column: span 1 !important; }
   .modal-section-title { grid-column: span 1 !important; }
@@ -1268,4 +1182,26 @@ body.sidebar-collapsed .main-wrapper { margin-left: 0; }
   .credencial-buscador { flex-direction: column; }
   .credencial-buscador button { width: 100%; justify-content: center; }
   .content { padding: 14px 12px 28px; }
+}
+/* ── FIX DESBORDAMIENTO HORIZONTAL ── */
+.main-wrapper {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+.content {
+  overflow-x: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.card {
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.tabla-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
 }

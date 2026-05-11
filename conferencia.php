@@ -230,7 +230,5 @@ $iconos_mat = [
   <?php endif; ?>
 
 </section>
-<script src="js/conferencia.js"></script>
-
-
+<?php $js_pagina = ['conferencia.js']; ?>
 <?php include_once 'includes/templates/footer.php'; ?>

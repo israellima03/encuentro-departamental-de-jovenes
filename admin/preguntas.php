@@ -233,5 +233,5 @@ if($res) while($r = $res->fetch_assoc()) $eventos_lista[] = $r;
 var PUEDE_GESTIONAR_P = <?php echo $puede_gestionar ? 'true' : 'false'; ?>;
 var SECCION_ACTUAL    = '<?php echo $seccion; ?>';
 </script>
-<script src="js/preguntas.js"></script>
+<?php $js_pagina = ['preguntas.js']; ?>
 <?php include_once 'templates/footer.php'; ?>

@@ -505,5 +505,5 @@ $puede_gastos = puede(['Administrador','Lider departamental','tesorera']);
 <script>
 var PUEDE_EDITAR_REP = <?php echo $puede_gastos ? 'true' : 'false'; ?>;
 </script>
-<script src="js/reportes.js"></script>
+<?php $js_pagina = ['reportes.js']; ?>
 <?php include_once 'templates/footer.php'; ?>

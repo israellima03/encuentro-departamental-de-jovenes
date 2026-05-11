@@ -339,5 +339,5 @@ include_once 'funciones/funciones.php';
 <!-- TOAST -->
 <div class="toast" id="toast-cupos"></div>
 
-<script src="js/editar-cupos.js"></script>
+<?php $js_pagina = ['editar-cupos.js']; ?>
 <?php include_once 'templates/footer.php'; ?>

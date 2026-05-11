@@ -502,7 +502,7 @@ while($r = $res->fetch_assoc()) $distritos_modal[] = $r;
   var PUEDE_GESTIONAR = <?php echo $puede_gestionar ? 'true' : 'false'; ?>;
   var PUEDE_ENTREGAR  = <?php echo $puede_entregar  ? 'true' : 'false'; ?>;
 </script>
-<script src="js/admin-encuentro.js"></script>
+<?php $js_pagina = ['admin-encuentro.js']; ?>
 <?php include_once 'templates/footer.php'; ?>
 
 <script>

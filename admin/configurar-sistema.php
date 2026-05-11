@@ -574,5 +574,5 @@ if($res) while($r = $res->fetch_assoc()) $ubicaciones[] = $r;
 
 </style>
 
-<script src="js/configurar-sistema.js"></script>
+<?php $js_pagina = ['configurar-sistema.js']; ?>
 <?php include_once 'templates/footer.php'; ?>

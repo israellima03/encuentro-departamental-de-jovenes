@@ -53,3 +53,17 @@ $inicial       = strtoupper(substr($nombre_admin, 0, 1));
         </div>
       </div>
     </header>
+    <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      document.querySelectorAll('.nav-item, .nav-subitem').forEach(function(item){
+        item.addEventListener('click', function(){
+          if(window.innerWidth > 768) return;
+
+          /* si tiene flecha (es un padre con submenú) no cerrar */
+          if(this.querySelector('.nav-arrow')) return;
+
+          document.body.classList.add('sidebar-collapsed');
+        });
+      });
+    });
+    </script>

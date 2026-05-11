@@ -58,7 +58,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login — Admin Encuentro</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="css/login.css">
+  <link rel="stylesheet" href="css/login.css?v=<?php echo filemtime(__DIR__.'/css/login.css'); ?>">
 </head>
 <body>
 
@@ -143,6 +143,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     </div>
   </div>
 
-  <script src="js/login.js"></script>
+  <script src="js/login.js?v=<?php echo filemtime(__DIR__.'/js/login.js'); ?>"></script>
 </body>
 </html>
