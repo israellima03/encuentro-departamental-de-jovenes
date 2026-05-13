@@ -1,11 +1,12 @@
 <?php include_once 'includes/templates/header.php'; ?>
 
 <section class="seccion contenedor">
-  <h2>Pre Calendario de Eventos</h2>
+  <h2>Calendario de Eventos</h2>
 
   <?php 
+    $calendario = [];
     try {
-      require_once('includes/funciones/bd_conexion.php');
+      if(!isset($conn)) require_once('includes/funciones/bd_conexion.php');
 
       /* consulta con JOIN para traer todos los datos relacionados */
       $sql  = "SELECT 
@@ -169,7 +170,7 @@
 
   </div><!-- fin calendario -->
 
-  <?php $conn->close(); ?>
+
 </section>
 
 <?php include_once 'includes/templates/footer.php'; ?>

@@ -7,7 +7,7 @@
   <?php
     $expositores = [];
     try {
-      require_once('includes/funciones/bd_conexion.php');
+      if(!isset($conn)) require_once('includes/funciones/bd_conexion.php');
 
       $sql = "SELECT  id_expositor, nombre, apellido, rango, descripcion, imagen
               FROM expositores
@@ -23,7 +23,7 @@
         $expositores[] = $fila;
       }
 
-      $conn->close();
+    
 
     } catch (\Exception $e) {
       echo '<p class="error-bd">' . htmlspecialchars($e->getMessage()) . '</p>';

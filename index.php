@@ -1,10 +1,33 @@
 <?php include_once 'includes/templates/header.php'; ?>
 
-  <section class="seccion contenedor">
-    <h2>La Iglesia Dios De La Profecia te invita a ser parte de este encuentro </h2>
-    <p>
-      La Iglesia de Dios de la Profecía en Oruro extiende una cordial invitación a toda la juventud de las distintas iglesias a ser parte de este gran encuentro espiritual. Será un tiempo especial de unidad, adoración y crecimiento en la presencia de Dios, donde juntos podremos renovar nuestras fuerzas, fortalecer nuestra fe y compartir como una sola familia en Cristo. No te quedes fuera de esta experiencia única que marcará tu vida. ¡Ven y sé parte de lo que Dios tiene preparado para ti!
-    </p>
+  <section class="seccion-invitacion">
+    <div class="inv-contenido">
+      <span class="inv-tag">— Encuentro Departamental 2026 —</span>
+      <h2 class="inv-titulo">La Iglesia Dios de la Profecía<br>te invita</h2>
+      <p class="inv-texto">
+        La Iglesia de Dios de la Profecía en Oruro extiende una cordial invitación a toda la juventud de las distintas iglesias a ser parte de este gran encuentro espiritual. Será un tiempo especial de unidad, adoración y crecimiento en la presencia de Dios, donde juntos podremos renovar nuestras fuerzas, fortalecer nuestra fe y compartir como una sola familia en Cristo.
+      </p>
+      <div class="inv-datos">
+        <div class="inv-dato">
+          <i class="fa-solid fa-calendar-days"></i>
+          <span class="inv-dato-lbl">Fecha</span>
+          <span class="inv-dato-val">10 de Julio, 2026</span>
+        </div>
+        <div class="inv-dato">
+          <i class="fa-solid fa-location-dot"></i>
+          <span class="inv-dato-lbl">Lugar</span>
+          <span class="inv-dato-val">Tarija, Bolivia</span>
+        </div>
+        <div class="inv-dato">
+          <i class="fa-solid fa-dove"></i>
+          <span class="inv-dato-lbl">Lema</span>
+          <span class="inv-dato-val">Sin Filtros</span>
+        </div>
+      </div>
+      <a href="tipo_inscripciones.php" class="inv-btn">
+      <i class="fa-solid fa-arrow-right"></i> Inscríbete ahora
+      </a>
+    </div>
   </section>
 
   <section class="programa">
@@ -29,28 +52,24 @@
           </nav>
 
           <?php 
-          require_once('includes/funciones/bd_conexion.php');
+          if(!isset($conn)) require_once('includes/funciones/bd_conexion.php');
 
           $sql = "SELECT e.*, 
-                         g.nombre_grupo,
                          t.titulo        AS tema,
                          ex.nombre       AS expositor_nombre,
                          ex.apellido     AS expositor_apellido,
-                         ex.rango        AS expositor_rango
+                         ex.rango        AS expositor_rango,
+                         m.nombre        AS moderador_nombre,
+                         m.apellido      AS moderador_apellido
                   FROM eventos e
-                  LEFT JOIN grupos_alabanza g  ON e.id_grupo    = g.id_grupo
-                  LEFT JOIN temas           t  ON e.id_tema      = t.id_tema
-                  LEFT JOIN expositores     ex ON e.id_expositor = ex.id_expositor
+                  LEFT JOIN temas        t  ON e.id_tema      = t.id_tema
+                  LEFT JOIN expositores  ex ON e.id_expositor = ex.id_expositor
+                  LEFT JOIN moderadores  m  ON e.id_moderador = m.id_moderador
                   ORDER BY e.id_dia, e.hora_inicio";
 
           $resultado = $conn->query($sql);
 
-          $eventos = [
-            1 => [], // viernes
-            2 => [], // sabado
-            3 => []  // domingo
-          ];
-
+          $eventos = [ 1 => [], 2 => [], 3 => [] ];
           while($row = $resultado->fetch_assoc()){
             $eventos[$row['id_dia']][] = $row;
           }
@@ -60,111 +79,104 @@
           <div id="viernes" class="info-curso">
             <?php foreach($eventos[1] as $evento): ?>
               <div class="detalle-evento">
-                <h3><?php echo htmlspecialchars($evento['tipo_evento']); ?></h3>
 
-                <p><i class="fa-solid fa-clock"></i>
-                  <?php echo substr($evento['hora_inicio'],0,5); ?> hrs
-                </p>
-
-                <p><i class="fa-solid fa-calendar"></i>
-                  <?php echo $evento['fecha']; ?>
-                </p>
+                <div class="evento-header">
+                  <span class="evento-tipo"><?php echo htmlspecialchars($evento['tipo_evento']); ?></span>
+                  <span class="evento-hora">
+                    <i class="fa-solid fa-clock"></i>
+                    <?php echo substr($evento['hora_inicio'],0,5); ?> — <?php echo substr($evento['hora_fin'],0,5); ?>
+                  </span>
+                </div>
 
                 <?php if (!empty($evento['tema'])): ?>
-                  <p><i class="fa-solid fa-book-open"></i>
+                  <p class="evento-tema">
+                    <i class="fa-solid fa-book-open"></i>
                     <?php echo htmlspecialchars($evento['tema']); ?>
                   </p>
                 <?php endif; ?>
 
                 <?php if (!empty($evento['expositor_nombre'])): ?>
-                  <p><i class="fa-solid fa-user-tie"></i>
-                    <?php echo htmlspecialchars($evento['expositor_rango'] . ' ' . $evento['expositor_nombre'] . ' ' . $evento['expositor_apellido']); ?>
+                  <p class="evento-expositor">
+                    <i class="fa-solid fa-user-tie"></i>
+                    <span class="exp-rango"><?php echo htmlspecialchars($evento['expositor_rango']); ?></span>
+                    <?php echo htmlspecialchars($evento['expositor_nombre'].' '.$evento['expositor_apellido']); ?>
                   </p>
                 <?php endif; ?>
 
-                <?php if (!empty($evento['nombre_grupo'])): ?>
-                  <p><i class="fa-solid fa-music"></i>
-                    <?php echo htmlspecialchars($evento['nombre_grupo']); ?>
+                <?php if (!empty($evento['moderador_nombre'])): ?>
+                  <p class="evento-moderador">
+                    <i class="fa-solid fa-microphone"></i>
+                    Moderador. <?php echo htmlspecialchars($evento['moderador_nombre'].' '.$evento['moderador_apellido']); ?>
                   </p>
                 <?php endif; ?>
 
               </div>
             <?php endforeach; ?>
-            <a href="calendario.php" class="button">Ver todos</a>
+            <a href="calendario.php" class="button">Ver calendario completo</a>
           </div>
 
           <!-- SABADO -->
           <div id="sabado" class="info-curso">
             <?php foreach($eventos[2] as $evento): ?>
               <div class="detalle-evento">
-                <h3><?php echo htmlspecialchars($evento['tipo_evento']); ?></h3>
-
-                <p><i class="fa-solid fa-clock"></i>
-                  <?php echo substr($evento['hora_inicio'],0,5); ?> hrs
-                </p>
-
-                <p><i class="fa-solid fa-calendar"></i>
-                  <?php echo $evento['fecha']; ?>
-                </p>
-
+                <div class="evento-header">
+                  <span class="evento-tipo"><?php echo htmlspecialchars($evento['tipo_evento']); ?></span>
+                  <span class="evento-hora">
+                    <i class="fa-solid fa-clock"></i>
+                    <?php echo substr($evento['hora_inicio'],0,5); ?> — <?php echo substr($evento['hora_fin'],0,5); ?>
+                  </span>
+                </div>
                 <?php if (!empty($evento['tema'])): ?>
-                  <p><i class="fa-solid fa-book-open"></i>
-                    <?php echo htmlspecialchars($evento['tema']); ?>
-                  </p>
+                  <p class="evento-tema"><i class="fa-solid fa-book-open"></i><?php echo htmlspecialchars($evento['tema']); ?></p>
                 <?php endif; ?>
-
                 <?php if (!empty($evento['expositor_nombre'])): ?>
-                  <p><i class="fa-solid fa-user-tie"></i>
-                    <?php echo htmlspecialchars($evento['expositor_rango'] . ' ' . $evento['expositor_nombre'] . ' ' . $evento['expositor_apellido']); ?>
+                  <p class="evento-expositor">
+                    <i class="fa-solid fa-user-tie"></i>
+                    <span class="exp-rango"><?php echo htmlspecialchars($evento['expositor_rango']); ?></span>
+                    <?php echo htmlspecialchars($evento['expositor_nombre'].' '.$evento['expositor_apellido']); ?>
                   </p>
                 <?php endif; ?>
-
-                <?php if (!empty($evento['nombre_grupo'])): ?>
-                  <p><i class="fa-solid fa-music"></i>
-                    <?php echo htmlspecialchars($evento['nombre_grupo']); ?>
+                <?php if (!empty($evento['moderador_nombre'])): ?>
+                  <p class="evento-moderador">
+                    <i class="fa-solid fa-microphone"></i>
+                    Moderador. <?php echo htmlspecialchars($evento['moderador_nombre'].' '.$evento['moderador_apellido']); ?>
                   </p>
                 <?php endif; ?>
-
               </div>
             <?php endforeach; ?>
-            <a href="calendario.php" class="button">Ver todos</a>
+            <a href="calendario.php" class="button">Ver calendario completo</a>
           </div>
 
           <!-- DOMINGO -->
           <div id="domingo" class="info-curso">
             <?php foreach($eventos[3] as $evento): ?>
               <div class="detalle-evento">
-                <h3><?php echo htmlspecialchars($evento['tipo_evento']); ?></h3>
-
-                <p><i class="fa-solid fa-clock"></i>
-                  <?php echo substr($evento['hora_inicio'],0,5); ?> hrs
-                </p>
-
-                <p><i class="fa-solid fa-calendar"></i>
-                  <?php echo $evento['fecha']; ?>
-                </p>
-
+                <div class="evento-header">
+                  <span class="evento-tipo"><?php echo htmlspecialchars($evento['tipo_evento']); ?></span>
+                  <span class="evento-hora">
+                    <i class="fa-solid fa-clock"></i>
+                    <?php echo substr($evento['hora_inicio'],0,5); ?> — <?php echo substr($evento['hora_fin'],0,5); ?>
+                  </span>
+                </div>
                 <?php if (!empty($evento['tema'])): ?>
-                  <p><i class="fa-solid fa-book-open"></i>
-                    <?php echo htmlspecialchars($evento['tema']); ?>
-                  </p>
+                  <p class="evento-tema"><i class="fa-solid fa-book-open"></i><?php echo htmlspecialchars($evento['tema']); ?></p>
                 <?php endif; ?>
-
                 <?php if (!empty($evento['expositor_nombre'])): ?>
-                  <p><i class="fa-solid fa-user-tie"></i>
-                    <?php echo htmlspecialchars($evento['expositor_rango'] . ' ' . $evento['expositor_nombre'] . ' ' . $evento['expositor_apellido']); ?>
+                  <p class="evento-expositor">
+                    <i class="fa-solid fa-user-tie"></i>
+                    <span class="exp-rango"><?php echo htmlspecialchars($evento['expositor_rango']); ?></span>
+                    <?php echo htmlspecialchars($evento['expositor_nombre'].' '.$evento['expositor_apellido']); ?>
                   </p>
                 <?php endif; ?>
-
-                <?php if (!empty($evento['nombre_grupo'])): ?>
-                  <p><i class="fa-solid fa-music"></i>
-                    <?php echo htmlspecialchars($evento['nombre_grupo']); ?>
+                <?php if (!empty($evento['moderador_nombre'])): ?>
+                  <p class="evento-moderador">
+                    <i class="fa-solid fa-microphone"></i>
+                    Moderador <?php echo htmlspecialchars($evento['moderador_nombre'].' '.$evento['moderador_apellido']); ?>
                   </p>
                 <?php endif; ?>
-
               </div>
             <?php endforeach; ?>
-            <a href="calendario.php" class="button">Ver todos</a>
+            <a href="calendario.php" class="button">Ver calendario completo</a>
           </div>
 
         </div>

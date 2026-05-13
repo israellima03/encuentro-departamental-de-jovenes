@@ -460,14 +460,14 @@ switch ($accion) {
             $mail->isSMTP();
             $mail->Host       = 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
-            $mail->Username   = 'limacondoriisrael@gmail.com';
-            $mail->Password   = 'updb xpfj qhcf sndb';
+            $mail->Username   = 'mjoruro413@gmail.com';
+            $mail->Password   = 'rhnr txee sngf ojlq';
             $mail->SMTPSecure = 'tls';
             $mail->Port       = 587;
             $mail->CharSet    = 'UTF-8';
             $mail->Timeout    = 10;
 
-            $mail->setFrom('limacondoriisrael@gmail.com', 'Sistema Encuentro');
+            $mail->setFrom('mjoruro413@gmail.com', 'Sistema Encuentro');
             $mail->addAddress(TESORERA_EMAIL, 'Tesorera');
             $mail->Subject = $asunto_correo;
             $mail->isHTML(true);
