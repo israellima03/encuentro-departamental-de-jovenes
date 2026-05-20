@@ -30,7 +30,7 @@ $res = $conn->query("
            d.nombre        AS descuento_nombre,
            d.porcentaje    AS descuento_porcentaje,
            d.fecha_fin,
-           ROUND(p.precio - (p.precio * COALESCE(d.porcentaje,0) / 100), 2) AS precio_final
+           ROUND(p.precio - (p.precio * COALESCE(d.porcentaje,0) / 100), 0) AS precio_final
     FROM paquetes p
     LEFT JOIN paquete_descuentos pd ON p.id = pd.paquete_id
     LEFT JOIN descuentos d ON pd.descuento_id = d.id AND d.activo = 1
@@ -84,7 +84,31 @@ if($res_r && $row_r = $res_r->fetch_assoc()) $regalo_fijo_nombre = $row_r['nombr
 
           <div class="campo">
             <label>Fecha de Nacimiento <span class="req">*</span></label>
-            <input type="date" id="fecha_nacimiento">
+            <input type="hidden" id="fecha_nacimiento">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <select id="fn-dia" style="flex:1;min-width:70px;padding:8px 6px;border:1px solid #e1e1e1;font-size:1em;font-family:'PT Sans',sans-serif;">
+                <option value="">Día</option>
+                <?php for($d=1;$d<=31;$d++): ?>
+                  <option value="<?php echo str_pad($d,2,'0',STR_PAD_LEFT); ?>"><?php echo $d; ?></option>
+                <?php endfor; ?>
+              </select>
+              <select id="fn-mes" style="flex:2;min-width:110px;padding:8px 6px;border:1px solid #e1e1e1;font-size:1em;font-family:'PT Sans',sans-serif;">
+                <option value="">Mes</option>
+                <?php
+                  $meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                            'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+                  foreach($meses as $i=>$m):
+                ?>
+                  <option value="<?php echo str_pad($i+1,2,'0',STR_PAD_LEFT); ?>"><?php echo $m; ?></option>
+                <?php endforeach; ?>
+              </select>
+              <select id="fn-anio" style="flex:1;min-width:90px;padding:8px 6px;border:1px solid #e1e1e1;font-size:1em;font-family:'PT Sans',sans-serif;">
+                <option value="">Año</option>
+                <?php for($y=date('Y');$y>=1940;$y--): ?>
+                  <option value="<?php echo $y; ?>"><?php echo $y; ?></option>
+                <?php endfor; ?>
+              </select>
+            </div>
             <span class="campo-error" id="err-fecha"></span>
           </div>
 
@@ -159,8 +183,8 @@ if($res_r && $row_r = $res_r->fetch_assoc()) $regalo_fijo_nombre = $row_r['nombr
                 </label>
 
                 <?php if($con_desc): ?>
-                  <p class="precio-original">Bs. <?php echo number_format($paq['precio'],2); ?></p>
-                  <p class="numero">Bs. <?php echo number_format($pf,2); ?></p>
+                  <p class="precio-original">Bs. <?php echo number_format($paq['precio'],0); ?></p>
+                  <p class="numero">Bs. <?php echo number_format($pf,0); ?></p>
                   <div class="badge-descuento">
                     <i class="fa-solid fa-tag"></i>
                     <?php echo htmlspecialchars($paq['descuento_nombre']); ?> —
@@ -219,13 +243,22 @@ if($res_r && $row_r = $res_r->fetch_assoc()) $regalo_fijo_nombre = $row_r['nombr
                 <p class="producto-precio">Bs. <?php echo number_format($prod['precio'],2); ?></p>
                 <p class="producto-cupos"><i class="fa-solid fa-box"></i> <?php echo $prod['cupos_disponibles']; ?> disponibles</p>
                 <div class="producto-cantidad">
-                  <label>Cantidad:</label>
+                  <button type="button" class="btn-cant" data-accion="menos" data-id="<?php echo $prod['id']; ?>"
+                          style="width:34px;height:34px;border:2px solid #e1e1e1;border-radius:6px;background:#fff;font-size:18px;cursor:pointer;font-weight:700;color:#da002b;transition:all .2s;">−</button>
                   <input type="number" min="0" max="<?php echo $prod['cupos_disponibles']; ?>"
                          class="input-cantidad" value="0"
                          data-id="<?php echo $prod['id']; ?>"
                          data-nombre="<?php echo htmlspecialchars($prod['nombre']); ?>"
-                         data-precio="<?php echo $prod['precio']; ?>">
+                         data-precio="<?php echo $prod['precio']; ?>"
+                         style="width:50px;text-align:center;border:1px solid #e1e1e1;padding:6px;font-size:1em;border-radius:4px;">
+                  <button type="button" class="btn-cant" data-accion="mas" data-id="<?php echo $prod['id']; ?>"
+                          data-max="<?php echo $prod['cupos_disponibles']; ?>"
+                          style="width:34px;height:34px;border:2px solid #e1e1e1;border-radius:6px;background:#fff;font-size:18px;cursor:pointer;font-weight:700;color:#03045e;transition:all .2s;">+</button>
                 </div>
+                <p style="font-size:0.78em;color:#666;margin-top:8px;font-style:italic;">
+                  <i class="fa-solid fa-circle-info" style="color:#0089e4;"></i>
+                  Si quieres productos extras contáctate con nuestra tesorera.
+                </p>
                 <div class="producto-talla" style="display:none;">
                   <?php $tipo_prod = strtolower(trim($prod['tipo'])); ?>
 

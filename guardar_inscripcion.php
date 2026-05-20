@@ -15,7 +15,7 @@ require_once __DIR__ . '/PHPMailer/src/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-define('TESORERA_EMAIL', 'limacondoriisrael@gmail.com');
+define('TESORERA_EMAIL', 'mjoruro413@gmail.com');
 define('CARPETA_COMP',   'comprobantes/');
 
 if (!is_dir(CARPETA_COMP)) mkdir(CARPETA_COMP, 0755, true);
@@ -183,7 +183,7 @@ switch ($accion) {
         /* precio paquete con descuento */
         $stmtP = $conn->prepare("
             SELECT p.precio,
-                   ROUND(p.precio - (p.precio * COALESCE(d.porcentaje,0) / 100), 2) AS precio_final
+                   ROUND(p.precio - (p.precio * COALESCE(d.porcentaje,0) / 100), 0) AS precio_final
             FROM paquetes p
             LEFT JOIN paquete_descuentos pd ON p.id = pd.paquete_id
             LEFT JOIN descuentos d ON pd.descuento_id = d.id AND d.activo = 1
@@ -461,7 +461,7 @@ switch ($accion) {
             $mail->Host       = 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
             $mail->Username   = 'mjoruro413@gmail.com';
-            $mail->Password   = 'rhnr txee sngf ojlq';
+            $mail->Password   = 'xnlt bryj clho anzo';
             $mail->SMTPSecure = 'tls';
             $mail->Port       = 587;
             $mail->CharSet    = 'UTF-8';
@@ -527,13 +527,103 @@ switch ($accion) {
 
         echo json_encode(['ok'=>true, 'tallas'=>$rows]);
         exit; 
+
+    /* ── BUSCAR INSCRITO PARA EQUIPO ── */
+    case 'buscar_inscrito_equipo':
+        $q = '%' . trim($_POST['q'] ?? '') . '%';
+        $stmt = $conn->prepare("
+            SELECT i.id, i.nombre, i.apellido, i.carnet
+            FROM inscritos i
+            INNER JOIN inscripciones ins ON ins.inscrito_id = i.id
+            WHERE (i.nombre LIKE ? OR i.apellido LIKE ? OR i.carnet LIKE ?)
+            AND ins.estado_pago = 'confirmado'
+            LIMIT 6
+        ");
+        $stmt->bind_param('sss', $q, $q, $q);
+        $stmt->execute();
+        $rows = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+        echo json_encode(['ok' => true, 'inscritos' => $rows]);
+        exit;
+
+    /* ── VERIFICAR NOMBRE EQUIPO ── */
+    case 'verificar_nombre_equipo':
+        $nombre = trim($_POST['nombre'] ?? '');
+        $stmt = $conn->prepare("SELECT id FROM equipos_deportivos WHERE LOWER(nombre_equipo) = LOWER(?) LIMIT 1");
+        $stmt->bind_param('s', $nombre);
+        $stmt->execute();
+        $stmt->store_result();
+        $disponible = $stmt->num_rows === 0;
+        $stmt->close();
+        echo json_encode(['disponible' => $disponible]);
+        exit;
+
+    /* ── REGISTRAR EQUIPO ── */
+    case 'registrar_equipo':
+        $inscrito_id = intval($_POST['inscrito_id'] ?? 0);
+        $nombre      = trim($_POST['nombre'] ?? '');
+
+        if(!$inscrito_id || strlen($nombre) < 3){
+            echo json_encode(['ok'=>false,'msg'=>'Datos incompletos']);
+            exit;
+        }
+
+        /* verificar que esté inscrito y confirmado */
+        $stmt = $conn->prepare("
+            SELECT i.id FROM inscritos i
+            INNER JOIN inscripciones ins ON ins.inscrito_id = i.id
+            WHERE i.id = ? AND ins.estado_pago = 'confirmado'
+            LIMIT 1
+        ");
+        $stmt->bind_param('i', $inscrito_id);
+        $stmt->execute();
+        $stmt->store_result();
+        if($stmt->num_rows === 0){
+            echo json_encode(['ok'=>false,'msg'=>'Solo los inscritos confirmados pueden registrar un equipo.']);
+            $stmt->close(); exit;
+        }
+        $stmt->close();
+
+        /* verificar que no tenga ya un equipo */
+        $stmt2 = $conn->prepare("SELECT id FROM equipos_deportivos WHERE inscrito_id = ? LIMIT 1");
+        $stmt2->bind_param('i', $inscrito_id);
+        $stmt2->execute();
+        $stmt2->store_result();
+        if($stmt2->num_rows > 0){
+            echo json_encode(['ok'=>false,'msg'=>'Este inscrito ya tiene un equipo registrado.']);
+            $stmt2->close(); exit;
+        }
+        $stmt2->close();
+    
+        /* verificar nombre duplicado */
+        $stmt3 = $conn->prepare("SELECT id FROM equipos_deportivos WHERE LOWER(nombre_equipo) = LOWER(?) LIMIT 1");
+        $stmt3->bind_param('s', $nombre);
+        $stmt3->execute();
+        $stmt3->store_result();
+        if($stmt3->num_rows > 0){
+            echo json_encode(['ok'=>false,'msg'=>'Ese nombre de equipo ya está registrado. Elige otro.']);
+            $stmt3->close(); exit;
+        }
+        $stmt3->close();
+
+        /* insertar */
+        $stmt4 = $conn->prepare("INSERT INTO equipos_deportivos (nombre_equipo, inscrito_id) VALUES (?, ?)");
+        $stmt4->bind_param('si', $nombre, $inscrito_id);
+        if($stmt4->execute()){
+            echo json_encode(['ok'=>true,'msg'=>'Equipo registrado']);
+        } else {
+            echo json_encode(['ok'=>false,'msg'=>'Error al registrar el equipo.']);
+        }
+        $stmt4->close();
+        exit;
         /* ================================================================
            ACCION NO RECONOCIDA
            ================================================================ */
-        default:
-            echo json_encode(['ok' => false, 'msg' => 'Accion no valida']);
-            exit;
+    default:
+        echo json_encode(['ok' => false, 'msg' => 'Accion no valida']);
+        exit;
     }
+    
 
 /* ══════════════════════════════════════════════════════════════════
    FUNCIONES AUXILIARES

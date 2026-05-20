@@ -18,4 +18,5 @@ $v = function($archivo){
   <link rel="stylesheet" href="css/confirmar-qr.css?v=<?php echo $v('css/confirmar-qr.css'); ?>">
   <link rel="stylesheet" href="css/productos.css?v=<?php echo $v('css/productos.css'); ?>">
   <link rel="stylesheet" href="css/editar-cupos.css?v=<?php echo $v('css/editar-cupos.css'); ?>">
+  <?php echo $css_extra ?? ''; ?>
 </head>

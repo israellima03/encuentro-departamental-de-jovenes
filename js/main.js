@@ -71,6 +71,44 @@ console.log("JS FUNCIONANDO");
         });
       }
 
+      /* ── BOTONES +/− PRODUCTOS ── */
+      document.querySelectorAll('.btn-cant').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var id  = this.dataset.id;
+          var inp = document.querySelector('.input-cantidad[data-id="'+id+'"]');
+          if(!inp) return;
+          var val = parseInt(inp.value) || 0;
+          var max = parseInt(inp.max) || 999;
+          if(this.dataset.accion === 'mas'){
+            if(val < max) inp.value = val + 1;
+          } else {
+            if(val > 0) inp.value = val - 1;
+          }
+          inp.dispatchEvent(new Event('input'));
+        });
+      });
+
+      /* ── COMBOBOX FECHA NACIMIENTO ── */
+      function actualizarFechaNacimiento(){
+        var d = document.getElementById('fn-dia');
+        var m = document.getElementById('fn-mes');
+        var y = document.getElementById('fn-anio');
+        var fn = document.getElementById('fecha_nacimiento');
+        if(!d||!m||!y||!fn) return;
+        if(d.value && m.value && y.value){
+          fn.value = y.value + '-' + m.value + '-' + d.value;
+          fn.dispatchEvent(new Event('change'));
+        } else {
+          fn.value = '';
+        }
+      }
+
+      ['fn-dia','fn-mes','fn-anio'].forEach(function(id){
+        var el = document.getElementById(id);
+        if(el) el.addEventListener('change', actualizarFechaNacimiento);
+      });
+
+
       /* CUENTA REGRESIVA */
       if (document.querySelector('.cuenta-regresiva')) {
         var fechaEvento      = new Date('2026-07-10T14:00:00');
@@ -612,39 +650,91 @@ console.log("JS FUNCIONANDO");
 
       function validar() {
         var ok = true;
-        function req(id, errId, msg) {
-          var el = document.getElementById(id);
-          if (!el || el.value.trim() === '') { mostrarError(errId, msg); ok = false; }
+
+        /* ── NOMBRE ── */
+       var nombre = document.getElementById('nombre');
+        if (!nombre || nombre.value.trim() === '') {
+          mostrarError('err-nombre', 'El nombre es obligatorio'); ok = false;
+        } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(nombre.value.trim())) {
+          mostrarError('err-nombre', 'El nombre solo puede contener letras'); ok = false;
+        } else if (nombre.value.trim().length < 2) {
+          mostrarError('err-nombre', 'El nombre debe tener al menos 2 letras'); ok = false;
+        } else if (nombre.value.trim().length > 50) {
+          mostrarError('err-nombre', 'El nombre no puede superar 50 caracteres'); ok = false;
         }
-        req('nombre',          'err-nombre',   'El nombre es obligatorio');
-        req('apellido',        'err-apellido', 'El apellido es obligatorio');
-        req('iglesia_id',      'err-iglesia',  'Selecciona tu iglesia');
-        req('tipo_inscrito_id','err-tipo',     'Selecciona el tipo de inscrito');
+
+        /* ── APELLIDO ── */
+        var apellido = document.getElementById('apellido');
+        if (!apellido || apellido.value.trim() === '') {
+          mostrarError('err-apellido', 'El apellido es obligatorio'); ok = false;
+        } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(apellido.value.trim())) {
+          mostrarError('err-apellido', 'El apellido solo puede contener letras'); ok = false;
+        } else if (apellido.value.trim().length < 2) {
+          mostrarError('err-apellido', 'El apellido debe tener al menos 2 letras'); ok = false;
+        } else if (apellido.value.trim().length > 60) {
+          mostrarError('err-apellido', 'El apellido no puede superar 60 caracteres'); ok = false;
+        }
+
+        /* ── CARNET ── */
         var carnet = document.getElementById('carnet');
         if (!carnet || carnet.value.trim() === '') {
           mostrarError('err-carnet', 'El carnet es obligatorio'); ok = false;
         } else if (!/^\d{6,8}(-\d{1,2}[A-Za-z]?)?[A-Za-z]?$/.test(carnet.value.trim())) {
           mostrarError('err-carnet', 'Formato invalido. Ej: 1234567 o 1234567-1A'); ok = false;
         }
+      
+        /* ── CELULAR ── */
         var cel = document.getElementById('celular');
         if (!cel || cel.value.trim() === '') {
           mostrarError('err-celular', 'El celular es obligatorio'); ok = false;
-        } else if (!/^[67]\d{7}$/.test(cel.value.trim())) {
-          mostrarError('err-celular', 'Celular boliviano invalido. Ej: 68319277'); ok = false;
+        } else if (!/^\d{8}$/.test(cel.value.trim())) {
+          mostrarError('err-celular', 'El celular debe tener exactamente 8 digitos numericos'); ok = false;
+        } else if (!/^[67]/.test(cel.value.trim())) {
+          mostrarError('err-celular', 'El celular debe empezar con 6 o 7. Ej: 68319277'); ok = false;
         }
+      
+        /* ── IGLESIA ── */
+        var igl = document.getElementById('iglesia_id');
+        if (!igl || igl.value === '') {
+          mostrarError('err-iglesia', 'Selecciona tu iglesia'); ok = false;
+        }
+      
+        /* ── TIPO INSCRITO ── */
+        var tipo = document.getElementById('tipo_inscrito_id');
+        if (!tipo || tipo.value === '') {
+          mostrarError('err-tipo', 'Selecciona el tipo de inscrito'); ok = false;
+        }
+      
+        /* ── FECHA NACIMIENTO ── */
         var fecha = document.getElementById('fecha_nacimiento');
         if (!fecha || fecha.value === '') {
           mostrarError('err-fecha', 'La fecha de nacimiento es obligatoria'); ok = false;
         } else if (new Date(fecha.value) >= new Date()) {
           mostrarError('err-fecha', 'La fecha no puede ser hoy o en el futuro'); ok = false;
+        } else {
+          /* edad mínima 5 años, máxima 100 */
+          var hoy = new Date();
+          var nac = new Date(fecha.value);
+          var edad = hoy.getFullYear() - nac.getFullYear();
+          var mes  = hoy.getMonth() - nac.getMonth();
+          if (mes < 0 || (mes === 0 && hoy.getDate() < nac.getDate())) edad--;
+          if (edad < 5) {
+            mostrarError('err-fecha', 'La edad minima es 5 años'); ok = false;
+          } else if (edad > 100) {
+            mostrarError('err-fecha', 'Verifica el año de nacimiento'); ok = false;
+          }
         }
+      
+        /* ── PAQUETE ── */
         if (!document.querySelector('input[name="paquete"]:checked')) {
           mostrarError('err-paquete', 'Debes elegir un paquete'); ok = false;
         }
+      
+        /* ── TALLAS DE PRODUCTOS ── */
         document.querySelectorAll('.input-cantidad').forEach(function (inp) {
           var cant = parseInt(inp.value) || 0;
           if (cant > 0) {
-            var card = inp.closest('.card-producto');
+            var card  = inp.closest('.card-producto');
             var talla = card.querySelector('.select-talla');
             var errT  = card.querySelector('.error-talla');
             if (talla && talla.value === '') {
@@ -654,6 +744,7 @@ console.log("JS FUNCIONANDO");
             }
           }
         });
+      
         if (!ok) {
           var primero = document.querySelector('.campo-error[style*="block"]');
           if (primero && primero.offsetParent !== null) primero.scrollIntoView({ behavior: 'smooth', block: 'center' });

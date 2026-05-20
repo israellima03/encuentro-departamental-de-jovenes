@@ -309,7 +309,9 @@ function renderTabla(){
       acciones+='<button class="btn-accion btn-ver" onclick="abrirEditar(\''+insJson+'\')" title="Editar"><i class="fa-solid fa-pen"></i></button> ';
     }
     acciones+='<button class="btn-accion btn-credencial" onclick="descargarCredencial('+ins.id+')" title="Credencial PDF"><i class="fa-solid fa-id-card"></i></button>';
-
+    if(typeof ES_ADMIN!=='undefined'&&ES_ADMIN){
+      acciones+=' <button class="btn-accion btn-eliminar" onclick="eliminarInscrito('+ins.id+',\''+esc(ins.nombre+' '+ins.apellido)+'\')" title="Eliminar inscrito"><i class="fa-solid fa-trash"></i></button>';
+    }
     return '<tr>'+
       '<td>'+(inicio+i+1)+'</td>'+
       '<td><div class="participante-cell">'+
@@ -487,24 +489,123 @@ function resetModalInscripcion(){
   document.querySelectorAll('.ni-prod-cant-display').forEach(function(d){ d.textContent='0'; });
 }
 
+
 function validarFormInscripcion(){
-  var ok=true;
+  var ok = true;
+  var mensajes = [];
+
+  /* limpiar bordes anteriores */
   ['ni-nombre','ni-apellido','ni-carnet','ni-celular'].forEach(function(id){
-    var el=document.getElementById(id);
-    if(!el||!el.value.trim()){ if(el) el.style.borderColor='#dc2626'; ok=false; }
-    else if(el) el.style.borderColor='';
+    var el = document.getElementById(id);
+    if(el) el.style.borderColor = '';
   });
-  if(!document.getElementById('ni-fecha').value){
-    ok=false; toast('Selecciona la fecha de nacimiento','warn');
+
+  function marcarError(id){
+    var el = document.getElementById(id);
+    if(el) el.style.borderColor = '#dc2626';
   }
+
+  /* ── NOMBRE ── */
+  var nombre = val('ni-nombre');
+  if(!nombre){
+    marcarError('ni-nombre'); mensajes.push('El nombre es obligatorio'); ok = false;
+  } else if(!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(nombre)){
+    marcarError('ni-nombre'); mensajes.push('El nombre solo puede contener letras'); ok = false;
+  } else if(nombre.length < 2){
+    marcarError('ni-nombre'); mensajes.push('El nombre debe tener al menos 2 letras'); ok = false;
+  } else if(nombre.length > 50){
+    marcarError('ni-nombre'); mensajes.push('El nombre no puede superar 50 caracteres'); ok = false;
+  }
+
+  /* ── APELLIDO ── */
+  var apellido = val('ni-apellido');
+  if(!apellido){
+    marcarError('ni-apellido'); mensajes.push('El apellido es obligatorio'); ok = false;
+  } else if(!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(apellido)){
+    marcarError('ni-apellido'); mensajes.push('El apellido solo puede contener letras'); ok = false;
+  } else if(apellido.length < 2){
+    marcarError('ni-apellido'); mensajes.push('El apellido debe tener al menos 2 letras'); ok = false;
+  } else if(apellido.length > 60){
+    marcarError('ni-apellido'); mensajes.push('El apellido no puede superar 60 caracteres'); ok = false;
+  }
+
+  /* ── CARNET ── */
+  var carnet = val('ni-carnet');
+  if(!carnet){
+    marcarError('ni-carnet'); mensajes.push('El carnet es obligatorio'); ok = false;
+  } else if(!/^\d{6,8}(-\d{1,2}[A-Za-z]?)?[A-Za-z]?$/.test(carnet)){
+    marcarError('ni-carnet'); mensajes.push('Carnet inválido. Ej: 1234567 o 1234567-1A'); ok = false;
+  }
+
+  /* ── CELULAR ── */
+  var celular = val('ni-celular');
+  if(!celular){
+    marcarError('ni-celular'); mensajes.push('El celular es obligatorio'); ok = false;
+  } else if(!/^\d{8}$/.test(celular)){
+    marcarError('ni-celular'); mensajes.push('El celular debe tener exactamente 8 dígitos'); ok = false;
+  } else if(!/^[67]/.test(celular)){
+    marcarError('ni-celular'); mensajes.push('El celular debe empezar con 6 o 7'); ok = false;
+  }
+
+  /* ── FECHA ── */
+  var fecha = val('ni-fecha');
+  if(!fecha){
+    mensajes.push('Selecciona la fecha de nacimiento'); ok = false;
+  } else {
+    var hoy = new Date(); var nac = new Date(fecha);
+    if(nac >= hoy){ mensajes.push('La fecha no puede ser hoy o en el futuro'); ok = false; }
+    else {
+      var edad = hoy.getFullYear() - nac.getFullYear();
+      var mes  = hoy.getMonth() - nac.getMonth();
+      if(mes < 0 || (mes === 0 && hoy.getDate() < nac.getDate())) edad--;
+      if(edad < 5)  { mensajes.push('La edad mínima es 5 años'); ok = false; }
+      if(edad > 100){ mensajes.push('Verifica el año de nacimiento'); ok = false; }
+    }
+  }
+
+  /* ── TIPO ── */
+  if(!val('ni-tipo')){
+    mensajes.push('Selecciona el tipo de inscrito'); ok = false;
+  }
+
+  /* ── IGLESIA ── */
+  if(!val('ni-iglesia')){
+    mensajes.push('Selecciona la iglesia'); ok = false;
+  }
+
+  /* ── PAQUETE ── */
   if(!document.querySelector('input[name="ni-paquete"]:checked')){
-    toast('Selecciona un paquete','warn'); ok=false;
+    mensajes.push('Selecciona un paquete'); ok = false;
   }
-  if(!ok && document.getElementById('ni-nombre') && document.getElementById('ni-nombre').value){
-    toast('Completa todos los campos obligatorios','warn');
+
+  /* ── PRODUCTOS: si tiene cantidad debe tener talla ── */
+  document.querySelectorAll('.ni-prod-cant').forEach(function(inp){
+    var cant = parseInt(inp.value || 0);
+    if(cant > 0){
+      var tallaEl = document.querySelector('.ni-prod-talla[data-prod-id="'+inp.dataset.prodId+'"]');
+      if(tallaEl && !tallaEl.value){
+        tallaEl.style.borderColor = '#dc2626';
+        mensajes.push('Selecciona una talla para: ' + inp.dataset.nombre);
+        ok = false;
+      } else if(tallaEl){
+        tallaEl.style.borderColor = '';
+      }
+    }
+  });
+
+  if(!ok){
+    toast(mensajes[0], 'error');
+    /* mostrar todos si hay más de uno con un pequeño delay */
+    if(mensajes.length > 1){
+      setTimeout(function(){
+        toast(mensajes.length + ' campos requieren atención', 'warn');
+      }, 600);
+    }
   }
+
   return ok;
 }
+
 
 function mostrarResumenInscripcion(){
   var radio=document.querySelector('input[name="ni-paquete"]:checked');
@@ -905,5 +1006,29 @@ function animarNum(id,objetivo){
   }
   requestAnimationFrame(step);
 }
+
+window.eliminarInscrito = function(inscritoId, nombre){
+  if(!confirm('⚠ ELIMINAR INSCRITO\n\n¿Estás seguro de eliminar a "'+nombre+'" del sistema?\n\nEsto eliminará:\n• Su inscripción\n• Sus productos\n• Sus regalos\n• Recuperará los cupos\n\nEsta acción NO se puede deshacer.')) return;
+  if(!confirm('Segunda confirmación requerida.\n\n¿Confirmas eliminar permanentemente a "'+nombre+'"?')) return;
+
+  var fd = new FormData();
+  fd.append('accion', 'eliminar_inscrito');
+  fd.append('inscrito_id', inscritoId);
+
+  fetch('api_dashboard.php', {method:'POST', body:fd})
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if(data.ok){
+      toast(data.msg, 'ok');
+      cargarInscritos();
+      cargarStats();
+    } else {
+      toast(data.msg || 'Error al eliminar', 'error');
+    }
+  })
+  .catch(function(){
+    toast('Error de conexion', 'error');
+  });
+};
 
 })();

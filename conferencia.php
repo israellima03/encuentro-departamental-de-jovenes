@@ -220,6 +220,13 @@ $iconos_mat = [
                   </div>
                 <?php endif; ?>
               </div>
+              <!-- BOTÓN VER PREGUNTAS APROBADAS -->
+              <div class="ver-preguntas-wrap">
+                <button class="btn-ver-preguntas" data-evento="<?php echo $ev['id_evento']; ?>"
+                        data-tema="<?php echo htmlspecialchars($ev['tema']); ?>">
+                  <i class="fa-solid fa-comments"></i> Ver Preguntas
+                </button>
+              </div>
 
             </div><!-- fin tarjeta-conferencia -->
           <?php endforeach; ?>
@@ -228,6 +235,54 @@ $iconos_mat = [
     <?php endforeach; ?>
 
   <?php endif; ?>
+  <!-- MODAL PREGUNTAS APROBADAS -->
+  <div id="modal-preguntas-overlay" style="display:none;position:fixed;inset:0;background:rgba(3,4,94,0.85);z-index:9999;place-items:center;padding:20px;">
+    <div id="modal-preguntas" style="background:#fff;border-radius:16px;width:100%;max-width:600px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.4);max-height:90vh;display:flex;flex-direction:column;">
+    
+      <div style="background:linear-gradient(135deg,#03045e,#0077b6);padding:20px 24px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+        <div>
+          <h3 style="font-family:'Oswald',sans-serif;color:#fff;margin:0;font-size:1.1em;letter-spacing:1px;">
+            <i class="fa-solid fa-comments"></i> Preguntas Aprobadas
+          </h3>
+          <p id="modal-pq-tema" style="color:rgba(255,255,255,0.7);font-size:0.82em;margin:4px 0 0;"></p>
+        </div>
+        <button onclick="cerrarModalPreguntas()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:32px;height:32px;border-radius:6px;cursor:pointer;font-size:16px;">✕</button>
+      </div>
+
+      <!-- CONTENIDO PREGUNTA -->
+      <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 30px;min-height:200px;">
+        <div id="modal-pq-loading" style="text-align:center;color:#999;">
+          <i class="fa-solid fa-spinner fa-spin" style="font-size:2em;display:block;margin-bottom:10px;"></i>
+          Cargando preguntas...
+        </div>
+        <div id="modal-pq-contenido" style="display:none;text-align:center;width:100%;">
+          <div style="margin-bottom:16px;">
+            <span id="modal-pq-num" style="font-family:'Oswald',sans-serif;font-size:0.8em;letter-spacing:2px;color:#9ca3af;text-transform:uppercase;"></span>
+          </div>
+          <blockquote id="modal-pq-texto" style="font-family:'PT Sans',sans-serif;font-size:1.4em;color:#03045e;line-height:1.6;margin:0 0 20px;font-style:italic;padding:0 10px;"></blockquote>
+          <div style="height:3px;background:linear-gradient(90deg,#da002b,#0089e4);border-radius:2px;width:60px;margin:0 auto;"></div>
+        </div>
+        <div id="modal-pq-vacio" style="display:none;text-align:center;color:#9ca3af;">
+          <i class="fa-solid fa-comment-slash" style="font-size:3em;display:block;margin-bottom:12px;color:#e1e1e1;"></i>
+          <p style="font-size:0.95em;">No hay preguntas aprobadas aún para esta conferencia.</p>
+        </div>
+      </div>
+
+      <!-- NAVEGACIÓN -->
+      <div id="modal-pq-nav" style="display:none;padding:16px 24px;border-top:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+        <button id="btn-pq-ant" onclick="navegarPregunta(-1)"
+                style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#03045e;color:#fff;border:none;border-radius:8px;font-family:'Oswald',sans-serif;font-size:0.9em;cursor:pointer;transition:all .2s;">
+          <i class="fa-solid fa-chevron-left"></i> Anterior
+        </button>
+        <span id="modal-pq-progreso" style="font-size:0.85em;color:#9ca3af;font-family:'Oswald',sans-serif;letter-spacing:1px;"></span>
+        <button id="btn-pq-sig" onclick="navegarPregunta(1)"
+                style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#03045e;color:#fff;border:none;border-radius:8px;font-family:'Oswald',sans-serif;font-size:0.9em;cursor:pointer;transition:all .2s;">
+          Siguiente <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
 
 </section>
 <?php $js_pagina = ['conferencia.js']; ?>

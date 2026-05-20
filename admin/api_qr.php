@@ -103,8 +103,8 @@ switch($accion){
 
     /* ── CONFIRMAR pago ── */
     case 'confirmar':
-        $inscripcion_id   = intval($_POST['inscripcion_id'] ?? 0);
-        $confirmado_por   = intval($_SESSION['usuario_id']  ?? 0);
+        $inscripcion_id = intval($_POST['inscripcion_id'] ?? 0);
+        $confirmado_por = intval($_SESSION['usuario_id']  ?? 0);
 
         if(!$inscripcion_id){
             echo json_encode(['ok'=>false,'msg'=>'ID invalido']);
@@ -113,20 +113,33 @@ switch($accion){
 
         $stmt = $conn->prepare("
             UPDATE inscripciones
-            SET estado_pago      = 'confirmado',
-                confirmado_por   = ?,
+            SET estado_pago       = 'confirmado',
+                confirmado_por    = ?,
                 fecha_confirmacion = NOW()
             WHERE id = ? AND metodo_pago = 'qr'
         ");
         $stmt->bind_param('ii', $confirmado_por, $inscripcion_id);
 
         if($stmt->execute() && $stmt->affected_rows > 0){
-            echo json_encode(['ok'=>true,'msg'=>'Pago confirmado correctamente']);
+            $stmt->close();
+            /* ── GENERAR CREDENCIAL CON QR ── */
+            $r2 = $conn->query("SELECT inscrito_id FROM inscripciones WHERE id=$inscripcion_id LIMIT 1")->fetch_assoc();
+            $credencial = null;
+            if($r2){
+                require_once('../includes/funciones/bd_conexion.php');
+                /* reutilizar la función de api_dashboard.php */
+                if(!function_exists('generarCredencialHTML')){
+                    require_once(__DIR__ . '/funciones_credencial.php');
+                }
+                $credencial = generarCredencialHTML($conn, $r2['inscrito_id'], $inscripcion_id);
+            }
+            echo json_encode(['ok'=>true,'msg'=>'Pago confirmado correctamente','credencial'=>$credencial]);
         } else {
-            echo json_encode(['ok'=>false,'msg'=>'No se pudo confirmar — verifica que sea una inscripcion QR pendiente']);
+            $stmt->close();
+            echo json_encode(['ok'=>false,'msg'=>'No se pudo confirmar']);
         }
-        $stmt->close();
         break;
+
 
     default:
         echo json_encode(['ok'=>false,'msg'=>'Accion no valida']);

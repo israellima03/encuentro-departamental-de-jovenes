@@ -29,6 +29,13 @@ $solo_basico = ['Lider distrital', 'Lider local', 'secretario', 'Equipo departam
         <span>Confirmar QR</span>
       </a>
       <?php endif; ?>
+      <!-- Ver comisiones o editar comisiones -->
+      <?php if(puede($admin_full)): ?>
+      <a href="comisiones.php" class="nav-item">
+        <i class="fa-solid fa-users"></i>
+        <span>Comisiones</span>
+      </a>
+      <?php endif; ?>
 
       <!-- INSCRIPCIONES — solo admin full -->
       <?php if(puede($admin_full)): ?>
@@ -54,10 +61,6 @@ $solo_basico = ['Lider distrital', 'Lider local', 'secretario', 'Equipo departam
       <a href="reportes.php" class="nav-item">
         <i class="fa-solid fa-chart-bar"></i>
         <span>Reportes</span>
-      </a>
-      <a href="#" class="nav-item">
-        <i class="fa-solid fa-clock-rotate-left"></i>
-        <span>Iglesias</span>
       </a>
       <a href="productos.php" class="nav-item">
         <i class="fa-solid fa-shirt"></i>
@@ -111,6 +114,25 @@ $solo_basico = ['Lider distrital', 'Lider local', 'secretario', 'Equipo departam
           <i class="fa-solid fa-list-ul"></i> Ver Preguntas
         </a>
       </div>
+
+
+      <!-- CONCURSOS -->
+      <?php if(puede(['Administrador','Lider departamental','Lider distrital','tesorera','Equipo departamental','Lider local'])): ?>
+      <div class="nav-section-label">Concursos</div>
+      <div class="nav-item nav-parent" id="nav-concursos-toggle">
+        <i class="fa-solid fa-trophy"></i>
+        <span>Concursos</span>
+        <i class="fa-solid fa-chevron-down nav-arrow"></i>
+      </div>
+      <div class="nav-submenu" id="submenu-concursos">
+        <a href="concursos.php?tipo=deportivo" class="nav-subitem">
+          <i class="fa-solid fa-futbol"></i> Deportivo
+        </a>
+        <a href="concursos.php?tipo=biblico" class="nav-subitem">
+         <i class="fa-solid fa-bible"></i> Bíblico
+        </a>
+      </div>
+      <?php endif; ?>
 
       <!-- ADMINISTRADORES — solo Administrador, Lider departamental -->
       <?php if(puede(['Administrador', 'Lider departamental'])): ?>

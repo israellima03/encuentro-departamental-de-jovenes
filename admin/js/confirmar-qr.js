@@ -237,25 +237,26 @@ document.getElementById('btn-modal-qr-confirmar').addEventListener('click', func
     fd.append('inscripcion_id', inscActual.inscripcion_id);
 
     fetch('api_qr.php', { method:'POST', body:fd })
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-check"></i> Confirmar Pago';
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Confirmar Pago';
 
-        if(data.ok){
-            mostrarToast('Pago confirmado correctamente', 'ok');
-            document.getElementById('modal-qr-overlay').classList.remove('open');
-            cargar(); /* recarga la tabla */
-        } else {
-            mostrarToast(data.msg || 'Error al confirmar', 'error');
-        }
-    })
-    .catch(function(){
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-check"></i> Confirmar Pago';
-        mostrarToast('Error de conexion', 'error');
+            if(data.ok){
+                mostrarToast('Pago confirmado correctamente', 'ok');
+                document.getElementById('modal-qr-overlay').classList.remove('open');
+                if(data.credencial) window.open('../credenciales/' + data.credencial, '_blank');
+                cargar();
+            } else {
+                mostrarToast(data.msg || 'Error al confirmar', 'error');
+            }
+        })
+        .catch(function(){
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Confirmar Pago';
+            mostrarToast('Error de conexion', 'error');
+        });
     });
-});
 
 /* ── CERRAR MODAL ── */
 function cerrarModal(){

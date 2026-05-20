@@ -27,6 +27,242 @@
       <a href="tipo_inscripciones.php" class="inv-btn">
       <i class="fa-solid fa-arrow-right"></i> Inscríbete ahora
       </a>
+      <a href="#inscribir-equipo" class="inv-btn inv-btn-deportivo" onclick="abrirModalEquipo(event)">
+        <i class="fa-solid fa-futbol"></i> ¡En Tarija habrá noches deportivas de fútbol y otros deportes! Inscribe tu equipo puede ser mixto tambien.
+      </a>
+
+      <!-- MODAL INSCRIPCIÓN EQUIPO -->
+      <div id="modal-equipo-overlay" style="display:none;position:fixed;inset:0;background:rgba(3,4,94,0.7);z-index:9999;display:none;place-items:center;padding:20px;">
+        <div id="modal-equipo" style="background:#fff;border-radius:16px;width:100%;max-width:480px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:modalIn .25s ease;">
+
+          <div style="background:linear-gradient(135deg,#03045e,#0077b6);padding:20px 24px;display:flex;justify-content:space-between;align-items:center;">
+            <h3 style="font-family:'Oswald',sans-serif;color:#fff;margin:0;font-size:1.2em;letter-spacing:1px;">
+              <i class="fa-solid fa-futbol"></i> Inscribir Equipo
+            </h3>
+            <button onclick="cerrarModalEquipo()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:16px;">✕</button>
+          </div>
+
+          <div style="padding:24px;">
+
+            <div style="background:#fef9c3;border-left:4px solid #f59e0b;border-radius:6px;padding:12px 14px;margin-bottom:20px;font-size:13px;color:#78350f;">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <strong> Debes estar inscrito al encuentro</strong> para registrar tu equipo. y el equipo puede ser mixto.
+            </div>
+
+            <!-- BUSCADOR INSCRITO -->
+            <div style="margin-bottom:16px;">
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#6b7280;display:block;margin-bottom:6px;">
+                Busca tu nombre o carnet *
+              </label>
+              <input type="text" id="eq-buscar" placeholder="Ej: 12345678 o Juan Pérez"
+                     style="width:100%;padding:10px 14px;border:1.5px solid #e4e8f0;border-radius:8px;font-size:13px;font-family:inherit;outline:none;">
+              <div id="eq-resultados" style="margin-top:6px;"></div>
+              <input type="hidden" id="eq-inscrito-id">
+              <div id="eq-inscrito-sel" style="display:none;margin-top:8px;background:#d1fae5;border-radius:8px;padding:10px 14px;font-size:13px;color:#065f46;font-weight:600;">
+                <i class="fa-solid fa-circle-check"></i> <span id="eq-inscrito-nombre"></span>
+              </div>
+            </div>
+
+            <!-- NOMBRE EQUIPO -->
+            <div style="margin-bottom:16px;">
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#6b7280;display:block;margin-bottom:6px;">
+                Nombre de tu equipo *
+              </label>
+              <input type="text" id="eq-nombre" maxlength="50" placeholder="Ej: Los Guerreros"
+                     style="width:100%;padding:10px 14px;border:1.5px solid #e4e8f0;border-radius:8px;font-size:13px;font-family:inherit;outline:none;">
+              <div id="eq-nombre-msg" style="font-size:12px;margin-top:4px;display:none;"></div>
+              <p style="font-size:11px;color:#9ca3af;margin-top:4px;">
+                <i class="fa-solid fa-circle-info"></i> Los equipos con nombres inapropiados serán eliminados.
+              </p>
+            </div>
+
+            <div id="eq-error" style="display:none;background:#fee2e2;border-left:4px solid #ef4444;border-radius:6px;padding:10px 14px;font-size:13px;color:#991b1b;margin-bottom:14px;"></div>
+
+            <button id="eq-btn-registrar" onclick="registrarEquipo()"
+                    style="width:100%;background:#03045e;color:#fff;border:none;border-radius:8px;padding:13px;font-family:'Oswald',sans-serif;font-size:1em;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:background .2s;">
+              <i class="fa-solid fa-futbol"></i> Inscribir mi equipo
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL ÉXITO EQUIPO -->
+      <div id="modal-equipo-exito" style="display:none;position:fixed;inset:0;background:rgba(3,4,94,0.7);z-index:9999;place-items:center;padding:20px;">
+        <div style="background:#fff;border-radius:16px;width:100%;max-width:420px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center;">
+          <div style="background:linear-gradient(135deg,#10b981,#065f46);padding:28px 20px;">
+            <i class="fa-solid fa-futbol" style="font-size:3em;color:#fff;display:block;margin-bottom:10px;"></i>
+            <h3 style="font-family:'Oswald',sans-serif;color:#fff;margin:0;font-size:1.4em;">¡Equipo Inscrito!</h3>
+          </div>
+          <div style="padding:24px;">
+            <p style="font-size:14px;color:#374151;margin-bottom:6px;">Tu equipo <strong id="eq-exito-nombre"></strong> fue registrado exitosamente.</p>
+            <p style="font-size:13px;color:#6b7280;margin-bottom:20px;">Únete al grupo de WhatsApp para coordinar y compartir con tus amigos.</p>
+            <a href="https://chat.whatsapp.com/H5ar8bbEUO0Dy0pNXxKkvn" target="_blank"
+               style="display:inline-flex;align-items:center;gap:10px;background:#25d366;color:#fff;text-decoration:none;padding:13px 28px;border-radius:50px;font-family:'Oswald',sans-serif;font-size:1em;letter-spacing:1px;margin-bottom:14px;">
+              <i class="fa-brands fa-whatsapp"></i> Unirme al grupo
+            </a>
+            <br>
+            <button onclick="cerrarModalExitoEquipo()"
+                    style="background:none;border:none;color:#9ca3af;font-size:13px;cursor:pointer;margin-top:6px;">
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <script>
+      /* ── MODAL EQUIPO ── */
+      function abrirModalEquipo(e){
+        e.preventDefault();
+        var m = document.getElementById('modal-equipo-overlay');
+       m.style.display = 'grid';
+        document.body.style.overflow = 'hidden';
+      }
+
+      function cerrarModalEquipo(){
+        document.getElementById('modal-equipo-overlay').style.display = 'none';
+        document.body.style.overflow = '';
+        /* limpiar */
+        document.getElementById('eq-buscar').value = '';
+        document.getElementById('eq-nombre').value = '';
+        document.getElementById('eq-inscrito-id').value = '';
+        document.getElementById('eq-inscrito-sel').style.display = 'none';
+        document.getElementById('eq-resultados').innerHTML = '';
+        document.getElementById('eq-error').style.display = 'none';
+        document.getElementById('eq-nombre-msg').style.display = 'none';
+      }
+
+      function cerrarModalExitoEquipo(){
+        document.getElementById('modal-equipo-exito').style.display = 'none';
+        document.body.style.overflow = '';
+      }
+
+      /* buscador inscrito */
+      var eqTimer;
+      document.addEventListener('DOMContentLoaded', function(){
+        var inp = document.getElementById('eq-buscar');
+        if(!inp) return;
+        inp.addEventListener('input', function(){
+          clearTimeout(eqTimer);
+          var q = this.value.trim();
+          document.getElementById('eq-inscrito-id').value = '';
+          document.getElementById('eq-inscrito-sel').style.display = 'none';
+          if(q.length < 2){ document.getElementById('eq-resultados').innerHTML = ''; return; }
+          eqTimer = setTimeout(function(){
+            var fd = new FormData();
+            fd.append('accion', 'buscar_inscrito_equipo');
+            fd.append('q', q);
+            fetch('guardar_inscripcion.php', {method:'POST', body:fd})
+            .then(function(r){ return r.json(); })
+            .then(function(data){
+              var res = document.getElementById('eq-resultados');
+              if(!data.ok || !data.inscritos.length){
+                res.innerHTML = '<p style="font-size:12px;color:#9ca3af;margin-top:4px;"><i class="fa-solid fa-circle-info"></i> No encontrado. Debes estar inscrito al encuentro.</p>';
+                return;
+              }
+              res.innerHTML = data.inscritos.map(function(i){
+                return '<div onclick="seleccionarInscritoEquipo('+i.id+',\''+i.nombre+' '+i.apellido+'\')" '+
+                  'style="padding:9px 12px;border:1px solid #e4e8f0;border-radius:8px;margin-bottom:4px;cursor:pointer;font-size:13px;transition:background .15s;" '+
+                  'onmouseover="this.style.background=\'#f0f4ff\'" onmouseout="this.style.background=\'\'">'+
+                  '<i class="fa-solid fa-user" style="color:#0077b6;margin-right:6px;"></i>'+
+                  i.nombre+' '+i.apellido+' — <small style="color:#9ca3af;">'+i.carnet+'</small></div>';
+              }).join('');
+            });
+          }, 350);
+        });
+
+        /* validar nombre en tiempo real */
+        var inpNombre = document.getElementById('eq-nombre');
+        if(inpNombre){
+          inpNombre.addEventListener('input', function(){
+            var msg = document.getElementById('eq-nombre-msg');
+            var v = this.value.trim();
+            if(v.length < 3){
+              msg.style.display = 'block';
+              msg.style.color = '#ef4444';
+              msg.textContent = 'Mínimo 3 caracteres';
+              return;
+            }
+            /* verificar disponibilidad */
+            var fd = new FormData();
+            fd.append('accion', 'verificar_nombre_equipo');
+            fd.append('nombre', v);
+            fetch('guardar_inscripcion.php', {method:'POST', body:fd})
+            .then(function(r){ return r.json(); })
+            .then(function(data){
+              msg.style.display = 'block';
+              if(data.disponible){
+                msg.style.color = '#10b981';
+                msg.innerHTML = '<i class="fa-solid fa-check"></i> Nombre disponible';
+              } else {
+                msg.style.color = '#ef4444';
+                msg.innerHTML = '<i class="fa-solid fa-xmark"></i> Ese nombre ya está registrado';
+              }
+            });
+          });
+        }
+      });
+
+      function seleccionarInscritoEquipo(id, nombre){
+        document.getElementById('eq-inscrito-id').value = id;
+        document.getElementById('eq-buscar').value = nombre;
+        document.getElementById('eq-inscrito-nombre').textContent = nombre;
+        document.getElementById('eq-inscrito-sel').style.display = 'block';
+        document.getElementById('eq-resultados').innerHTML = '';
+      }
+
+      function registrarEquipo(){
+        var inscritoId = document.getElementById('eq-inscrito-id').value;
+        var nombre     = document.getElementById('eq-nombre').value.trim();
+        var errDiv     = document.getElementById('eq-error');
+        var btn        = document.getElementById('eq-btn-registrar');
+      
+        errDiv.style.display = 'none';
+
+        if(!inscritoId){
+          errDiv.style.display = 'block';
+          errDiv.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Debes seleccionar un inscrito válido del buscador.';
+          return;
+        }
+        if(nombre.length < 3){
+          errDiv.style.display = 'block';
+          errDiv.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> El nombre del equipo debe tener al menos 3 caracteres.';
+          return;
+        }
+      
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registrando...';
+
+        var fd = new FormData();
+        fd.append('accion',      'registrar_equipo');
+        fd.append('inscrito_id', inscritoId);
+        fd.append('nombre',      nombre);
+
+        fetch('guardar_inscripcion.php', {method:'POST', body:fd})
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-futbol"></i> Inscribir mi equipo';
+          if(data.ok){
+            cerrarModalEquipo();
+            document.getElementById('eq-exito-nombre').textContent = nombre;
+            document.getElementById('modal-equipo-exito').style.display = 'grid';
+            document.body.style.overflow = 'hidden';
+          } else {
+            errDiv.style.display = 'block';
+            errDiv.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ' + data.msg;
+          }
+        })
+        .catch(function(){
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-futbol"></i> Inscribir mi equipo';
+          errDiv.style.display = 'block';
+          errDiv.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Error de conexión. Intenta de nuevo.';
+        });
+      }
+      </script>
+
+
+
     </div>
   </section>
 
@@ -185,7 +421,7 @@
   </section>
 
 
-  <section class="invitados contenedor seccion">
+  <section class="invitados seccion">
     <h2>Nuestros Invitados</h2>
     <?php
       require_once('includes/funciones/bd_conexion.php');
@@ -226,7 +462,7 @@
   </div>
 
   <!--precios-->
-  <section class="precios seccion">
+  <section class="precios seccion seccion-fondo-azul">
     <h2>Precios</h2>
 
     <div class="aviso-inscripcion">
@@ -245,7 +481,7 @@
                    d.nombre        AS desc_nombre,
                    d.porcentaje    AS desc_porcentaje,
                    d.fecha_fin,
-                   ROUND(p.precio - (p.precio * COALESCE(d.porcentaje,0) / 100), 2) AS precio_final
+                   ROUND(p.precio - (p.precio * COALESCE(d.porcentaje,0) / 100), 0) AS precio_final
             FROM paquetes p
            LEFT JOIN paquete_descuentos pd ON p.id = pd.paquete_id
             LEFT JOIN descuentos d ON pd.descuento_id = d.id AND d.activo = 1
@@ -296,7 +532,7 @@
 
               <!-- precio con o sin descuento -->
               <?php if($con_desc): ?>
-                <p class="precio-original">Bs. <?php echo number_format($paq['precio'],2); ?></p>
+                <p class="precio-original">Bs. <?php echo number_format($paq['precio'],0); ?></p>
                 <p class="numero">Bs. <?php echo number_format($pf,2); ?></p>
                 <div class="badge-descuento">
                   <i class="fa-solid fa-tag"></i>
@@ -308,7 +544,7 @@
                   Promocion hasta: <?php echo date('d/m/Y', strtotime($paq['fecha_fin'])); ?>
                 </p>
               <?php else: ?>
-                <p class="numero">Bs. <?php echo number_format($pf,2); ?></p>
+                <p class="numero">Bs. <?php echo number_format($pf,0); ?></p>
               <?php endif; ?>
 
               <!-- cupos disponibles resaltados -->
@@ -353,7 +589,7 @@
   $aloj2_link   = $cfg['mapa_aloj2_link']   ?? '#';
   $evento_link  = $cfg['mapa_evento_link']  ?? '#';
   ?>
-  <section class="seccion-mapa">
+  <section class="seccion-mapa seccion-fondo-azul">
     <h2>Ubicación del Evento</h2>
     <p class="texto-mapa">
       <i class="fa-solid fa-location-dot"></i>
@@ -386,7 +622,7 @@
   </section>
 
 
-  <section class="seccion">
+<section class="seccion seccion-cuenta-regresiva">
     <h2>Faltan</h2>
     <div class="cuenta-regresiva contenedor">
       <ul class="">
@@ -395,6 +631,68 @@
         <li><p class="numero" id="minutos">0</p> minutos</li>
         <li><p class="numero" id="segundos">0</p> segundos</li>
       </ul>
+    </div>
+  </section>
+
+  <!-- ══ COMISIONES ══ -->
+  <section class="seccion-comisiones">
+    <div class="contenedor">
+      <span class="com-tag">— Organización —</span>
+      <h2 class="com-titulo">Comisiones del Encuentro</h2>
+
+      <?php
+        if(!isset($conn)) require_once('includes/funciones/bd_conexion.php');
+        $res_com = $conn->query("
+          SELECT c.id, c.nombre, c.icono,
+                 GROUP_CONCAT(e.nombre ORDER BY e.id SEPARATOR '||') AS nombres,
+                 GROUP_CONCAT(e.celular ORDER BY e.id SEPARATOR '||') AS celulares
+          FROM comisiones c
+          LEFT JOIN comision_encargados e ON e.comision_id = c.id
+          WHERE c.activo = 1
+          GROUP BY c.id
+          ORDER BY c.orden
+        ");
+      ?>
+
+      <div class="com-grid">
+        <?php while($com = $res_com->fetch_assoc()): ?>
+          <div class="com-card">
+            <div class="com-card-header">
+              <div class="com-icono">
+                <i class="<?php echo htmlspecialchars($com['icono']); ?>"></i>
+              </div>
+              <h3 class="com-nombre"><?php echo htmlspecialchars($com['nombre']); ?></h3>
+            </div>
+
+            <?php if($com['nombres']): ?>
+              <ul class="com-encargados">
+                <?php
+                  $nombres   = explode('||', $com['nombres']);
+                  $celulares = explode('||', $com['celulares']);
+                  foreach($nombres as $k => $nom):
+                    $cel = $celulares[$k] ?? '';
+                    $wa  = 'https://wa.me/591' . preg_replace('/[^0-9]/', '', $cel);
+                ?>
+                  <li class="com-encargado">
+                    <div class="com-enc-info">
+                      <i class="fa-solid fa-user"></i>
+                      <span><?php echo htmlspecialchars($nom); ?></span>
+                    </div>
+                    <?php if($cel): ?>
+                      <a href="<?php echo $wa; ?>" target="_blank" class="com-wa-btn" title="WhatsApp">
+                        <i class="fa-brands fa-whatsapp"></i>
+                        <?php echo htmlspecialchars($cel); ?>
+                      </a>
+                    <?php endif; ?>
+                  </li>
+                <?php endforeach; ?>
+              </ul>
+            <?php else: ?>
+              <p class="com-sin-enc">Por definir</p>
+            <?php endif; ?>
+          </div>
+        <?php endwhile; ?>
+      </div>
     </div>
   </section>
   

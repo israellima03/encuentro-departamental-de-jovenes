@@ -81,7 +81,7 @@ switch($accion){
              COALESCE(d.nombre,'—') AS distrito,
              COALESCE(p.nombre,'—') AS paquete,
              ins.metodo_pago, ins.estado_pago,
-             CAST(ins.precio_final AS DECIMAL(10,2)) AS precio_final,
+             CAST(ins.precio_final AS DECIMAL(10,0)) AS precio_final,
              COALESCE(ur.nombre,'—') AS registrado_por,
              COALESCE(uc.nombre,'—') AS confirmo_por
       FROM inscripciones ins
