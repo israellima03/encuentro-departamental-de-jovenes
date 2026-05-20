@@ -10,11 +10,27 @@
 /* ==========================================================================
    Base styles: opinionated defaults
    ========================================================================== */
+html {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+html::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
 
 html {
   color: #222;
   font-size: 1em;
   line-height: 1.4;
+}
+body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+html {
+  overflow-x: hidden;
 }
 
 /*
@@ -939,6 +955,16 @@ h1.nombre-sitio {
   border: 2px solid #25d366;
   color: #25d366;
   box-shadow: 0 8px 24px rgba(37,211,102,0.35);
+}
+
+@media (max-width: 480px) {
+  #modal-equipo {
+    max-width: 100% !important;
+    border-radius: 12px !important;
+  }
+  #modal-equipo-overlay {
+    padding: 8px !important;
+  }
 }
 
 /* ══════════════════════════════════════

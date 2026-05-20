@@ -32,17 +32,17 @@
       </a>
 
       <!-- MODAL INSCRIPCIÓN EQUIPO -->
-      <div id="modal-equipo-overlay" style="display:none;position:fixed;inset:0;background:rgba(3,4,94,0.7);z-index:9999;display:none;place-items:center;padding:20px;">
+      <div id="modal-equipo-overlay" style="display:none;position:fixed;inset:0;background:rgba(3,4,94,0.7);z-index:9999;display:none;place-items:center;padding:10px;">
         <div id="modal-equipo" style="background:#fff;border-radius:16px;width:100%;max-width:480px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:modalIn .25s ease;">
 
-          <div style="background:linear-gradient(135deg,#03045e,#0077b6);padding:20px 24px;display:flex;justify-content:space-between;align-items:center;">
+          <div style="background:linear-gradient(135deg,#03045e,#0077b6);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;">
             <h3 style="font-family:'Oswald',sans-serif;color:#fff;margin:0;font-size:1.2em;letter-spacing:1px;">
               <i class="fa-solid fa-futbol"></i> Inscribir Equipo
             </h3>
             <button onclick="cerrarModalEquipo()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:16px;">✕</button>
           </div>
 
-          <div style="padding:24px;">
+          <div style="padding:14px;">
 
             <div style="background:#fef9c3;border-left:4px solid #f59e0b;border-radius:6px;padding:12px 14px;margin-bottom:20px;font-size:13px;color:#78350f;">
               <i class="fa-solid fa-triangle-exclamation"></i>
