@@ -58,6 +58,7 @@ window.guardarConfig = function(seccion){
    NOTICIAS
 ══════════════════════════════════════ */
 window.abrirModalNoticia = function(n){
+  if(typeof n === 'string') n = JSON.parse(decodeURIComponent(n));
   n = n || {};
   document.getElementById('not-id').value    = n.id    || '';
   document.getElementById('not-texto').value = n.texto || '';
@@ -95,6 +96,7 @@ window.recargarNoticias = function(){
    REDES SOCIALES
 ══════════════════════════════════════ */
 window.abrirModalRed = function(r){
+  if(typeof r === 'string') r = JSON.parse(decodeURIComponent(r));
   r = r || {};
   document.getElementById('red-id').value     = r.id     || '';
   document.getElementById('red-nombre').value = r.nombre || '';
@@ -147,6 +149,7 @@ window.recargarRedes = function(){
    UBICACIONES
 ══════════════════════════════════════ */
 window.abrirModalUbicacion = function(u){
+  if(typeof u === 'string') u = JSON.parse(decodeURIComponent(u));
   u = u || {};
   document.getElementById('ubic-id').value     = u.id        || '';
   document.getElementById('ubic-nombre').value = u.nombre    || '';

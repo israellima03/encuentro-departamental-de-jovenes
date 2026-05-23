@@ -575,42 +575,68 @@
   </section>
 
   <?php
-  $aloj1_nombre = $cfg['mapa_aloj1_nombre'] ?? 'Alojamiento 1';
-  $aloj1_link   = $cfg['mapa_aloj1_link']   ?? '#';
-  $aloj2_nombre = $cfg['mapa_aloj2_nombre'] ?? 'Alojamiento 2';
-  $aloj2_link   = $cfg['mapa_aloj2_link']   ?? '#';
-  $evento_link  = $cfg['mapa_evento_link']  ?? '#';
-  ?>
-  <section class="seccion-mapa seccion-fondo-azul">
-    <h2>Ubicación del Evento</h2>
-    <p class="texto-mapa">
-      <i class="fa-solid fa-location-dot"></i>
-      Haz click en el mapa para abrir en Google Maps
-    </p>
-    <div class="contenedor-mapa">
-      <a href="<?php echo htmlspecialchars($evento_link); ?>" target="_blank" class="link-mapa">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3203.750919665405!2d-64.72678242144536!3d-21.541682100000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9406475233b071dd%3A0xdbb1f8dbcd3f54bc!2sPunto%20de%20Venta%20Loter%C3%ADa%20%22Kiosko%20Ex.%20Terminal%22!5e1!3m2!1ses-419!2sbo!4v1776045310858!5m2!1ses-419!2sbo"
-                width="100%" height="100%" style="border:0;pointer-events:none;" allowfullscreen="" loading="lazy"></iframe>
-        <div class="overlay-mapa">
-          <i class="fa-solid fa-location-dot"></i>
-          <p>Click para abrir en Google Maps</p>
-        </div>
-      </a>
-    </div>
+  /* cargar ubicaciones activas */
+  if(!isset($conn)) require_once('includes/funciones/bd_conexion.php');
+  $ubicaciones_mapa = [];
+  $res_ubic = $conn->query("SELECT * FROM ubicaciones WHERE activo=1 ORDER BY orden ASC");
+  if($res_ubic) while($u = $res_ubic->fetch_assoc()) $ubicaciones_mapa[] = $u;
 
-    <!-- LUGARES DE ALOJAMIENTO -->
-    <div class="lugares-alojamiento">
-      <a href="<?php echo htmlspecialchars($aloj1_link); ?>" target="_blank" class="lugar-item">
-        <i class="fa-solid fa-bed"></i>
-        <span><?php echo htmlspecialchars($aloj1_nombre); ?></span>
-        <small><i class="fa-solid fa-arrow-up-right-from-square"></i> Ver en Maps</small>
-      </a>
-      <a href="<?php echo htmlspecialchars($aloj2_link); ?>" target="_blank" class="lugar-item">
-        <i class="fa-solid fa-bed"></i>
-        <span><?php echo htmlspecialchars($aloj2_nombre); ?></span>
-        <small><i class="fa-solid fa-arrow-up-right-from-square"></i> Ver en Maps</small>
-      </a>
-    </div>
+  $ubicacion_evento     = null;
+  $ubicaciones_aloj     = [];
+  foreach($ubicaciones_mapa as $u){
+    if($u['tipo'] === 'evento' && !$ubicacion_evento) $ubicacion_evento = $u;
+    elseif($u['tipo'] === 'alojamiento') $ubicaciones_aloj[] = $u;
+  }
+  ?>
+  <section class="seccion-mapa">
+    <h2>Ubicación del Evento</h2>
+
+    <?php if(!$ubicacion_evento && empty($ubicaciones_aloj)): ?>
+      <p class="mapa-sin-ubicacion">
+        <i class="fa-solid fa-map-location-dot"></i>
+        No hay ubicaciones configuradas aún.
+      </p>
+
+    <?php else: ?>
+
+      <?php if($ubicacion_evento): ?>
+        <p class="texto-mapa">
+          <i class="fa-solid fa-location-dot"></i>
+          Haz click en el mapa para abrir en Google Maps
+        </p>
+        <div class="contenedor-mapa">
+          <a href="<?php echo htmlspecialchars($ubicacion_evento['link_maps']); ?>" target="_blank" class="link-mapa">
+            <?php if(!empty($ubicacion_evento['embed_url'])): ?>
+              <iframe src="<?php echo htmlspecialchars($ubicacion_evento['embed_url']); ?>"
+                      width="100%" height="100%" style="border:0;pointer-events:none;"
+                      allowfullscreen="" loading="lazy"></iframe>
+            <?php else: ?>
+              <div class="mapa-sin-embed">
+                <i class="fa-solid fa-map-location-dot"></i>
+                <p><?php echo htmlspecialchars($ubicacion_evento['nombre']); ?></p>
+              </div>
+            <?php endif; ?>
+            <div class="overlay-mapa">
+              <i class="fa-solid fa-location-dot"></i>
+              <p><?php echo htmlspecialchars($ubicacion_evento['nombre']); ?> — Click para abrir en Google Maps</p>
+            </div>
+          </a>
+        </div>
+      <?php endif; ?>
+
+      <?php if(!empty($ubicaciones_aloj)): ?>
+        <div class="lugares-alojamiento">
+          <?php foreach($ubicaciones_aloj as $aloj): ?>
+            <a href="<?php echo htmlspecialchars($aloj['link_maps']); ?>" target="_blank" class="lugar-item">
+              <i class="fa-solid fa-bed"></i>
+              <span><?php echo htmlspecialchars($aloj['nombre']); ?></span>
+              <small><i class="fa-solid fa-arrow-up-right-from-square"></i> Ver en Maps</small>
+            </a>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
+
+    <?php endif; ?>
   </section>
 
 
