@@ -86,26 +86,11 @@ $v = function($archivo){
         <span></span>
       </div>
       <nav class="navegacion-principal clearfix">
-        <a href="index.php"
-           <?php echo $pagina_actual === 'index.php' ? 'class="nav-activo"' : ''; ?>>
-          Inicio
-        </a>
-        <a href="conferencia.php"
-           <?php echo $pagina_actual === 'conferencia.php' ? 'class="nav-activo"' : ''; ?>>
-          Conferencia
-        </a>
-        <a href="calendario.php"
-           <?php echo $pagina_actual === 'calendario.php' ? 'class="nav-activo"' : ''; ?>>
-          Calendario
-        </a>
-        <a href="invitados.php"
-           <?php echo $pagina_actual === 'invitados.php' ? 'class="nav-activo"' : ''; ?>>
-          Invitados
-        </a>
-        <a href="tipo_inscripciones.php"
-           <?php echo in_array($pagina_actual, ['tipo_inscripciones.php','registro.php']) ? 'class="nav-activo"' : ''; ?>>
-          Inscripciones
-        </a>
+        <a href="index.php" <?php echo $pagina_actual === 'index.php' ? 'class="nav-activo"' : ''; ?>>Inicio</a>
+        <a href="conferencia.php" <?php echo $pagina_actual === 'conferencia.php' ? 'class="nav-activo"' : ''; ?>>Conferencia</a>
+        <a href="calendario.php" <?php echo $pagina_actual === 'calendario.php' ? 'class="nav-activo"' : ''; ?>>Calendario</a>
+        <a href="invitados.php" <?php echo $pagina_actual === 'invitados.php' ? 'class="nav-activo"' : ''; ?>>Invitados</a>
+        <a href="tipo_inscripciones.php" <?php echo in_array($pagina_actual, ['tipo_inscripciones.php','registro.php']) ? 'class="nav-activo"' : ''; ?>>Inscripciones</a>
       </nav>
     </div>
   </div>

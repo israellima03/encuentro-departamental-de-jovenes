@@ -30,47 +30,76 @@ console.log("JS FUNCIONANDO");
       var navegacion = document.querySelector('.navegacion-principal');
 
       if(menuMovil && navegacion){
+        /* mover nav al body para evitar herencia de filter */
+          if(window.innerWidth < 768){
+            document.body.appendChild(navegacion);
+          } else {
+            /* en desktop dejarla dentro de la barra */
+            var contenedor = document.querySelector('.barra .contenedor');
+            if(contenedor) contenedor.appendChild(navegacion);
+          }
+        window.addEventListener('resize', function(){
+          if(window.innerWidth >= 768){
+            var contenedor = document.querySelector('.barra .contenedor');
+            if(contenedor && !contenedor.contains(navegacion)){
+              contenedor.appendChild(navegacion);
+            }
+          } else {
+            if(!document.body.contains(navegacion) || navegacion.parentElement !== document.body){
+              document.body.appendChild(navegacion);
+            }
+          }
+        });
+        /* crear overlay una sola vez */
+        var overlay = document.createElement('div');
+        overlay.id = 'menu-overlay';
+        overlay.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,5,30,0.5);z-index:9997;';
+        document.body.appendChild(overlay);
+
+        function cerrarMenu(){
+          navegacion.classList.remove('activo');
+          menuMovil.classList.remove('activo');
+          document.body.classList.remove('menu-abierto');
+          overlay.style.display = 'none';
+          document.body.style.overflow = '';
+        }
+
         menuMovil.addEventListener('click', function(){
           var abierto = navegacion.classList.toggle('activo');
           menuMovil.classList.toggle('activo');
-          if(abierto && barra && !barra.classList.contains('sticky')){
-            window.scrollTo({ top: barra.offsetTop, behavior: 'smooth' });
+          if(abierto){
+            document.body.classList.add('menu-abierto');
+            document.body.style.overflow = 'hidden';
+            overlay.style.display = 'block';
+            if(barra && !barra.classList.contains('sticky')){
+              window.scrollTo({ top: barra.offsetTop, behavior: 'smooth' });
+            }
+          } else {
+            cerrarMenu();
           }
-          document.body.style.overflow = abierto ? 'hidden' : '';
         });
-
         navegacion.querySelectorAll('a').forEach(function(a){
-          a.addEventListener('click', function(e){
-            var href = this.getAttribute('href');
-            e.preventDefault();
-            navegacion.classList.remove('activo');
-            menuMovil.classList.remove('activo');
-            document.body.style.overflow = '';
-            setTimeout(function(){
-              window.location.href = href;
-            }, 200);
-          });
+        a.addEventListener('click', function(e){
+          var href = this.getAttribute('href');
+          e.preventDefault();
+          cerrarMenu();
+          setTimeout(function(){ window.location.href = href; }, 200);
         });
+      });
 
-        document.addEventListener('keydown', function(e){
-          if(e.key === 'Escape'){
-            navegacion.classList.remove('activo');
-            menuMovil.classList.remove('activo');
-            document.body.style.overflow = '';
-          }
-        });
+      document.addEventListener('keydown', function(e){
+        if(e.key === 'Escape') cerrarMenu();
+      });
 
-        document.addEventListener('click', function(e){
-          if(navegacion.classList.contains('activo') &&
-             !navegacion.contains(e.target) &&
-             !menuMovil.contains(e.target)){
-            navegacion.classList.remove('activo');
-            menuMovil.classList.remove('activo');
-            document.body.style.overflow = '';
-          }
-        });
-      }
-
+      document.addEventListener('click', function(e){
+        if(navegacion.classList.contains('activo') &&
+           !navegacion.contains(e.target) &&
+           !menuMovil.contains(e.target)){
+          cerrarMenu();
+        }
+      });
+    }
+        
       /* ── BOTONES +/− PRODUCTOS ── */
       document.querySelectorAll('.btn-cant').forEach(function(btn){
         btn.addEventListener('click', function(){
