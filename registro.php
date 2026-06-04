@@ -420,6 +420,10 @@ if($res_r && $row_r = $res_r->fetch_assoc()) $regalo_fijo_nombre = $row_r['nombr
   <div id="seccion-qr" style="display:none;">
     <div class="seccion-qr">
       <h3><i class="fa-solid fa-qrcode"></i> Realiza tu Pago por QR</h3>
+      <div style="background:#03045e;color:#fff;border-radius:10px;padding:14px 24px;text-align:center;margin-bottom:20px;display:inline-block;">
+        <span style="font-size:0.85em;letter-spacing:1px;text-transform:uppercase;opacity:0.75;">Total a Pagar</span>
+        <div style="font-size:2em;font-weight:bold;" id="qr-total-mostrar">Bs. 0.00</div>
+      </div>
       <div class="qr-contenido">
         <div class="qr-imagen-wrap">
           <p class="qr-instruccion"><i class="fa-solid fa-circle-info"></i> Descarga y Escanea este QR con tu app de banca movil, no olvides poner tu nombre en el comprobante</p>

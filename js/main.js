@@ -514,6 +514,11 @@ console.log("JS FUNCIONANDO");
           document.getElementById('bloque-resumen').style.display = 'none';
           var secQR = document.getElementById('seccion-qr');
           secQR.style.display = 'block';
+          /* mostrar total en la sección QR */
+          var totalEl = document.getElementById('qr-total-mostrar');
+          if(totalEl && formReg.dataset.totalCalculado){
+            totalEl.textContent = 'Bs. ' + parseFloat(formReg.dataset.totalCalculado).toFixed(2);
+          }
           secQR.scrollIntoView({ behavior: 'smooth' });
         });
       }
@@ -805,3 +810,4 @@ console.log("JS FUNCIONANDO");
     }); // cierra domReady
 
 })(); // cierra IIFE
+
