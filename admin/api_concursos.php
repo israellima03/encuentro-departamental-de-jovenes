@@ -194,8 +194,15 @@ switch($accion){
   case 'eliminar_concursante':
     if(!$puede_inscribir){ echo json_encode(['ok'=>false,'msg'=>'Sin permisos']); exit; }
     $id = intval($_POST['id'] ?? 0);
-    $conn->query("DELETE FROM concurso_inscritos WHERE id=$id");
-    echo json_encode(['ok'=>true,'msg'=>'Concursante eliminado']);
+    if(!$id){ echo json_encode(['ok'=>false,'msg'=>'ID requerido']); exit; }
+    /* eliminar puntuaciones primero */
+    $conn->query("DELETE FROM concurso_puntuaciones WHERE concursante_id=$id");
+    $res = $conn->query("DELETE FROM concurso_inscritos WHERE id=$id");
+    if($res){
+      echo json_encode(['ok'=>true,'msg'=>'Concursante eliminado']);
+    } else {
+      echo json_encode(['ok'=>false,'msg'=>'Error al eliminar: '.$conn->error]);
+    }
     break;
 
   /* ── FASES: listar por categoría ── */
@@ -290,10 +297,10 @@ switch($accion){
 
     if($id){
       $stmt = $conn->prepare("UPDATE concurso_categorias SET nombre=?,tipo=?,max_por_distrito=?,max_por_equipo=?,orden=?,activo=? WHERE id=?");
-      $stmt->bind_param('ssiiiiii',$nombre,$tipo,$max_dist,$max_equipo,$orden,$activo,$id);
+      $stmt->bind_param('ssiiiii',$nombre,$tipo,$max_dist,$max_equipo,$orden,$activo,$id);
     } else {
       $stmt = $conn->prepare("INSERT INTO concurso_categorias (nombre,tipo,max_por_distrito,max_por_equipo,orden,activo) VALUES (?,?,?,?,?,?)");
-      $stmt->bind_param('ssiii i',$nombre,$tipo,$max_dist,$max_equipo,$orden,$activo);
+      $stmt->bind_param('ssiiii',$nombre,$tipo,$max_dist,$max_equipo,$orden,$activo);
     }
     if($stmt->execute()){
       echo json_encode(['ok'=>true,'msg'=>$id?'Categoría actualizada':'Categoría creada']);
@@ -307,8 +314,14 @@ switch($accion){
   case 'eliminar_categoria':
     if(!$puede_gestionar){ echo json_encode(['ok'=>false,'msg'=>'Sin permisos']); exit; }
     $id = intval($_POST['id'] ?? 0);
+    if(!$id){ echo json_encode(['ok'=>false,'msg'=>'ID requerido']); exit; }
     /* verificar que no tenga concursantes */
-    $c = $conn->query("SELECT COUNT(*) AS c FROM concurso_inscritos WHERE categoria_id=$id")->fetch_assoc()['c'];
+    $res_c = $conn->query("SELECT COUNT(*) AS c FROM concurso_inscritos WHERE categoria_id=$id");
+    if(!$res_c){
+      echo json_encode(['ok'=>false,'msg'=>'Error al verificar concursantes: '.$conn->error]);
+      exit;
+    }
+    $c = $res_c->fetch_assoc()['c'];
     if($c > 0){
       echo json_encode(['ok'=>false,'msg'=>'No puedes eliminar una categoría con concursantes inscritos ('.$c.')']);
       exit;

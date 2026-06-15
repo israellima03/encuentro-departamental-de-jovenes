@@ -1,0 +1,74 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+<title>Credencial — israel lima condori</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Arial,sans-serif;background:#f0f2f8;display:flex;flex-direction:column;align-items:center;padding:30px 16px;min-height:100vh;}
+.acciones{margin-bottom:18px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 24px;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
+.btn-pdf{background:#03045e;color:#fff;}
+.btn-pdf:hover{background:#da002b;}
+.btn-print{background:#10b981;color:#fff;}
+.credencial{width:100%;max-width:420px;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.15);}
+.cab{background:#03045e;padding:10px 14px 8px;text-align:center;color:#fff;}
+.avatar{width:44px;height:44px;border-radius:50%;background:#da002b;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;font-weight:700;margin:0 auto 6px;}
+.nombre-txt{font-size:13px;font-weight:700;margin-bottom:2px;}
+.subtitulo{font-size:9px;color:rgba(255,255,255,.6);}
+.body{padding:6px 12px;}
+.row{display:flex;justify-content:space-between;align-items:center;padding:2px 0;border-bottom:1px solid #f0f2f8;}
+.row:last-child{border-bottom:none;}
+.lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af;}
+.val{font-size:9px;font-weight:600;color:#1a1d2e;text-align:right;max-width:60%;}
+.estado-ok{display:inline-block;background:#d1fae5;color:#065f46;border:1px solid #10b981;border-radius:20px;padding:1px 8px;font-size:8px;font-weight:700;}
+.qr-wrap{border-top:1px dashed #e4e8f0;margin:0;padding:6px 12px;text-align:center;background:#f8faff;}
+.qr-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:4px;}
+.qr-img{width:80px;height:80px;border:2px solid #03045e;border-radius:6px;padding:2px;background:#fff;}
+.qr-code-txt{font-size:7px;color:#9ca3af;margin-top:4px;letter-spacing:.5px;word-break:break-all;}
+.pie{background:#f0f2f8;padding:5px;text-align:center;font-size:8px;color:#9ca3af;}
+@media print{.acciones{display:none;}}
+</style>
+</head><body>
+<div class="acciones">
+  <button class="btn btn-pdf" onclick="descargarPDF()">⬇ Descargar PDF</button>
+  <button class="btn btn-print" onclick="window.print()">🖨 Imprimir</button>
+</div>
+<div class="credencial" id="credencial-contenido">
+  <div class="cab">
+    <div class="avatar">IL</div>
+    <div class="nombre-txt">israel lima condori</div>
+    <div class="subtitulo">Encuentro Departamental de Jovenes — Tarija 2026</div>
+  </div>
+  <div class="body">
+    <div class="row"><span class="lbl">Carnet</span><span class="val">7389062</span></div>
+    <div class="row"><span class="lbl">Celular</span><span class="val">61826844</span></div>
+    <div class="row"><span class="lbl">Edad</span><span class="val">35 años</span></div>
+    <div class="row"><span class="lbl">Tipo</span><span class="val">miembro</span></div>
+    <div class="row"><span class="lbl">Iglesia</span><span class="val">Vinto</span></div>
+    <div class="row"><span class="lbl">Distrito</span><span class="val">Distrito 2</span></div>
+    <div class="row"><span class="lbl">Paquete</span><span class="val">encuentro + alojamiento en iglesia</span></div>
+    <div class="row"><span class="lbl">Productos</span><span class="val">—</span></div>
+    <div class="row"><span class="lbl">Total pagado</span><span class="val">Bs. 60</span></div>
+    <div class="row"><span class="lbl">Método pago</span><span class="val">EFECTIVO</span></div>
+    <div class="row"><span class="lbl">Estado</span><span class="val"><span class="estado-ok">CONFIRMADO</span></span></div>
+    <div class="row"><span class="lbl">Fecha</span><span class="val">15/06/2026 00:34</span></div>
+  </div>
+  <div class="qr-wrap">
+    <div class="qr-lbl">Escanea para verificar credencial</div>
+    <img class="qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https%3A%2F%2Fmjoruro.com%2Fver-credencial.php%3Fcode%3D81c3ece0295efbe1b43f6cdb33f6e9fb" alt="QR Credencial" crossorigin="anonymous">
+    <div class="qr-code-txt">Código: 81c3ece0295efbe1b43f6cdb33f6e9fb</div>
+  </div>
+  <div class="pie">Sistema de inscripciones IDDP Oruro · Lima Technology</div>
+</div>
+<script>
+function descargarPDF(){
+  var el=document.getElementById("credencial-contenido");
+  html2pdf().set({
+    margin:2,
+    filename:"credencial_7389062_lima condori.pdf",
+    image:{type:"jpeg",quality:0.98},
+    html2canvas:{scale:2,useCORS:true,allowTaint:false},
+    jsPDF:{unit:"mm",format:[85,130],orientation:"portrait"}
+  }).from(el).save();
+}
+</script>
+</body></html>
