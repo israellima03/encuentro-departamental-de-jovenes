@@ -139,28 +139,42 @@ console.log("JS FUNCIONANDO");
 
 
       /* CUENTA REGRESIVA */
+      /* CUENTA REGRESIVA */
       if (document.querySelector('.cuenta-regresiva')) {
         var fechaEvento      = new Date('2026-07-10T14:00:00');
         var elementoDias     = document.getElementById('dias');
         var elementoHoras    = document.getElementById('horas');
         var elementoMinutos  = document.getElementById('minutos');
         var elementoSegundos = document.getElementById('segundos');
+        var intervaloContador;
+
         function actualizarContador() {
-          var ahora = new Date(); var diferencia = fechaEvento - ahora;
+          var ahora      = new Date();
+          var diferencia = fechaEvento - ahora;
+
           if (diferencia <= 0) {
-            if (elementoDias)     elementoDias.textContent     = '0';
-            if (elementoHoras)    elementoHoras.textContent    = '0';
-            if (elementoMinutos)  elementoMinutos.textContent  = '0';
-            if (elementoSegundos) elementoSegundos.textContent = '0';
+            clearInterval(intervaloContador);
+            var ul = document.querySelector('.cuenta-regresiva ul');
+            if(ul){
+              ul.innerHTML =
+                '<li style="grid-column:1/-1;text-align:center;color:#fff;font-family:\'Oswald\',sans-serif;'+
+                'font-size:1.8em;font-weight:700;letter-spacing:2px;text-transform:uppercase;'+
+                'text-shadow:0 0 10px rgba(254,135,93,0.9),0 0 30px rgba(218,0,43,0.6);">'+
+                '<i class="fa-solid fa-fire" style="color:#fe875d;margin-right:10px;"></i>'+
+                '¡El Encuentro ha comenzado!'+
+                '</li>';
+            }
             return;
           }
+
           if (elementoDias)     elementoDias.textContent     = Math.floor(diferencia / (1000 * 60 * 60 * 24));
           if (elementoHoras)    elementoHoras.textContent    = Math.floor((diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
           if (elementoMinutos)  elementoMinutos.textContent  = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
           if (elementoSegundos) elementoSegundos.textContent = Math.floor((diferencia % (1000 * 60)) / 1000);
         }
+
         actualizarContador();
-        setInterval(actualizarContador, 1000);
+        intervaloContador = setInterval(actualizarContador, 1000);
       }
 
       /* PROGRAMA POR DIA */
@@ -226,6 +240,20 @@ console.log("JS FUNCIONANDO");
                 ? '<p class="aviso-pendiente-msg">Tu comprobante esta siendo revisado por la tesorera.</p>'
                 : '<p class="aviso-confirmado-msg">Tu inscripcion esta confirmada. Nos vemos en el encuentro!</p>') +
               '</div>';
+
+            /* mostrar botón credencial si está confirmado */
+            var credWrap = document.getElementById('credencial-wrap');
+            var btnCred  = document.getElementById('btn-descargar-credencial');
+            if(credWrap && btnCred){
+              if(d.estado_pago === 'confirmado' && d.credencial){
+                credWrap.style.display = 'block';
+                btnCred.onclick = function(){
+                  window.open('credenciales/' + d.credencial, '_blank');
+                };
+              } else {
+                credWrap.style.display = 'none';
+              }
+            }
           } else {
             resultado.innerHTML = '<div class="aviso-inscrito-existente" style="display:block;"><i class="fa-solid fa-circle-info"></i> ' + data.msg + '</div>';
           }

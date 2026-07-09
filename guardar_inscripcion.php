@@ -88,7 +88,40 @@ switch ($accion) {
             $fila['fecha'] = $fila['fecha_pago']
                 ? date('d/m/Y H:i', strtotime($fila['fecha_pago']))
                 : '—';
+            /* buscar credencial */
+            $fila['credencial'] = null;
+            $stmt_cred = $conn->prepare("
+                SELECT ins.codigo_qr 
+                FROM inscripciones ins
+                INNER JOIN inscritos i ON i.id = ins.inscrito_id
+                WHERE i.carnet = ? OR i.celular = ?
+                LIMIT 1
+            ");
+            $stmt_cred->bind_param('ss', $busqueda, $busqueda);
+            $stmt_cred->execute();
+            $cred = $stmt_cred->get_result()->fetch_assoc();
+            $stmt_cred->close();
+            if($cred && !empty($cred['codigo_qr'])){
+                /* buscar archivo de credencial por código QR o carnet */
+                $patron1 = __DIR__ . '/credenciales/credencial_' . $cred['codigo_qr'] . '.pdf';
+                $patron2 = __DIR__ . '/credenciales/credencial_' . $busqueda . '_*.html';
+    
+                $fila['credencial'] = null;
+    
+                if(file_exists($patron1)){
+                    $fila['credencial'] = 'credencial_' . $cred['codigo_qr'] . '.pdf';
+                    $fila['tipo_credencial'] = 'pdf';
+                } else {
+                    $archivos = glob($patron2);
+                    if(!empty($archivos)){
+                        $fila['credencial'] = basename(end($archivos));
+                        $fila['tipo_credencial'] = 'html';
+                    }
+                }
+            }
             echo json_encode(['ok' => true, 'datos' => $fila]);
+            
+
         } else {
             echo json_encode(['ok' => false, 'msg' => 'No se encontro ningun inscrito con ese carnet o celular']);
         }

@@ -407,15 +407,7 @@ if($res_r && $row_r = $res_r->fetch_assoc()) $regalo_fijo_nombre = $row_r['nombr
   $qr_src = 'img/' . htmlspecialchars($qr_imagen);
   ?>
 
-  <?php
-  /* leer imagen QR de la BD */
-  $qr_imagen = 'comprobante1.jpeg';
-  $res_qr = $conn->query("SELECT valor FROM config_sistema WHERE clave='qr_imagen' LIMIT 1");
-  if($res_qr && $row_qr = $res_qr->fetch_assoc()){
-      $qr_imagen = $row_qr['valor'];
-  }
-  $qr_src = 'img/' . htmlspecialchars($qr_imagen);
-  ?>
+
 
   <div id="seccion-qr" style="display:none;">
     <div class="seccion-qr">
@@ -452,19 +444,26 @@ if($res_r && $row_r = $res_r->fetch_assoc()) $regalo_fijo_nombre = $row_r['nombr
   </div>
 
   <div class="seccion-form caja buscador-estado" style="margin-top:50px;">
-    <h4><i class="fa-solid fa-magnifying-glass"></i> Consulta el estado de tu inscripcion</h4>
-    <p style="text-align:center;color:#666;font-size:0.9em;">Ingresa tu carnet o celular para ver si tu inscripcion fue confirmada</p>
-    <div class="campo" style="max-width:400px;margin:0 auto;">
-      <label>Carnet o Celular</label>
-      <input type="text" id="buscar-inscrito" placeholder="Ej: 1234567 o 70000000">
+      <h4><i class="fa-solid fa-magnifying-glass"></i> Consulta el estado de tu inscripcion</h4>
+      <p style="text-align:center;color:#666;font-size:0.9em;">Ingresa tu carnet o celular para ver si tu inscripcion fue confirmada</p>
+      <div class="campo" style="max-width:400px;margin:0 auto;">
+        <label>Carnet o Celular</label>
+        <input type="text" id="buscar-inscrito" placeholder="Ej: 1234567 o 70000000">
+      </div>
+      <div style="text-align:center;margin-top:10px;">
+        <button type="button" id="btn-buscar" class="button hollow">
+          <i class="fa-solid fa-search"></i> Consultar Estado
+        </button>
+      </div>
+      <div id="resultado-busqueda" style="margin-top:20px;"></div>
+      <div id="credencial-wrap" style="display:none;text-align:center;margin-top:20px;padding:20px;background:#f0f7ff;border:2px solid #03045e;border-radius:12px;">
+        <i class="fa-solid fa-id-card" style="font-size:2em;color:#03045e;display:block;margin-bottom:10px;"></i>
+        <p style="font-weight:bold;color:#03045e;margin-bottom:14px;">Tu inscripcion esta confirmada. Puedes descargar tu credencial:</p>
+        <button type="button" id="btn-descargar-credencial" class="button">
+          <i class="fa-solid fa-download"></i> Descargar Credencial PDF
+        </button>
+      </div>
     </div>
-    <div style="text-align:center;margin-top:10px;">
-      <button type="button" id="btn-buscar" class="button hollow">
-        <i class="fa-solid fa-search"></i> Consultar Estado
-      </button>
-    </div>
-    <div id="resultado-busqueda" style="margin-top:20px;"></div>
-  </div>
 
 </section>
 
